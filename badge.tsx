@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 // 小さな強調バッジ群（純粋 leaf UI）。旧 .count-chip / .tab-badge / .nav-new-badge /
 // .live-badge を集約する。色・角丸・タイポは @theme トークン経由のユーティリティ。
-// live は擬似要素のパルス点 + room-card 側の絶対配置に依存するため、当面は legacy class
+// live は擬似要素のパルス点 + space-card 側の絶対配置に依存するため、当面は legacy class
 // (.live-badge) を再利用する（段階移行。マークアップだけ Badge に寄せる）。
 
 // 件数チップ（旧 .count-chip / .tab-badge）。tab 側は出現アニメを持つので animated で切替。
@@ -32,7 +32,7 @@ export type BadgeProps = {
 
 export function Badge({ children, variant, className = '' }: BadgeProps) {
   if (variant === 'live') {
-    // パルス点(::before) + room-card の絶対配置は legacy .live-badge を使う（段階移行）。
+    // パルス点(::before) + space-card の絶対配置は legacy .live-badge を使う（段階移行）。
     return <span className={`live-badge ${className}`.trim()}>{children}</span>;
   }
   return (

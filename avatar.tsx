@@ -2,7 +2,7 @@
 // 先頭1文字ロジック・referrerPolicy="no-referrer"・fallback 分岐が4箇所で重複していたのを集約。
 // 見た目クラス（.avatar / .auth-avatar 等）は文脈ごとに異なるため className で注入する
 // （スタック重ね・アニメ・レスポンシブは各コンテキストの legacy CSS が供給する。段階移行）。
-// 背景色（room-topbar は id から生成、account は既定）と寸法は props 注入（utils 非依存を保つ）。
+// 背景色（space-topbar は id から生成、account は既定）と寸法は props 注入（utils 非依存を保つ）。
 export type AvatarProps = {
   // 表示名。先頭1文字を fallback 円に使う。
   name?: string | null;

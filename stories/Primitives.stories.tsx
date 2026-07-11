@@ -47,7 +47,7 @@ export const Card: Story = {
       note="基本形: bg-tint-5 border border-solid border-border rounded-card。控えめ・洗練。"
     >
       <div className="bg-tint-5 border border-solid border-border rounded-card p-5 max-w-sm">
-        <h4 className="font-display text-lg font-bold text-text mb-1">ルーム名</h4>
+        <h4 className="font-display text-lg font-bold text-text mb-1">スペース名</h4>
         <p className="text-smd text-text-dim leading-normal">
           tinted surface + 細ボーダーが面の基本形。派手なグラデ/グローは使わない。
         </p>
@@ -70,7 +70,7 @@ export const Pills: Story = {
           同期中
         </span>
         <span className="rounded-pill bg-tint-8 border border-solid border-border text-text-dim text-sm px-3 py-1">
-          #ルームID
+          #スペースID
         </span>
       </div>
     </Section>
@@ -163,8 +163,8 @@ export const Modal: Story = {
         <button type="button" className="modal-close" aria-label="閉じる">
           ×
         </button>
-        <h2>ルームを作成</h2>
-        <input type="text" placeholder="ルーム名" />
+        <h2>スペースを作成</h2>
+        <input type="text" placeholder="スペース名" />
         <button type="submit">作成する</button>
       </div>
     </Section>
