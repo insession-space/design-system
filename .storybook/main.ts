@@ -6,7 +6,7 @@ import { mergeConfig } from 'vite';
 // 既存の Vite + Tailwind v4 + client/src/style.css のトークンをそのまま読み込み、
 // 実物と同じ見た目でトークン/コンポーネントを一覧する living catalog。
 const config: StorybookConfig = {
-  stories: ['../client/src/**/*.stories.@(ts|tsx)', '../client/src/**/*.mdx'],
+  stories: ['../apps/web/src/**/*.stories.@(ts|tsx)', '../apps/web/src/**/*.mdx'],
   addons: ['@storybook/addon-docs'],
   framework: {
     name: '@storybook/react-vite',

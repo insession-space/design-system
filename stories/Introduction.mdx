@@ -1,0 +1,19 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# Session デザインカタログ
+
+友達と同期して YouTube を観る Watch Party アプリ **Session** のデザインシステム・カタログです。
+
+- **Foundations** — デザイントークン（カラー / タイポグラフィ / 半径 / グロー / z-index / モーション）。
+  トークンの単一ソースは `client/src/style.css` の `@theme`（CSS 変数として出力）。
+- **Components** — 共通コンポーネントとプリミティブ（Toggle / ボタン / 入力 / カード / バッジ / モーダル / スナックバー）。
+
+## 原則（トンマナ）
+
+- パレットはロゴ由来（ミント / シアン / バイオレット）。柔らかい発光、**控えめ・洗練**を優先。
+- 面は **tinted surface + 細ボーダー**を基本形にする。派手なグラデ/グローは使わない。
+- 生値（マジックナンバー）や生 `#hex` / `rgba()` を書かない。足りなければ `@theme` にトークンを足す。
+
+詳細な実装語彙・移行パターン・落とし穴は `client/src/STYLE_GUIDE.md` が正です。
