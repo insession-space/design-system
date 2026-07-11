@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { mergeConfig } from 'vite';
 
 // デザインガイド/コンポーネントカタログ(Issue #69)。
-// 既存の Vite + Tailwind v4 + client/src/style.css のトークンをそのまま読み込み、
+// 既存の Vite + Tailwind v4 + apps/web/src/style.css のトークンをそのまま読み込み、
 // 実物と同じ見た目でトークン/コンポーネントを一覧する living catalog。
 const config: StorybookConfig = {
   stories: ['../apps/web/src/**/*.stories.@(ts|tsx)', '../apps/web/src/**/*.mdx'],
