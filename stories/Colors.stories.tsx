@@ -1,0 +1,75 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { ColorSwatch, Grid, LineSwatch, Section } from './tokens';
+
+// カラートークンのカタログ。パレット/背景面/境界/テキスト/ティント面を一覧する。
+// 実物と同じ style.css の @theme を読み込むため、色は本アプリと完全に一致する。
+const meta: Meta = {
+  title: 'Foundations/Colors',
+  parameters: { layout: 'padded' },
+};
+export default meta;
+
+type Story = StoryObj;
+
+export const Palette: Story = {
+  render: () => (
+    <Section title="パレット" note="ロゴ由来。アクセントは text-mint-soft を基本にする。">
+      <Grid>
+        <ColorSwatch varName="--color-mint" label="mint" />
+        <ColorSwatch varName="--color-mint-soft" label="mint-soft" />
+        <ColorSwatch varName="--color-cyan" label="cyan" />
+        <ColorSwatch varName="--color-violet" label="violet" />
+        <ColorSwatch varName="--color-maroon" label="maroon" />
+      </Grid>
+    </Section>
+  ),
+};
+
+export const Surfaces: Story = {
+  render: () => (
+    <Section title="背景面" note="奥(bg)→手前(surface)。カード/行は tinted surface を基本にする。">
+      <Grid>
+        <ColorSwatch varName="--color-bg" label="bg" />
+        <ColorSwatch varName="--color-bg-elevated" label="bg-elevated" />
+        <ColorSwatch varName="--color-surface" label="surface" />
+      </Grid>
+    </Section>
+  ),
+};
+
+export const Tints: Story = {
+  render: () => (
+    <Section title="ティント面" note="rgba(mint, α) の面。数値=不透明度×100。bg-tint-* で使う。">
+      <Grid>
+        <ColorSwatch varName="--color-tint-3" label="tint-3" />
+        <ColorSwatch varName="--color-tint-5" label="tint-5" />
+        <ColorSwatch varName="--color-tint-7" label="tint-7" />
+        <ColorSwatch varName="--color-tint-8" label="tint-8" />
+        <ColorSwatch varName="--color-tint-10" label="tint-10" />
+        <ColorSwatch varName="--color-tint-13" label="tint-13" />
+        <ColorSwatch varName="--color-tint-16" label="tint-16" />
+        <ColorSwatch varName="--color-tint-22" label="tint-22" />
+      </Grid>
+    </Section>
+  ),
+};
+
+export const BordersAndText: Story = {
+  render: () => (
+    <>
+      <Section title="境界" note="ミントを薄く重ねた線。border-border / -strong。">
+        <Grid>
+          <LineSwatch varName="--color-border" label="border" />
+          <LineSwatch varName="--color-border-strong" label="border-strong" />
+        </Grid>
+      </Section>
+      <Section title="テキスト" note="階層。本文=text、補足=text-dim、さらに薄い=text-faint。">
+        <Grid>
+          <LineSwatch varName="--color-text" label="text" />
+          <LineSwatch varName="--color-text-dim" label="text-dim" />
+          <LineSwatch varName="--color-text-faint" label="text-faint" />
+        </Grid>
+      </Section>
+    </>
+  ),
+};
