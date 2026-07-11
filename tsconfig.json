@@ -1,5 +1,5 @@
 {
-  // @session/ui は React + ESM の leaf UI。tsc は型検査専用（noEmit）。
+  // @in-session/ui は React + ESM の leaf UI。tsc は型検査専用（noEmit）。
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "module": "ESNext",
