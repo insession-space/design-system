@@ -1,4 +1,4 @@
-import { I18nProvider } from '@session/i18n';
+import { I18nProvider } from '@in-session/i18n';
 import type { Preview } from '@storybook/react-vite';
 import { MemoryRouter } from 'react-router-dom';
 // デザイントークンの単一ソース。読み込むと body に本アプリと同じ背景/フォント/リセットが効く。
