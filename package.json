@@ -1,9 +1,9 @@
 {
-  "name": "@session/ui",
+  "name": "@in-session/ui",
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Session の純粋 leaf UI（アプリ依存なし。i18n 等は props で注入する）",
+  "description": "InSession の純粋 leaf UI（アプリ依存なし。i18n 等は props で注入する）",
   "//": "ソースのまま Vite が解決する（事前ビルドしない）。react はホスト（apps/web）と同一インスタンスを使うため peerDependency。",
   "exports": {
     ".": "./index.ts"

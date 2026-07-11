@@ -36,7 +36,7 @@ export const Scale: Story = {
         {SIZES.map((s) => (
           <div key={s.cls} className="flex items-baseline gap-4">
             <code className="text-2xs text-text-faint w-24 shrink-0">{s.label}</code>
-            <span className={`${s.cls} text-text font-body`}>Session — 友達と同期して観る</span>
+            <span className={`${s.cls} text-text font-body`}>InSession — 友達と同期して観る</span>
           </div>
         ))}
       </div>
@@ -51,7 +51,7 @@ export const Fonts: Story = {
         <div>
           <code className="text-2xs text-text-faint">font-display</code>
           <p className="font-display text-4xl font-extrabold text-text leading-normal">
-            Session Watch Party
+            InSession Watch Party
           </p>
         </div>
         <div>
