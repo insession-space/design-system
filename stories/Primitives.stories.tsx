@@ -1,4 +1,4 @@
-import { Avatar, Badge, CountChip, EmptyNote, Stepper } from '@in-session/ui';
+import { Avatar, Badge, CountChip, EmptyNote, Icon, Stepper } from '@in-session/ui';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';
@@ -180,11 +180,15 @@ export const Snackbar: Story = {
       <div className="flex flex-col gap-4">
         {/* .snackbar は本来 position:fixed。カタログ表示のため位置指定だけ無効化する。 */}
         <div className="snackbar" style={{ position: 'static', transform: 'none' }}>
-          <span className="snackbar-icon">✓</span>
+          <span className="snackbar-icon">
+            <Icon name="check_circle" size={16} />
+          </span>
           招待リンクをコピーしました
         </div>
         <div className="snackbar error" style={{ position: 'static', transform: 'none' }}>
-          <span className="snackbar-icon">!</span>
+          <span className="snackbar-icon">
+            <Icon name="warning" size={16} />
+          </span>
           追加できませんでした
         </div>
       </div>
