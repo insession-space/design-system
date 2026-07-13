@@ -47,6 +47,8 @@ const PATHS = {
   // ログアウト（#219 ユーザーメニューのドロップダウン用）
   logout:
     'M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z',
+  // 追加（+）。チャットメッセージへのリアクション追加トリガー等（#236）。
+  add: 'M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z',
 };
 
 export type IconName = keyof typeof PATHS;
