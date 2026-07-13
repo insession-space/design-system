@@ -6,15 +6,15 @@ import type { ReactNode } from 'react';
 // variant で切り替える（class 文字列の後付けでは Tailwind の生成順に負ける落とし穴を避ける）。
 export type EmptyNoteProps = {
   children: ReactNode;
-  // 'default'=中央寄せ・広め（既定）/ 'compact'=左寄せ・詰め（キュー/履歴タブ）/
-  // 'dropdown'=左寄せ・検索候補ドロップダウン内。
+  // 'default'=中央寄せ・広め（既定）/ 'compact'=中央寄せ・詰め（キュー/履歴タブ）/
+  // 'dropdown'=中央寄せ・検索候補ドロップダウン内。いずれも水平・垂直とも中央（#202）。
   variant?: 'default' | 'compact' | 'dropdown';
 };
 
 const VARIANT: Record<NonNullable<EmptyNoteProps['variant']>, string> = {
   default: 'px-4 py-5 text-center',
-  compact: 'px-1 py-3.5 text-left',
-  dropdown: 'px-4 py-[18px] text-left',
+  compact: 'flex min-h-32 items-center justify-center px-1 py-3.5 text-center',
+  dropdown: 'flex min-h-28 items-center justify-center px-4 py-[18px] text-center',
 };
 
 export default function EmptyNote({ children, variant = 'default' }: EmptyNoteProps) {
