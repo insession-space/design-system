@@ -60,6 +60,8 @@ const PATHS = {
   // 参加者一覧の行展開トグル（簡易プロフィール開閉。#254）。
   expand_more: 'M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z',
   expand_less: 'M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z',
+  // モバイルBottom Navのチャット導線用の吹き出しアイコン(#284)
+  chat: 'M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z',
 };
 
 export type IconName = keyof typeof PATHS;
