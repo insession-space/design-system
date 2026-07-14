@@ -9,14 +9,16 @@ import type { ReactNode } from 'react';
 export type CountChipProps = {
   children: ReactNode;
   animated?: boolean;
+  // 配置場所ごとの位置調整(例: Bottom Navアイコンへの絶対配置重ね)用の追加クラス。
+  className?: string;
 };
 
-export function CountChip({ children, animated = false }: CountChipProps) {
+export function CountChip({ children, animated = false, className = '' }: CountChipProps) {
   return (
     <span
       className={`inline-flex items-center justify-center min-w-[17px] h-[17px] px-[5px] rounded-pill bg-tint-12 text-mint text-xs font-extrabold tracking-normal${
         animated ? ' animate-[pop-in_0.3s_var(--ease-spring)]' : ''
-      }`}
+      } ${className}`.trim()}
     >
       {children}
     </span>
