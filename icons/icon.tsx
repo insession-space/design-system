@@ -76,11 +76,24 @@ const PATHS = {
   // 画像スタンプ添付ボタン(チャットの画像アップロード。#394)
   image:
     'M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86-3 3.87L9 13.14 6 17h12l-3.86-5.14z',
-  // プリセットスタンプピッカーのトリガー(にっこり顔。#416)
-  mood: 'M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z',
 };
 
-export type IconName = keyof typeof PATHS;
+// 通常の Material Icons(0 0 24 24)とは異なる viewBox を持つアイコン(Material Symbols由来。
+// #416フォローアップ: 絵文字ピッカーと誤解されないよう「にっこり顔」(mood)から実際のシール型
+// アイコン(sticker)へ変更。Material Symbolsは 0 -960 960 960 のグリッドを使う)。
+const CUSTOM_VIEWBOX: Record<string, string> = {
+  sticker: '0 -960 960 960',
+};
+
+// スタンプピッカーのトリガー(シール型。#416)
+const EXTRA_PATHS = {
+  sticker:
+    'M460-360q69 0 120-45t60-113l-320 90q26 32 62 50t78 18ZM294-510l106-30q4-28-14-49t-46-21q-25 0-42.5 17.5T280-550q0 11 4 21t10 19Zm240-70 106-30q5-28-13.5-49T580-680q-25 0-42.5 17.5T520-620q0 11 4 21t10 19Zm106 460H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v440L640-120Zm-40-80v-80q0-33 23.5-56.5T680-360h80v-400H200v560h400Zm0 0Zm-400 0v-560 560Z',
+};
+
+const ALL_PATHS = { ...PATHS, ...EXTRA_PATHS };
+
+export type IconName = keyof typeof ALL_PATHS;
 
 export type IconProps = {
   name: IconName;
@@ -91,14 +104,14 @@ export type IconProps = {
 export default function Icon({ name, size = 20, className }: IconProps) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox={CUSTOM_VIEWBOX[name] ?? '0 0 24 24'}
       width={size}
       height={size}
       fill="currentColor"
       aria-hidden="true"
       className={className}
     >
-      <path d={PATHS[name]} />
+      <path d={ALL_PATHS[name]} />
     </svg>
   );
 }
