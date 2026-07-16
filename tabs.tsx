@@ -50,7 +50,10 @@ export default function Tabs({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className={`flex border-b border-solid border-border ${className}`.trim()}
+      // border-t-0 border-x-0 は必須: プリフライト未使用のため border-solid が全辺の border-style を
+      // solid にし、border-b で未指定の上/左/右の border-width が既定 medium(3px) のまま枠として出る。
+      // 明示的に 0 にして legacy .side-tabs(border-bottom のみ)へ一致させる(#448 リグレッション修正)。
+      className={`flex border-t-0 border-x-0 border-b border-solid border-border ${className}`.trim()}
     >
       {tabs.map((tab) => {
         const active = tab.key === value;
