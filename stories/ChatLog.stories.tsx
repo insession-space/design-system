@@ -1,3 +1,4 @@
+import { LogActionButton } from '@in-session/space-core';
 import { Icon } from '@in-session/ui';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
@@ -14,9 +15,7 @@ export default meta;
 
 type Story = StoryObj;
 
-// chat-panel.tsx のログアクションボタンと同一クラス。
-const ACTION_BTN =
-  'inline-flex items-center gap-1.5 rounded-md border border-solid border-border bg-surface px-2.5 py-1 text-xs font-semibold text-cyan transition-colors duration-(--dur-fast) hover:bg-surface-hover';
+const noop = () => {};
 
 export const AppJoin: Story = {
   render: () => (
@@ -33,10 +32,9 @@ export const AppJoin: Story = {
             <strong className="log-name">gump2</strong> がテトリスに参加しました
           </em>
           <div className="chat-line-log-actions">
-            <button type="button" className={ACTION_BTN}>
-              <Icon name="sports_esports" size={14} />
+            <LogActionButton icon="sports_esports" onClick={noop}>
               テトリスへ切り替える
-            </button>
+            </LogActionButton>
           </div>
         </div>
       </div>
@@ -56,10 +54,9 @@ export const ScreenShare: Story = {
             <strong className="log-name">Seiya</strong> が画面共有を開始しました
           </em>
           <div className="chat-line-log-actions">
-            <button type="button" className={ACTION_BTN}>
-              <Icon name="screen_share" size={14} />
+            <LogActionButton icon="screen_share" onClick={noop}>
               画面共有を見る
-            </button>
+            </LogActionButton>
           </div>
         </div>
       </div>
@@ -79,10 +76,9 @@ export const Greeting: Story = {
             <strong className="log-name">外道</strong> が入室しました
           </em>
           <div className="chat-line-log-actions">
-            <button type="button" className={ACTION_BTN}>
-              <Icon name="auto_awesome" size={14} />
+            <LogActionButton icon="auto_awesome" onClick={noop}>
               Wave で挨拶
-            </button>
+            </LogActionButton>
           </div>
         </div>
       </div>
@@ -136,10 +132,9 @@ export const InChatFlow: Story = {
             <strong className="log-name">gump2</strong> がテトリスに参加しました
           </em>
           <div className="chat-line-log-actions">
-            <button type="button" className={ACTION_BTN}>
-              <Icon name="sports_esports" size={14} />
+            <LogActionButton icon="sports_esports" onClick={noop}>
               テトリスへ切り替える
-            </button>
+            </LogActionButton>
           </div>
         </div>
         <div className="chat-message-row">
