@@ -9,11 +9,13 @@ export {
   type ButtonVariant,
   default as Button,
 } from './button.tsx';
+export { type ChipProps, default as Chip } from './chip.tsx';
 export { type ConfirmModalProps, default as ConfirmModal } from './confirm-modal.tsx';
 export { default as EmptyNote, type EmptyNoteProps } from './empty-note.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
 export { default as PersonIcon } from './icons/person-icon.tsx';
+export { default as Input, type InputProps } from './input.tsx';
 export { Menu, MenuItem, type MenuItemProps, type MenuProps } from './menu.tsx';
 export { default as Modal, type ModalProps } from './modal.tsx';
 export { default as Popover, type PopoverPlacement, type PopoverProps } from './popover.tsx';
