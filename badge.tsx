@@ -16,7 +16,7 @@ export type CountChipProps = {
 export function CountChip({ children, animated = false, className = '' }: CountChipProps) {
   return (
     <span
-      className={`inline-flex items-center justify-center min-w-[17px] h-[17px] px-[5px] rounded-pill bg-tint-12 text-mint text-xs font-extrabold tracking-normal${
+      className={`inline-flex items-center justify-center min-w-[17px] h-[17px] px-[5px] rounded-pill bg-success-surface text-success text-xs font-extrabold tracking-normal${
         animated ? ' animate-[pop-in_0.3s_var(--ease-spring)]' : ''
       } ${className}`.trim()}
     >
@@ -39,7 +39,7 @@ export function Badge({ children, variant, className = '' }: BadgeProps) {
   }
   return (
     <span
-      className={`shrink-0 inline-flex items-center px-[7px] py-0.5 rounded-pill bg-tint-12 text-mint-soft text-2xs font-extrabold tracking-[0.06em] uppercase ${className}`.trim()}
+      className={`shrink-0 inline-flex items-center px-[7px] py-0.5 rounded-pill bg-success-surface text-success text-2xs font-extrabold tracking-[0.06em] uppercase ${className}`.trim()}
     >
       {children}
     </span>
