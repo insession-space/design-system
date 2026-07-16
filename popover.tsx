@@ -31,7 +31,7 @@ const PLACEMENT: Record<PopoverPlacement, string> = {
 };
 
 const PANEL =
-  'absolute z-(--z-dropdown) min-w-[220px] max-h-80 overflow-y-auto p-3 bg-surface-2 border border-solid border-border-strong rounded-card shadow-popover animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
+  'absolute z-(--z-dropdown) min-w-[220px] max-h-80 overflow-y-auto p-3 bg-surface border border-solid border-border-strong rounded-card shadow-popover animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
 
 export default function Popover({
   open,
