@@ -27,6 +27,11 @@ export {
 } from './status.tsx';
 export { default as Stepper, type StepperProps } from './stepper.tsx';
 export { default as Tabs, type TabItem, type TabsProps } from './tabs.tsx';
-export { default as Toast, type ToastProps, type ToastTone } from './toast.tsx';
+export {
+  default as Toast,
+  type ToastProps,
+  type ToastTone,
+  type ToastVariant,
+} from './toast.tsx';
 export { default as Toggle } from './toggle.tsx';
 export { useDismiss } from './use-dismiss.ts';
