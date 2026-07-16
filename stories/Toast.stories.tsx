@@ -33,3 +33,32 @@ export const Tones: Story = {
     </Section>
   ),
 };
+
+export const Snackbar: Story = {
+  render: () => (
+    <Section
+      title="snackbar バリアント"
+      note="feature の操作フィードバック(旧 .snackbar)互換パレット。success=border-strong+mint、error=soft pink。"
+    >
+      <div className="flex flex-col items-start gap-4">
+        <Toast
+          fixed={false}
+          variant="snackbar"
+          tone="success"
+          icon={<Icon name="check_circle" size={16} />}
+        >
+          キューに追加しました
+        </Toast>
+        <Toast
+          fixed={false}
+          variant="snackbar"
+          tone="error"
+          role="alert"
+          icon={<Icon name="warning" size={16} />}
+        >
+          追加できませんでした
+        </Toast>
+      </div>
+    </Section>
+  ),
+};
