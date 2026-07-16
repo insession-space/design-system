@@ -15,7 +15,7 @@ export type ChipProps = {
 
 const BASE =
   'inline-flex items-center gap-1.5 rounded-pill border border-solid text-sm font-semibold px-3.5 py-[7px] cursor-pointer select-none transition-colors duration-(--dur-fast)';
-const DEFAULT = 'bg-surface-2 border-border-strong text-text enabled:hover:border-text-dim';
+const DEFAULT = 'bg-surface-2 border-border-strong text-text enabled:hover:bg-surface-hover';
 const SELECTED = 'bg-tint-12 border-accent text-accent font-bold';
 
 export default function Chip({
