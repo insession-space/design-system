@@ -39,8 +39,10 @@ export type MenuItemProps = {
   role?: 'menuitem' | 'menuitemradio' | 'menuitemcheckbox';
 };
 
+// 新 DS(#463) Menu 行: radius-md / gap 13 / padding 11x13 / font 15。hover は surface-hover、
+// 選択中は live(green) の tint 面 + green テキスト。
 const ROW =
-  'flex w-full items-center gap-2.5 rounded-chip border-none bg-transparent px-2 py-2 text-left text-base shadow-none transition-colors duration-(--dur-fast) cursor-pointer disabled:opacity-(--disabled-opacity) disabled:cursor-not-allowed';
+  'flex w-full items-center gap-[13px] rounded-md border-none bg-transparent px-[13px] py-[11px] text-left text-[15px] shadow-none transition-colors duration-(--dur-fast) cursor-pointer disabled:opacity-(--disabled-opacity) disabled:cursor-not-allowed';
 
 export function MenuItem({
   onSelect,
@@ -55,8 +57,8 @@ export function MenuItem({
   const tone = danger
     ? 'text-danger enabled:hover:bg-danger-surface'
     : active
-      ? 'text-mint-soft enabled:hover:bg-tint-8'
-      : 'text-text enabled:hover:bg-tint-8';
+      ? 'text-success bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]'
+      : 'text-text enabled:hover:bg-surface-hover';
   return (
     <li>
       <button
