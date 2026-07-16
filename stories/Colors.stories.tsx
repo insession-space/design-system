@@ -54,6 +54,47 @@ export const Tints: Story = {
   ),
 };
 
+export const Semantic: Story = {
+  render: () => (
+    <>
+      <Section
+        title="セマンティック(状態色)"
+        note="success/warning/danger/info。ブランドと調和するトーン(#445)。地(text/icon)・面(surface)・枠(border)の3点セット。StatusBadge / Button danger / Toast 等で使う。"
+      >
+        <Grid>
+          <ColorSwatch varName="--color-success" label="success" />
+          <ColorSwatch varName="--color-warning" label="warning" />
+          <ColorSwatch varName="--color-danger" label="danger" />
+          <ColorSwatch varName="--color-info" label="info" />
+        </Grid>
+      </Section>
+      <Section
+        title="セマンティック: 面 / 枠"
+        note="tinted surface + 細ボーダーの基本形に載せる淡い面と枠。"
+      >
+        <Grid>
+          <ColorSwatch varName="--color-success-surface" label="success-surface" />
+          <ColorSwatch varName="--color-warning-surface" label="warning-surface" />
+          <ColorSwatch varName="--color-danger-surface" label="danger-surface" />
+          <ColorSwatch varName="--color-info-surface" label="info-surface" />
+          <LineSwatch varName="--color-success-border" label="success-border" />
+          <LineSwatch varName="--color-warning-border" label="warning-border" />
+          <LineSwatch varName="--color-danger-border" label="danger-border" />
+          <LineSwatch varName="--color-info-border" label="info-border" />
+        </Grid>
+      </Section>
+      <Section
+        title="オーバーレイ面"
+        note="ポップオーバー/スナックバー等、前面に浮く面(surface-2)。"
+      >
+        <Grid>
+          <ColorSwatch varName="--color-surface-2" label="surface-2" />
+        </Grid>
+      </Section>
+    </>
+  ),
+};
+
 export const BordersAndText: Story = {
   render: () => (
     <>

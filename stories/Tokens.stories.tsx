@@ -41,6 +41,75 @@ export const Elevation: Story = {
   ),
 };
 
+export const Shadows: Story = {
+  render: () => (
+    <Section
+      title="エレベーション(ドロップシャドウ)"
+      note="グローとは別系統の中立的な影(#445)。soft=小要素、overlay=スナックバー、popover=ポップオーバー/メニュー。"
+    >
+      <div className="flex flex-wrap gap-12 p-6">
+        <BoxSwatch label="soft" varName="--shadow-soft" boxClassName="rounded-card shadow-soft" />
+        <BoxSwatch
+          label="overlay"
+          varName="--shadow-overlay"
+          boxClassName="rounded-card shadow-overlay"
+        />
+        <BoxSwatch
+          label="popover"
+          varName="--shadow-popover"
+          boxClassName="rounded-card shadow-popover"
+        />
+        <BoxSwatch
+          label="focus"
+          varName="--shadow-focus"
+          boxClassName="rounded-card shadow-focus"
+        />
+      </div>
+    </Section>
+  ),
+};
+
+export const FocusAndDisabled: Story = {
+  render: () => (
+    <>
+      <Section
+        title="フォーカスリング"
+        note="キーボードフォーカスの表現(#445)。アウトライン(色/幅/offset) + 発光(shadow-focus)。下の入力を Tab でフォーカスすると確認できる。"
+      >
+        <div className="flex flex-wrap items-center gap-6">
+          <input type="text" placeholder="Tab でフォーカス" />
+          <button type="button" className="focus-visible:shadow-focus">
+            フォーカスで発光
+          </button>
+        </div>
+        <div className="mt-4">
+          <TokenTable
+            rows={[
+              { varName: '--color-focus-ring', label: 'focus-ring 色' },
+              { varName: '--focus-ring-width', label: 'focus-ring 幅' },
+              { varName: '--focus-ring-offset', label: 'focus-ring offset' },
+            ]}
+          />
+        </div>
+      </Section>
+      <Section
+        title="無効状態(disabled)"
+        note="DS 標準の一組: opacity-(--disabled-opacity) + cursor-not-allowed。"
+      >
+        <div className="flex flex-wrap items-center gap-6">
+          <button type="button">通常</button>
+          <button type="button" disabled>
+            無効
+          </button>
+        </div>
+        <div className="mt-4">
+          <TokenTable rows={[{ varName: '--disabled-opacity', label: 'disabled 不透明度' }]} />
+        </div>
+      </Section>
+    </>
+  ),
+};
+
 export const ZIndex: Story = {
   render: () => (
     <Section title="z-index" note="重なり順の単一ソース。生の z-index を新規に書かない。">

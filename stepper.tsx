@@ -15,7 +15,7 @@ export type StepperProps = {
 };
 
 const BTN =
-  'w-[30px] h-[30px] pointer-coarse:w-10 pointer-coarse:h-10 p-0 inline-flex items-center justify-center text-lg leading-none rounded-full bg-tint-7 border border-solid border-border text-text-dim transition-[background,box-shadow] enabled:hover:bg-tint-13 enabled:hover:shadow-glow disabled:opacity-40 disabled:cursor-not-allowed';
+  'w-[30px] h-[30px] pointer-coarse:w-10 pointer-coarse:h-10 p-0 inline-flex items-center justify-center text-lg leading-none rounded-full bg-tint-7 border border-solid border-border text-text-dim transition-[background,box-shadow] enabled:hover:bg-tint-13 enabled:hover:shadow-glow disabled:opacity-(--disabled-opacity) disabled:cursor-not-allowed';
 
 export default function Stepper({
   value,
