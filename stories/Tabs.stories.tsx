@@ -42,7 +42,7 @@ function TabsDemo({
 
 export const Default: Story = {
   render: () => (
-    <Section title="タブ" note="アクティブ下にシアンの下線がスプリングで伸びる。">
+    <Section title="タブ" note="アクティブ下にコーラル(accent)の下線がスプリングで伸びる。">
       <TabsDemo />
     </Section>
   ),
