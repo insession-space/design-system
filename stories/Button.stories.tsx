@@ -2,7 +2,7 @@ import { Button } from '@in-session/ui';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 
-// DS のボタン。variant(primary/ghost/danger) × size × loading/disabled。
+// DS のボタン。variant(primary/accent/secondary/ghost/danger/join) × size × loading/disabled。
 const meta: Meta<typeof Button> = {
   title: 'Components/Button',
   component: Button,
@@ -15,13 +15,16 @@ type Story = StoryObj<typeof Button>;
 export const Variants: Story = {
   render: () => (
     <Section
-      title="バリアント"
-      note="primary / ghost / danger。tinted surface + 細ボーダー、ホバーで控えめに発光。"
+      title="バリアント (DS)"
+      note="primary=中立塗り / accent=コーラル / secondary=2px アウトライン / ghost=テキスト(info) / danger / join=ライブ緑 pill+ドット。radius 10、join のみ pill。"
     >
       <div className="flex flex-wrap items-center gap-4">
-        <Button variant="primary">プライマリ</Button>
-        <Button variant="ghost">ゴースト</Button>
+        <Button variant="primary">Primary</Button>
+        <Button variant="accent">Accent</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="ghost">Ghost</Button>
         <Button variant="danger">削除する</Button>
+        <Button variant="join">Join session</Button>
       </div>
     </Section>
   ),
