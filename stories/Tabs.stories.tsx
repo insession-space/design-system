@@ -13,12 +13,19 @@ export default meta;
 
 type Story = StoryObj<typeof Tabs>;
 
-function TabsDemo({ withBadge = false }: { withBadge?: boolean }) {
+function TabsDemo({
+  withBadge = false,
+  variant = 'default',
+}: {
+  withBadge?: boolean;
+  variant?: 'default' | 'fill';
+}) {
   const [value, setValue] = useState('queue');
   return (
     <Tabs
       value={value}
       onChange={setValue}
+      variant={variant}
       ariaLabel="サンプルタブ"
       tabs={[
         {
@@ -45,6 +52,17 @@ export const WithBadge: Story = {
   render: () => (
     <Section title="件数バッジ付き" note="badge に CountChip を載せる(media-tabs のキュー件数)。">
       <TabsDemo withBadge />
+    </Section>
+  ),
+};
+
+export const Fill: Story = {
+  render: () => (
+    <Section
+      title="fill バリアント"
+      note="各タブが flex:1 で均等に行幅いっぱいを占める(legacy 基底 .tab-btn 相当。playlist サブタブ / sticker タブ)。"
+    >
+      <TabsDemo variant="fill" />
     </Section>
   ),
 };
