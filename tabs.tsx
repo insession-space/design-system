@@ -25,8 +25,11 @@ export type TabsProps = {
   variant?: 'default' | 'fill';
 };
 
+// hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent は、プリフライト未使用で
+// タブが <button> 要素であるため露出する legacy グローバル button:hover(glow+teal 背景)/button:active(scale)
+// を打ち消し、旧 .tab-btn:hover/:active(transparent・shadow none・transform none)の挙動へ完全一致させる(#448)。
 const TAB_BASE =
-  "relative inline-flex items-center justify-center gap-1.5 border-none bg-transparent py-3 font-display text-smd font-bold tracking-[0.1em] text-text-faint shadow-none transition-colors duration-(--dur-base) cursor-pointer hover:text-text-dim after:absolute after:inset-x-[12%] after:-bottom-px after:h-0.5 after:origin-center after:scale-x-0 after:rounded-[2px] after:bg-cyan after:transition-transform after:duration-(--dur-base) after:ease-spring after:content-['']";
+  "relative inline-flex items-center justify-center gap-1.5 border-none bg-transparent py-3 font-display text-smd font-bold tracking-[0.1em] text-text-faint shadow-none transition-colors duration-(--dur-base) cursor-pointer hover:text-text-dim hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent after:absolute after:inset-x-[12%] after:-bottom-px after:h-0.5 after:origin-center after:scale-x-0 after:rounded-[2px] after:bg-cyan after:transition-transform after:duration-(--dur-base) after:ease-spring after:content-['']";
 const TAB_WIDTH: Record<'default' | 'fill', string> = {
   default: 'flex-none px-3.5',
   fill: 'flex-1 px-1.5',
