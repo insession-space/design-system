@@ -35,6 +35,9 @@ const PATHS = {
   auto_awesome:
     'M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zM11.5 9.5 9 4l-2.5 5.5L1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z',
   play_arrow: 'M8 5v14l11-7z',
+  // スペース内キュー(モバイル下部ナビ #572)。Material Symbols queue_music 由来。
+  queue_music:
+    'M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z',
   pause: 'M6 19h4V5H6v14zm8-14v14h4V5h-4z',
   fast_forward: 'M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z',
   videocam:
