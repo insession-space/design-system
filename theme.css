@@ -1,0 +1,255 @@
+/* @in-session/ui — デザインシステム(DS)のトークン契約。
+ *
+ * ui コンポーネント(button / input / spinner 等)が参照する @theme トークンを一元管理する。
+ * apps/web は歴史的経緯(巨大な legacy CSS と共存させるため)で同じトークンを src/style.css に
+ * インラインで持つ。ui パッケージを単体で使うアプリ(apps/admin など)は Tailwind の
+ * `@import "tailwindcss"` に続けてこのファイルを `@import "@in-session/ui/theme.css"` し、
+ * さらに `@source` で packages/ui を走査対象に加えること(ui のユーティリティ生成のため)。
+ *
+ * 値は apps/web/src/style.css の @theme(ダーク既定)から抜き出したもの。ライトテーマの
+ * オーバーレイは含めない(単体利用アプリはダーク前提)。web 側と値を揃えて保守する。
+ * 生成方法: apps/web/src/style.css の `@theme { … }` と `@theme static { … }` を転記。
+ */
+
+@theme {
+  /* カラー: ブランドパレット(旧名を保持。値は新4色パレットへ。Claude Design の
+     「INSESSION Design System」本文の実値に合わせる) */
+  --color-mint: #ff6a47; /* 旧ミント→コーラル(アクセント)。ダーク(既定)値 */
+  --color-mint-soft: #ffb199; /* ダーク背景向けの淡いコーラル(テキスト/アイコン用) */
+  --color-cyan: #5b8bf0; /* 旧シアン→ブルー(セカンダリアクセント)。ダーク(既定)値 */
+  --color-violet: #31c47e; /* 新パレットに無いため落ち着いたグリーン系へ振替(装飾のみ) */
+  --color-maroon: #8a4a1f; /* 同上。深いアンバー系(装飾のみ) */
+
+  /* カラー: 背景面(奥 → 手前)。ダーク(既定)。DSの bg/surface-2/surface を3段ランプに割当 */
+  --color-bg: #121211;
+  --color-bg-elevated: #1a1a18;
+  --color-surface: #201f1d;
+  /* surface-3: DS の3段目の面。disabled ボタン等の「沈んだ面」に使う。ダーク(既定) */
+  --color-surface-3: #282826;
+  --color-surface-hover: #2b2b29;
+
+  /* カラー: 境界。ダーク(既定)はDSの border/border-2 */
+  --color-border: #332f25;
+  --color-border-strong: #403a2d;
+
+  /* カラー: テキスト階層。ダーク(既定) */
+  --color-text: #f3f0e7;
+  --color-text-dim: #a7a395;
+  --color-text-faint: #726e62;
+
+  /* カラー: DS の fill/accent(ボタン等の塗り)。fill=中立塗り(Primary。ダークでは明色)、
+     on-fill=その上の文字色。accent=コーラル(=mint 別名)、on-accent=その上の文字色。ダーク(既定) */
+  --color-fill: #f1eee6;
+  --color-on-fill: #17160f;
+  --color-accent: var(--color-mint);
+  --color-on-accent: #ffffff;
+
+  /* カラー: アクセント(コーラル)ティント面。rgba(accent, α) を段階トークン化(数値=α×100)。
+     tinted surface + 細ボーダーの控えめな面表現に使う。ライト/ダーク共通(半透明のため
+     どちらの背景でも機能する) */
+  --color-tint-3: rgba(255, 90, 54, 0.03);
+  --color-tint-5: rgba(255, 90, 54, 0.05);
+  --color-tint-7: rgba(255, 90, 54, 0.07);
+  --color-tint-8: rgba(255, 90, 54, 0.08);
+  --color-tint-10: rgba(255, 90, 54, 0.1);
+  --color-tint-12: rgba(255, 90, 54, 0.12);
+  --color-tint-13: rgba(255, 90, 54, 0.13);
+  --color-tint-16: rgba(255, 90, 54, 0.16);
+  --color-tint-22: rgba(255, 90, 54, 0.22);
+
+  /* カラー: セマンティック(状態表現)。新4色パレットと対応させる(#457)。
+     成功=グリーン、情報=ブルー、警告=アンバー、危険=旧来の #ff6b6b を維持(新パレットに
+     危険色の指定は無いため)。各色は「地の色(text/icon)」「面(surface)」「枠(border)」の
+     3点を持ち、tinted surface + 細ボーダーの基本形に載せられる。地の色はダーク(既定)値。
+     ライト値は下のオーバーレイヤーでコントラスト確保のため少し濃くする。
+     使い方: text-success / bg-success-surface / border-success-border(warning/danger/info も同様)。 */
+  --color-success: #31c47e;
+  --color-success-surface: rgba(49, 196, 126, 0.12);
+  --color-success-border: rgba(49, 196, 126, 0.3);
+  --color-warning: #f5b54a;
+  --color-warning-surface: rgba(245, 181, 74, 0.12);
+  --color-warning-border: rgba(245, 181, 74, 0.3);
+  --color-danger: #ff6b6b;
+  --color-danger-surface: rgba(255, 107, 107, 0.12);
+  --color-danger-border: rgba(255, 107, 107, 0.3);
+  --color-info: #5b8bf0;
+  --color-info-surface: rgba(91, 139, 240, 0.12);
+  --color-info-border: rgba(91, 139, 240, 0.3);
+
+  /* カラー: オーバーレイ面(ポップオーバー/スナックバー/ヘッダーエラー等、前面に浮く面)。
+     背景面(surface)より一段濃く不透明にして、下のコンテンツから浮かせる。ダーク(既定)値。 */
+  --color-surface-2: #1a1a18;
+
+  /* カラー: スナックバー(操作フィードバック)専用面。legacy .snackbar の生値をトークン化(#448)。
+     surface-2 とは僅かに異なる濃さ/色味を保つ(見た目を変えないため)。error は DS の danger(赤)とは
+     別系統の soft pink。DS の Toast(variant="snackbar")がこの3値を参照する。 */
+  --color-snackbar-surface: rgba(16, 22, 25, 0.94);
+  --color-snackbar-danger: #ff9ab8;
+  --color-snackbar-danger-border: rgba(255, 154, 184, 0.3);
+
+  /* フォント: 新 DS(claude design "INSESSION Design System" #463)に一新。
+     JetBrains Mono を「製品フォント」= UI・見出し・本文・ラベル・メタ・数値すべてに使う。
+     Archivo はロゴ/ワードマーク専用(現状ロゴは SVG アセット)。日本語フォールバックは維持。
+     → display / body / mono すべて JetBrains Mono に揃える(旧: display/body=Archivo を廃止)。 */
+  --font-display: "JetBrains Mono", "Hiragino Sans", "Noto Sans JP", monospace;
+  --font-body: "JetBrains Mono", "Hiragino Sans", "Noto Sans JP", monospace;
+  --font-mono: "JetBrains Mono", "Hiragino Sans", "Noto Sans JP", monospace;
+
+  /* タイポグラフィ: サイズ(既存 px の実測から)。行間は付けず normal 固定にし、
+     必要な箇所だけ leading-* で上書きする(既存の見た目と揃えるため) */
+  --text-2xs: 10px;
+  --text-2xs--line-height: normal;
+  --text-xs: 11px;
+  --text-xs--line-height: normal;
+  --text-sm: 12px;
+  --text-sm--line-height: normal;
+  --text-smd: 13px;
+  --text-smd--line-height: normal;
+  --text-base: 14px;
+  --text-base--line-height: normal;
+  --text-md: 15px;
+  --text-md--line-height: normal;
+  --text-lg: 16px;
+  --text-lg--line-height: normal;
+  --text-xl: 17px;
+  --text-xl--line-height: normal;
+  --text-2xl: 18px;
+  --text-2xl--line-height: normal;
+  --text-3xl: 21px;
+  --text-3xl--line-height: normal;
+  --text-4xl: 24px;
+  --text-4xl--line-height: normal;
+  --text-5xl: 30px;
+  --text-5xl--line-height: normal;
+  --text-6xl: 56px;
+  --text-6xl--line-height: normal;
+
+  /* タイポグラフィ: DS のセマンティック階層(claude design "INSESSION Design System" 準拠。#463)。
+     サイズだけでなく weight / letter-spacing / line-height を役割ごとに焼き込むので、
+     text-display / text-h1 / text-h2 / text-body / text-small / text-label を当てるだけで
+     DS の見出し・本文・ラベルの見た目になる。label は uppercase + mono を併用する
+     (font-mono と uppercase ユーティリティ、または .label クラスと組み合わせる)。
+     ※適用(既存見出しの置換)は画面フェーズで段階的に行う。ここでは語彙を用意する。 */
+  --text-display: 44px;
+  --text-display--line-height: 1;
+  --text-display--font-weight: 800;
+  --text-display--letter-spacing: -0.02em;
+  --text-h1: 32px;
+  --text-h1--line-height: 1.05;
+  --text-h1--font-weight: 800;
+  --text-h1--letter-spacing: -0.015em;
+  --text-h2: 22px;
+  --text-h2--line-height: 1.15;
+  --text-h2--font-weight: 700;
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 500;
+  --text-small: 14px;
+  --text-small--line-height: 1.45;
+  --text-small--font-weight: 500;
+  --text-label: 11px;
+  --text-label--line-height: 1;
+  --text-label--font-weight: 600;
+  --text-label--letter-spacing: 0.14em;
+
+  /* 半径: DS の 3 段スケール sm6 / md10 / lg16 + pill999 へ準拠(#463)。
+     既存の chip / card / panel トークン名は保ちつつ値を最寄りの DS 値へ寄せる
+     (chip 8→6=sm、card 14→16=lg、panel 20→16=lg。いずれも DS 値・変化は最小)。
+     DS md(10) は中間サイズ用に --radius-md として用意する(rounded-md で使える)。
+     ※ legacy CSS の生 border-radius 直書き(装飾的な小 radius・一部の一点物)は別途整理する。 */
+  --radius-chip: 6px;
+  --radius-md: 10px;
+  --radius-card: 16px;
+  --radius-panel: 16px;
+  --radius-pill: 999px;
+
+  /* グロー(旧 #457 ブランドの hover 発光)は新 DS で廃止(#463)。新 DS の hover は「ふわっと光る」
+     ではなく surface-hover への面変化 / filled は brightness(.93) / カード等は translateY(-2px) の
+     控えめな持ち上げで表す。互換のため --shadow-glow トークン名は残すが値は none にして、既存の
+     box-shadow: var(--glow) 参照(hover)を一括で無効化する。 */
+  --shadow-glow: none;
+  --shadow-glow-strong: none;
+
+  /* エレベーション: 中立的なドロップシャドウ(グローとは別系統)。DS の3段(card / popover /
+     modal)へ準拠(#463)。DS は blur を抑え負の spread(-2/-14/-28px)で締める控えめな影が signature。
+     app のトークン名(soft/popover/overlay)は保ちつつ DS の各段へ意味対応させる:
+       soft    = DS card   (0 2px 6px -2px。カード・小さな浮き要素)
+       popover = DS popover(0 12px 24px -14px。ポップオーバー/メニュー/ドロップダウン)
+       overlay = DS modal  (0 20px 46px -28px。モーダル・スナックバー等の最前面フロート)
+     alpha は DS 値(20/40/42%)。 */
+  /* 影の陰色。ダーク(既定)は黒。ライトでは黒だと硬すぎるため暖色グレーへ振る
+     (下の [data-theme] オーバーレイで上書き)。legacy の生 rgba(0,0,0,α) はこの
+     トークンへ color-mix で α を載せる形に移行し、ダークは従来どおり黒・ライトは
+     ソフトな影へ自動追従させる(#459)。 */
+  --color-shadow: #000;
+  /* 新 DS(#463) elevation: 既定(ダーク)は DS の dark 影値。ライトは [data-theme="light"] で上書き。
+     soft=elev-1(card) / popover=elev-2 / overlay=shadow(modal)。 */
+  --shadow-soft: 0 2px 6px -2px rgba(0, 0, 0, 0.5);
+  --shadow-popover: 0 16px 30px -16px rgba(0, 0, 0, 0.7);
+  --shadow-overlay: 0 26px 64px -32px rgba(0, 0, 0, 0.85);
+
+  /* フォーカスリング: キーボードフォーカスの発光(シアンの薄いリング + 柔らかいグロー)。
+     input:focus 等で生値だったものをトークン化(#445)。新規部品は focus-visible:shadow-focus で使う。
+     アウトライン色/幅/offset は @theme static 側(--color-focus-ring / --focus-ring-*)。 */
+  /* 新 DS(#463): focus は info ブルーの 3px リングのみ(外側の 24px ブルームは廃止)。 */
+  --shadow-focus: 0 0 0 3px rgba(91, 139, 240, 0.16);
+
+  /* モーション: イージング */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* レコードプレーヤー風ビュー専用パレット(#376。ダークトーン化 #402)。ニューモーフィズム
+     (Soft UI)向けに、単一の素材色から削り出したような外観にする一組。ミント/シアン/バイオレットの
+     ブランドパレットとは独立した、この一機能だけの意図的な例外(生値のJSX直書きを避ける
+     ためここにトークン化する。アプリ全体のトンマナには影響しない)。ダーク素材でも凸凹の
+     明暗差が視認できるよう、shadow-light はベースよりわずかに明るいグレー、shadow-dark は
+     ほぼ黒に近い深い陰にして、凸/凹のコントラストを確保している */
+  --color-rp-base: #2b2c33;
+  --color-rp-shadow-light: #3e4049;
+  --color-rp-shadow-dark: #121319;
+  --color-rp-ink: #c7c9d2;
+  /* 盤本体(--color-rp-disc)は筐体(--color-rp-base)よりわずかに暗く・僅かに青紫みを帯びた
+     ニュートラルにして、陰影だけに頼らず盤とプレーヤー本体を色味でも分離する(#402 追加要望) */
+  --color-rp-disc: #1c1c22;
+  /* 凸(浮き出し)。素材から盛り上がって見える基本形 */
+  --shadow-rp-convex:
+    -5px -5px 10px var(--color-rp-shadow-light), 5px 5px 10px var(--color-rp-shadow-dark);
+  --shadow-rp-convex-lg:
+    -9px -9px 20px var(--color-rp-shadow-light), 9px 9px 20px var(--color-rp-shadow-dark);
+  /* 凹(彫り込み)。素材が窪んで見える基本形(溝・レーベルの受け皿などに使う) */
+  --shadow-rp-concave:
+    inset -5px -5px 10px var(--color-rp-shadow-light),
+    inset 5px 5px 10px var(--color-rp-shadow-dark);
+  --shadow-rp-concave-lg:
+    inset -9px -9px 18px var(--color-rp-shadow-light),
+    inset 9px 9px 18px var(--color-rp-shadow-dark);
+}
+
+@theme static {
+  /* モーション: duration。ユーティリティでは duration-(--dur-fast) のように参照する。
+     prefers-reduced-motion 尊重はファイル末尾の legacy ルールで担保。 */
+  --dur-fast: 0.18s; /* 小さな state 変化(ホバー色・トグル) */
+  --dur-base: 0.25s; /* 標準のトランジション */
+  --dur-slow: 0.35s; /* 入場・強めのフィードバック */
+  --dur-slower: 0.5s; /* ゆっくりした演出 */
+
+  /* z-index レイヤースケール(重なり順の単一ソース)。
+     背景 < コンテンツ < 追従ヘッダー < ナビ/ドロップダウン < Snackbar < モーダル */
+  --z-behind: -1; /* 背景グラデーション(bg-drift) */
+  --z-base: 1; /* 通常フロー上の微小な持ち上げ */
+  --z-elevated: 5; /* 動画ウィジェット・リアクション等の前面要素 */
+  --z-sticky: 10; /* スペースのトップバー(sticky) */
+  --z-nav: 20; /* サイドバー・ヘッダーのメニュー */
+  --z-dropdown: 30; /* 検索候補などのドロップダウン */
+  --z-snackbar: 90; /* 操作完了フィードバック(Snackbar) */
+  --z-modal: 100; /* モーダル(backdrop 含む) */
+
+  /* フォーカスリング: アウトライン(生 var で legacy の :focus-visible から参照)。色はブルー(#457。旧シアン)。
+     グロー版(box-shadow)は @theme の --shadow-focus。新規部品/legacy とも同じ値に揃える(#445)。 */
+  --color-focus-ring: var(--color-cyan);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* 無効状態(disabled)の DS 標準の一組。部品ごとの ad hoc な opacity をこの一本に寄せる(#445)。
+     ユーティリティでは opacity-(--disabled-opacity)、カーソルは disabled:cursor-not-allowed。 */
+  --disabled-opacity: 0.4;
+}

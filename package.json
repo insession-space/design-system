@@ -6,7 +6,8 @@
   "description": "InSession の純粋 leaf UI（アプリ依存なし。i18n 等は props で注入する）",
   "//": "ソースのまま Vite が解決する（事前ビルドしない）。react はホスト（apps/web）と同一インスタンスを使うため peerDependency。",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./theme.css": "./theme.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json"
