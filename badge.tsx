@@ -86,7 +86,9 @@ export function Badge({
         legacyNew ? ' uppercase tracking-[0.06em]' : ''
       } ${className}`.trim()}
     >
-      {showDot && <span className={`h-1.5 w-1.5 rounded-pill ${DOT[legacyTone]}`} aria-hidden="true" />}
+      {showDot && (
+        <span className={`h-1.5 w-1.5 rounded-pill ${DOT[legacyTone]}`} aria-hidden="true" />
+      )}
       {icon != null &&
         (typeof icon === 'string' ? <Icon name={icon as IconName} size={13} /> : icon)}
       {children}

@@ -33,7 +33,8 @@ const BASE =
 const PAD_DEFAULT = 'px-3.5 py-[7px]';
 const PAD_REMOVABLE = 'pl-[14px] pr-2.5 py-1.5';
 const PAD_AVATAR = 'pl-[5px] pr-[13px] py-[5px]';
-const DEFAULT = 'bg-surface-2 border-border-strong text-text font-semibold enabled:hover:bg-surface-hover';
+const DEFAULT =
+  'bg-surface-2 border-border-strong text-text font-semibold enabled:hover:bg-surface-hover';
 // selected 枠は DS の accent 55%。tint は bg-tint-12 を維持。
 const SELECTED =
   'bg-tint-12 border-[color-mix(in_srgb,var(--color-accent)_55%,transparent)] text-accent font-bold';

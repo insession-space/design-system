@@ -11,7 +11,12 @@ export type ToggleProps = {
   disabled?: boolean;
 };
 
-export default function Toggle({ checked = false, onChange, label, disabled = false }: ToggleProps) {
+export default function Toggle({
+  checked = false,
+  onChange,
+  label,
+  disabled = false,
+}: ToggleProps) {
   return (
     <button
       type="button"
