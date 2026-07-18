@@ -44,6 +44,12 @@
   --color-accent: var(--color-mint);
   --color-on-accent: #ffffff;
 
+  /* カラー: リンクのセマンティック別名(#633)。生 hex は増やさず既存アクセントトークンを参照する。
+     link=静止色(淡コーラル)、link-hover=hover/active(コーラル)。web 側では [data-theme] で
+     light/dark に追従する。全リンク共通の focus リングは --color-focus-ring。 */
+  --color-link: var(--color-mint-soft);
+  --color-link-hover: var(--color-mint);
+
   /* カラー: アクセント(コーラル)ティント面。rgba(accent, α) を段階トークン化(数値=α×100)。
      tinted surface + 細ボーダーの控えめな面表現に使う。ライト/ダーク共通(半透明のため
      どちらの背景でも機能する) */
