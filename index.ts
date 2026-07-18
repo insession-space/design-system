@@ -24,7 +24,11 @@ export {
 } from './button.tsx';
 export { type CheckboxProps, default as Checkbox } from './checkbox.tsx';
 export { type ChipAvatar, type ChipProps, default as Chip } from './chip.tsx';
-export { type ConfirmModalProps, default as ConfirmModal } from './confirm-modal.tsx';
+export {
+  type ConfirmModalProps,
+  type ConfirmTone,
+  default as ConfirmModal,
+} from './confirm-modal.tsx';
 export { default as EmptyNote, type EmptyNoteProps } from './empty-note.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';

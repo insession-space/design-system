@@ -1,12 +1,17 @@
 import { type ReactNode, useEffect } from 'react';
+import Icon from './icons/icon.tsx';
 
 // 汎用モーダルの外殻（純粋 leaf UI）。backdrop・本体・×閉じボタン・Esc・背景クリックで閉じる、を
-// 一箇所にまとめる。見た目クラス（.modal-backdrop / .modal / .modal-close）はグローバル CSS 側の
-// 共有プリミティブを使う（Toggle 等と同じ方針）。i18n はこのパッケージに持たないため、
-// 閉じるラベルは props で注入する。
+// 一箇所にまとめる。i18n はこのパッケージに持たないため、閉じるラベルは props で注入する。
 //
-// 幅は `width`（CSS 長さ）を inline style で当てて基底 `.modal`（width:min(400px,92vw)）を確実に
-// 上書きする。ユーティリティ幅がレガシー層に負けて効かない問題を避け、任意幅のモーダルを作れる。
+// 2つの体裁を持つ（#663）:
+//  - 既定（children のみ）: legacy .modal / .modal-backdrop / .modal-close の共有プリミティブを使う
+//    従来経路（中央寄せ h2 / submit ボタン装飾に依存する多数の消費側をそのまま動かす）。
+//  - DS 構造（title / footer を渡したとき）: claude design "INSESSION Design System" の Modal に準拠し、
+//    トークンのユーティリティで title 行（border-bottom + × アイコン）/ body(pad18) / footer 行
+//    （border-top + surface-2）を組む。既存 API（children + width + closeLabel + as/onSubmit + closeOnEsc）は維持。
+//
+// 幅は `width`（CSS 長さ）を inline style で当てる。
 export type ModalProps = {
   onClose: () => void;
   children: ReactNode;
@@ -24,6 +29,10 @@ export type ModalProps = {
   onSubmit?: (e: any) => void;
   // Esc キーで閉じる。既定 true。
   closeOnEsc?: boolean;
+  // DS 構造のタイトル行（指定すると DS 構造で描画する）。
+  title?: ReactNode;
+  // DS 構造のフッター行（アクション群。指定すると DS 構造で描画する）。
+  footer?: ReactNode;
 };
 
 export default function Modal({
@@ -36,6 +45,8 @@ export default function Modal({
   as = 'div',
   onSubmit,
   closeOnEsc = true,
+  title,
+  footer,
 }: ModalProps) {
   useEffect(() => {
     if (!closeOnEsc) return undefined;
@@ -47,30 +58,69 @@ export default function Modal({
   }, [onClose, closeOnEsc]);
 
   const Box: any = as;
+  const ds = title != null || footer != null;
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <Box
-        className={`modal ${className}`.trim()}
-        style={width ? { width } : undefined}
-        role="dialog"
-        aria-modal="true"
-        aria-label={ariaLabel}
-        onClick={(e: any) => e.stopPropagation()}
-        onSubmit={onSubmit}
-      >
-        {closeLabel && (
-          <button
-            type="button"
-            className="modal-close"
-            aria-label={closeLabel}
-            title={closeLabel}
-            onClick={onClose}
-          >
-            ×
-          </button>
-        )}
-        {children}
-      </Box>
+      {ds ? (
+        // DS 構造（トークンのユーティリティ）。
+        <Box
+          className={`relative flex w-full flex-col overflow-hidden rounded-card border border-solid border-border bg-surface shadow-overlay animate-[card-in_0.4s_var(--ease-spring)_both] ${className}`.trim()}
+          style={width ? { width } : { width: 'min(420px, 92vw)' }}
+          role="dialog"
+          aria-modal="true"
+          aria-label={ariaLabel}
+          onClick={(e: any) => e.stopPropagation()}
+          onSubmit={onSubmit}
+        >
+          {title != null && (
+            <div className="flex items-center justify-between gap-3 border-b border-solid border-border px-[18px] py-4">
+              <span className="text-lg font-extrabold text-text">{title}</span>
+              {closeLabel && (
+                <button
+                  type="button"
+                  aria-label={closeLabel}
+                  title={closeLabel}
+                  onClick={onClose}
+                  className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-chip border-none bg-transparent text-text-dim cursor-pointer enabled:hover:bg-surface-hover enabled:hover:text-text"
+                >
+                  <Icon name="close" size={19} />
+                </button>
+              )}
+            </div>
+          )}
+          <div className="p-[18px]">{children}</div>
+          {footer != null && (
+            <div className="flex justify-end gap-2.5 border-t border-solid border-border bg-surface-2 px-[18px] py-3.5">
+              {footer}
+            </div>
+          )}
+        </Box>
+      ) : (
+        // 既定（legacy 共有プリミティブ）。従来経路と完全同一。
+        <Box
+          className={`modal ${className}`.trim()}
+          style={width ? { width } : undefined}
+          role="dialog"
+          aria-modal="true"
+          aria-label={ariaLabel}
+          onClick={(e: any) => e.stopPropagation()}
+          onSubmit={onSubmit}
+        >
+          {closeLabel && (
+            <button
+              type="button"
+              className="modal-close"
+              aria-label={closeLabel}
+              title={closeLabel}
+              onClick={onClose}
+            >
+              ×
+            </button>
+          )}
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
