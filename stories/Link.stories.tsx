@@ -2,8 +2,9 @@ import { Link } from '@in-session/ui';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 
-// DS のテキストリンク（#633）。variant=inline/subtle/pill。色は --color-link / --color-link-hover、
-// focus は全リンク共通のグローバル :focus-visible（--color-focus-ring）。
+// DS のテキストリンク（#633）。variant=inline/subtle/pill。下線は使わずボタンのラベルのように
+// 色 + ウェイトで区別する。色は --color-link / --color-link-hover、focus は全リンク共通の
+// グローバル :focus-visible（--color-focus-ring）。
 const meta: Meta<typeof Link> = {
   title: 'Components/Link',
   component: Link,
@@ -17,7 +18,7 @@ export const Variants: Story = {
   render: () => (
     <Section
       title="バリアント (DS)"
-      note="inline=本文中(下線あり・offset 2px) / subtle=弱い誘導(色のみ、hover で下線) / pill=独立リンク(旧 .section-link・.list-back)。"
+      note="下線なし・ボタンテキスト調。inline=本文中 / subtle=弱い誘導(小サイズ) / pill=独立リンク(旧 .section-link・.list-back)。色+ウェイトで区別。"
     >
       <div className="flex flex-col gap-5">
         <p className="text-base text-text-dim">
