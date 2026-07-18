@@ -8,7 +8,13 @@ export {
   type AvatarStatus,
   default as Avatar,
 } from './avatar.tsx';
-export { Badge, type BadgeProps, CountChip, type CountChipProps } from './badge.tsx';
+export {
+  Badge,
+  type BadgeProps,
+  type BadgeTone,
+  CountChip,
+  type CountChipProps,
+} from './badge.tsx';
 export { type BottomSheetProps, default as BottomSheet } from './bottom-sheet.tsx';
 export {
   type ButtonProps,
