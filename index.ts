@@ -22,6 +22,7 @@ export { default as Lozenge, type LozengeProps, type LozengeTone } from './lozen
 export { Menu, MenuItem, type MenuItemProps, type MenuProps } from './menu.tsx';
 export { default as Modal, type ModalProps } from './modal.tsx';
 export { default as Popover, type PopoverPlacement, type PopoverProps } from './popover.tsx';
+export { type OpenProfile, ProfileModalContext, useOpenProfile } from './profile-modal.tsx';
 export { default as Radio, type RadioProps } from './radio.tsx';
 export { default as Spinner, type SpinnerProps } from './spinner.tsx';
 export {
