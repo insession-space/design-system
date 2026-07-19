@@ -30,17 +30,24 @@ export {
   default as ConfirmModal,
 } from './confirm-modal.tsx';
 export { default as EmptyNote, type EmptyNoteProps } from './empty-note.tsx';
+export {
+  default as IconButton,
+  type IconButtonProps,
+  type IconButtonVariant,
+} from './icon-button.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
 export { default as PersonIcon } from './icons/person-icon.tsx';
 export { default as Input, type InputProps } from './input.tsx';
 export { default as Link, type LinkProps, type LinkVariant, linkClass } from './link.tsx';
+export { default as LogoMark, type LogoMarkProps, type LogoMarkVariant } from './logo-mark.tsx';
 export { default as Lozenge, type LozengeProps, type LozengeTone } from './lozenge.tsx';
 export { Menu, MenuItem, type MenuItemProps, type MenuProps } from './menu.tsx';
 export { default as Modal, type ModalProps } from './modal.tsx';
 export { default as Popover, type PopoverPlacement, type PopoverProps } from './popover.tsx';
 export { type OpenProfile, ProfileModalContext, useOpenProfile } from './profile-modal.tsx';
 export { default as Radio, type RadioProps } from './radio.tsx';
+export { default as SearchField, type SearchFieldProps } from './search-field.tsx';
 export { default as Spinner, type SpinnerProps } from './spinner.tsx';
 export {
   StatusBadge,
