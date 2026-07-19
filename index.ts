@@ -1,7 +1,20 @@
 // @in-session/ui — 純粋 leaf UI の公開窓口。外部はここ経由で import する。
 
-export { type AvatarProps, default as Avatar } from './avatar.tsx';
-export { Badge, type BadgeProps, CountChip, type CountChipProps } from './badge.tsx';
+export {
+  type AvatarProps,
+  AvatarStack,
+  type AvatarStackPerson,
+  type AvatarStackProps,
+  type AvatarStatus,
+  default as Avatar,
+} from './avatar.tsx';
+export {
+  Badge,
+  type BadgeProps,
+  type BadgeTone,
+  CountChip,
+  type CountChipProps,
+} from './badge.tsx';
 export { type BottomSheetProps, default as BottomSheet } from './bottom-sheet.tsx';
 export {
   type ButtonProps,
@@ -10,8 +23,12 @@ export {
   default as Button,
 } from './button.tsx';
 export { type CheckboxProps, default as Checkbox } from './checkbox.tsx';
-export { type ChipProps, default as Chip } from './chip.tsx';
-export { type ConfirmModalProps, default as ConfirmModal } from './confirm-modal.tsx';
+export { type ChipAvatar, type ChipProps, default as Chip } from './chip.tsx';
+export {
+  type ConfirmModalProps,
+  type ConfirmTone,
+  default as ConfirmModal,
+} from './confirm-modal.tsx';
 export { default as EmptyNote, type EmptyNoteProps } from './empty-note.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
@@ -40,5 +57,5 @@ export {
   type ToastTone,
   type ToastVariant,
 } from './toast.tsx';
-export { default as Toggle } from './toggle.tsx';
+export { default as Toggle, type ToggleProps } from './toggle.tsx';
 export { useDismiss } from './use-dismiss.ts';
