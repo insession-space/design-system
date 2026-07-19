@@ -1,4 +1,4 @@
-// ロゴマーク（純粋 leaf UI）。claude design "INSESSION Design System" のロゴ仕様に準拠（ON SESSION #682）。
+// ロゴマーク（純粋 leaf UI）。claude design "INSESSION Design System" のロゴ仕様に準拠（loophub #682）。
 // 4色(coral/amber/green/blue)のドットを重ねて表現する。variant='row' は横並びクラスタ +
 // showWordmark で "INSESSION" ワードマーク(Archivo/font-display)を並べる。variant='cluster' は
 // 2x2 グリッドの単体マーク（プロダクト切替チップ等の小さな箇所向け）。
