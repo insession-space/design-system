@@ -1,7 +1,7 @@
 import type { InputHTMLAttributes } from 'react';
 import Icon from './icons/icon.tsx';
 
-// 検索入力（純粋 leaf UI）。claude design "INSESSION Design System" 準拠（ON SESSION #682）。
+// 検索入力（純粋 leaf UI）。claude design "INSESSION Design System" 準拠（loophub #682）。
 // Input と同系の surface-2 面 + 1.5px border + radius-md + focus-within リング。左に search
 // アイコンを固定表示する(常時 search 固定なので Input の prefix とは別プリミティブにしてある)。
 // i18n は持たない(placeholder は呼び出し側が渡す)。

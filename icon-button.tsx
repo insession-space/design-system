@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-// アイコンのみの正方形ボタン（純粋 leaf UI）。claude design "INSESSION Design System" 準拠（ON SESSION #682）。
+// アイコンのみの正方形ボタン（純粋 leaf UI）。claude design "INSESSION Design System" 準拠（loophub #682）。
 // variant: surface(既定。surface-2 面 + border + hover surface-hover) / accent(coral 塗り) /
 // ghost(透明地・hover のみ面が付く)。icon は呼び出し側が `.mi` span か Icon(icons/icon.tsx) を渡す
 // (Material Symbols の ligature 名を使う箇所があるため、Button と違い IconName 限定にしない)。
