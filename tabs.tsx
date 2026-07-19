@@ -2,8 +2,10 @@ import type { ReactNode } from 'react';
 
 // タブ / セグメンテッドコントロール（純粋 leaf UI）。legacy の .side-tabs / .tab-btn（下線式タブ）を
 // トークン経由のユーティリティで再構成する。media-tabs・playlist サブタブ・sticker picker タブなどの
-// 別実装を将来この一本へ寄せる。見た目: 透明地 + アクティブ下にシアンの下線がスプリングで伸びる。
-// i18n は持たない（label は t() 済みを渡す）。
+// 別実装を将来この一本へ寄せる。見た目は DS(claude design "INSESSION Design System" #463)の
+// 下線タブに準拠: 透明地 + アクティブ下に accent(コーラル)の 2px 下線がスプリングで伸びる
+// (after:bg-accent)。非アクティブは text-faint→hover text-dim。件数は badge スロットへ
+// CountChip を渡す(DS の count バッジ相当)。i18n は持たない（label は t() 済みを渡す）。
 export type TabItem = {
   key: string;
   label: ReactNode;
