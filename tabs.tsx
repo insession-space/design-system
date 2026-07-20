@@ -11,8 +11,6 @@ export type TabItem = {
   label: ReactNode;
   // ラベル右の付随要素（件数 CountChip 等）。
   badge?: ReactNode;
-  // 所属グループの key（groups 指定時のみ使用。未指定は先頭グループ扱い #766）。
-  group?: string;
 };
 
 export type TabsProps = {
@@ -27,9 +25,6 @@ export type TabsProps = {
   // 幅の振る舞い。'default'=内容幅で左詰め（media-tabs 等）。'fill'=各タブが均等に伸びて
   // 行幅いっぱいを占める（legacy 基底 .tab-btn の flex:1 相当。playlist サブタブ / sticker タブ）。
   variant?: 'default' | 'fill';
-  // タブを見出し付きグループへ分割する（#766: プレイリストタブの「自分/スペース」分割）。
-  // 未指定なら従来どおりのフラット表示（DOM・見た目とも完全に据え置き）。
-  groups?: { key: string; label: ReactNode }[];
 };
 
 // hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent は、プリフライト未使用で
@@ -43,27 +38,6 @@ const TAB_WIDTH: Record<'default' | 'fill', string> = {
 };
 const TAB_ACTIVE = 'text-text after:scale-x-100';
 
-function renderTabButton(
-  tab: TabItem,
-  active: boolean,
-  tabClass: string,
-  onChange: (key: string) => void,
-) {
-  return (
-    <button
-      key={tab.key}
-      type="button"
-      role="tab"
-      aria-selected={active}
-      className={`${tabClass}${active ? ` ${TAB_ACTIVE}` : ''}`}
-      onClick={() => onChange(tab.key)}
-    >
-      {tab.label}
-      {tab.badge}
-    </button>
-  );
-}
-
 export default function Tabs({
   tabs,
   value,
@@ -72,52 +46,31 @@ export default function Tabs({
   trailing,
   className = '',
   variant = 'default',
-  groups,
 }: TabsProps) {
   const tabClass = `${TAB_BASE} ${TAB_WIDTH[variant]}`;
-  // border-t-0 border-x-0 は必須: プリフライト未使用のため border-solid が全辺の border-style を
-  // solid にし、border-b で未指定の上/左/右の border-width が既定 medium(3px) のまま枠として出る。
-  // 明示的に 0 にして legacy .side-tabs(border-bottom のみ)へ一致させる(#448 リグレッション修正)。
-  const outerClassName =
-    `flex border-t-0 border-x-0 border-b border-solid border-border ${className}`.trim();
-
-  if (!groups) {
-    return (
-      <div role="tablist" aria-label={ariaLabel} className={outerClassName}>
-        {tabs.map((tab) => renderTabButton(tab, tab.key === value, tabClass, onChange))}
-        {trailing}
-      </div>
-    );
-  }
-
-  // グループ表示（#766）: グループごとに縦積み(見出し + タブ行)し、グループ幅はタブ数比例の
-  // flexGrow で配分する。2つ目以降のグループには左区切り線を足す(同じ理由で他3辺は0を明示)。
-  // tablist はフラット時と同じく外側の1つだけに置き、グループ分割は視覚的なものに留める
-  // (グループごとに tablist を分けると「選択タブが1つも無い tablist」ができ、排他的な
-  //  1タブセットという意味が壊れるため)。見出しは装飾なので aria-hidden で AT から隠す。
   return (
-    <div role="tablist" aria-label={ariaLabel} className={outerClassName}>
-      {groups.map((group, i) => {
-        const groupTabs = tabs.filter((tab) => (tab.group ?? groups[0].key) === group.key);
-        if (groupTabs.length === 0) return null;
+    <div
+      role="tablist"
+      aria-label={ariaLabel}
+      // border-t-0 border-x-0 は必須: プリフライト未使用のため border-solid が全辺の border-style を
+      // solid にし、border-b で未指定の上/左/右の border-width が既定 medium(3px) のまま枠として出る。
+      // 明示的に 0 にして legacy .side-tabs(border-bottom のみ)へ一致させる(#448 リグレッション修正)。
+      className={`flex border-t-0 border-x-0 border-b border-solid border-border ${className}`.trim()}
+    >
+      {tabs.map((tab) => {
+        const active = tab.key === value;
         return (
-          <div
-            key={group.key}
-            role="presentation"
-            data-tab-group={group.key}
-            className={`flex flex-col${i > 0 ? ' border-y-0 border-r-0 border-l border-solid border-border' : ''}`}
-            style={{ flexGrow: groupTabs.length, flexBasis: 0 }}
+          <button
+            key={tab.key}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            className={`${tabClass}${active ? ` ${TAB_ACTIVE}` : ''}`}
+            onClick={() => onChange(tab.key)}
           >
-            <span
-              aria-hidden="true"
-              className="px-1.5 pt-1.5 text-center font-display text-2xs font-bold tracking-[0.12em] text-text-faint"
-            >
-              {group.label}
-            </span>
-            <div role="presentation" className="flex">
-              {groupTabs.map((tab) => renderTabButton(tab, tab.key === value, tabClass, onChange))}
-            </div>
-          </div>
+            {tab.label}
+            {tab.badge}
+          </button>
         );
       })}
       {trailing}
