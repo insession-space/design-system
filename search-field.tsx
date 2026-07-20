@@ -10,7 +10,7 @@ export type SearchFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'clas
 };
 
 const FIELD =
-  'flex items-center gap-2 w-full bg-surface-2 border-[1.5px] border-solid border-border rounded-md px-3.5 py-2.5 transition-[border-color,box-shadow] duration-(--dur-fast) focus-within:border-info focus-within:shadow-focus';
+  'flex items-center gap-2 bg-surface-2 border-[1.5px] border-solid border-border rounded-md px-3.5 py-2.5 transition-[border-color,box-shadow] duration-(--dur-fast) focus-within:border-info focus-within:shadow-focus';
 const CONTROL =
   'flex-1 min-w-0 border-none outline-none bg-transparent text-md text-text placeholder:text-text-faint';
 
