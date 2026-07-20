@@ -22,7 +22,7 @@ export type CountChipProps = {
 export function CountChip({ children, animated = false, className = '' }: CountChipProps) {
   return (
     <span
-      className={`inline-flex items-center justify-center min-w-[17px] h-[17px] px-[5px] rounded-pill bg-success-surface text-success text-xs font-extrabold tracking-normal${
+      className={`inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 rounded-pill bg-success-surface-strong text-success text-xs font-extrabold tracking-normal${
         animated ? ' animate-[pop-in_0.3s_var(--ease-spring)]' : ''
       } ${className}`.trim()}
     >

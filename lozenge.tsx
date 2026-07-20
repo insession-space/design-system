@@ -4,14 +4,17 @@ import type { ReactNode } from 'react';
 // 状態やメタ情報の小ラベル（LIVE / PENDING / REC / BETA 等）。モノスペース大文字・塗り控えめ・非操作。
 // StatusBadge（点 + ラベルの枠付きピル。継続的な状態）とは用途が別で、こちらは mono の状態タグ。
 // tone でセマンティック色を切替える。dot で先頭に同色ドットを出す。i18n は持たない。
+// 塗りは視認性確保のため -surface-strong 系トークンを使う(#765)。
 export type LozengeTone = 'success' | 'warning' | 'accent' | 'info' | 'neutral';
 
 const TONE: Record<LozengeTone, string> = {
-  success: 'text-success bg-success-surface',
-  warning: 'text-warning bg-warning-surface',
-  accent: 'text-accent bg-tint-12',
-  info: 'text-info bg-info-surface',
-  neutral: 'text-text-dim bg-tint-8',
+  success: 'text-success bg-success-surface-strong',
+  warning: 'text-warning bg-warning-surface-strong',
+  accent: 'text-accent bg-tint-22',
+  info: 'text-info bg-info-surface-strong',
+  // neutral は tint(accent 色相)ではなく中立の面を使う。tint を濃くすると accent tone と
+  // 見分けが付かなくなるため、面は surface-3・文字は text-text で濃度を確保する(#765)。
+  neutral: 'text-text bg-surface-3',
 };
 const DOT: Record<LozengeTone, string> = {
   success: 'bg-success',

@@ -33,11 +33,13 @@ const BASE =
 const PAD_DEFAULT = 'px-3.5 py-[7px]';
 const PAD_REMOVABLE = 'pl-[14px] pr-2.5 py-1.5';
 const PAD_AVATAR = 'pl-[5px] pr-[13px] py-[5px]';
+// 既定の面は surface-2 を維持する。surface-3 はライトで #ebe7dc とページ背景(#e9e9e6)にほぼ
+// 埋もれるため、濃くするつもりで下げると逆にコントラストが落ちる(#765)。
 const DEFAULT =
   'bg-surface-2 border-border-strong text-text font-semibold enabled:hover:bg-surface-hover';
-// selected 枠は DS の accent 55%。tint は bg-tint-12 を維持。
+// selected 枠は DS の accent 55%。tint は視認性確保のため bg-tint-22 に強化(#765)。
 const SELECTED =
-  'bg-tint-12 border-[color-mix(in_srgb,var(--color-accent)_55%,transparent)] text-accent font-bold';
+  'bg-tint-22 border-[color-mix(in_srgb,var(--color-accent)_55%,transparent)] text-accent font-bold';
 
 export default function Chip({
   selected = false,

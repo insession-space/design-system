@@ -72,15 +72,21 @@
      使い方: text-success / bg-success-surface / border-success-border(warning/danger/info も同様)。 */
   --color-success: #31c47e;
   --color-success-surface: rgba(49, 196, 126, 0.12);
+  /* success-surface-strong: Lozenge/Chip/CountChip 等の視認性改善用に一段濃い塗り(#765)。 */
+  --color-success-surface-strong: rgba(49, 196, 126, 0.2);
   --color-success-border: rgba(49, 196, 126, 0.3);
   --color-warning: #f5b54a;
   --color-warning-surface: rgba(245, 181, 74, 0.12);
+  /* warning-surface-strong: 同上(#765)。 */
+  --color-warning-surface-strong: rgba(245, 181, 74, 0.2);
   --color-warning-border: rgba(245, 181, 74, 0.3);
   --color-danger: #ff6b6b;
   --color-danger-surface: rgba(255, 107, 107, 0.12);
   --color-danger-border: rgba(255, 107, 107, 0.3);
   --color-info: #5b8bf0;
   --color-info-surface: rgba(91, 139, 240, 0.12);
+  /* info-surface-strong: 同上(#765)。 */
+  --color-info-surface-strong: rgba(91, 139, 240, 0.2);
   --color-info-border: rgba(91, 139, 240, 0.3);
 
   /* カラー: オーバーレイ面(ポップオーバー/スナックバー/ヘッダーエラー等、前面に浮く面)。
