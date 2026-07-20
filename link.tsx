@@ -11,6 +11,9 @@ import {
 //   inline  = 本文中リンク。静止=link 色 + semibold、hover で link-hover 色。
 //   subtle  = リスト脇の弱い誘導（旧 `text-accent text-sm` の置換先）。inline の小サイズ版。
 //   pill    = セクション見出し脇や「戻る」導線などの独立リンク（旧 `.section-link` / `.list-back` を統合）。
+//   wrapper = カード等のブロック全体をリンクにする器（#795）。中身のタイポは呼び出し側が持つので
+//             色・ウェイト・サイズを一切持たず（`text-inherit`）、UA 既定の下線だけを確実に消す。
+//             面/境界/角丸/影などのカード表現は呼び出し側の className で足す。
 //
 // 色は必ずセマンティックトークン（--color-link / --color-link-hover。生 hex を書かない）。
 // focus リングはアプリ横断のグローバル `:focus-visible`（--color-focus-ring / --focus-ring-*）に
@@ -22,7 +25,7 @@ import {
 //     （`<Link asChild variant="pill"><RouterLink to="/">…</RouterLink></Link>`）。
 //   - className だけ欲しい場合は `linkClass(variant)` を直接 className に渡す
 //     （react-router `Link` の className に載せる用途で最も手軽）。
-export type LinkVariant = 'inline' | 'subtle' | 'pill';
+export type LinkVariant = 'inline' | 'subtle' | 'pill' | 'wrapper';
 
 // 下線は使わない（ボタンテキスト調）。色・ウェイトはトークン経由。arbitrary は 4/8px リズムに
 // 載らない値のみ（py-[7px] 等）。
@@ -32,6 +35,7 @@ const VARIANT: Record<LinkVariant, string> = {
   subtle:
     'text-link text-sm font-semibold no-underline cursor-pointer transition-colors duration-(--dur-fast) hover:text-link-hover',
   pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-[0.08em] uppercase no-underline cursor-pointer transition-[background,color,transform] duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent hover:-translate-y-px',
+  wrapper: 'text-inherit no-underline cursor-pointer',
 };
 
 // variant のクラス文字列。react-router `Link`/`NavLink` の className にそのまま渡せる。

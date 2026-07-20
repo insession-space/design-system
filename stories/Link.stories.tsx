@@ -38,6 +38,18 @@ export const Variants: Story = {
             すべて見る
           </Link>
         </div>
+        <Link
+          variant="wrapper"
+          href="#"
+          className="flex max-w-[340px] items-center gap-3 rounded-card border border-solid border-border bg-surface p-4 shadow-soft"
+        >
+          <div className="flex-1 min-w-0">
+            <div className="text-base font-bold truncate">wrapper = カード全体がリンク</div>
+            <div className="font-body text-xs text-text-faint">
+              色/ウェイトを持たず下線だけ消す（中身のタイポは呼び出し側）
+            </div>
+          </div>
+        </Link>
       </div>
     </Section>
   ),
