@@ -31,7 +31,7 @@ const VARIANT: Record<LinkVariant, string> = {
     'text-link font-semibold no-underline cursor-pointer transition-colors duration-(--dur-fast) hover:text-link-hover',
   subtle:
     'text-link text-sm font-semibold no-underline cursor-pointer transition-colors duration-(--dur-fast) hover:text-link-hover',
-  pill: 'inline-flex items-center gap-1.5 self-start px-3 py-[7px] rounded-pill border border-solid border-border bg-surface text-text-dim text-sm font-bold tracking-[0.08em] uppercase no-underline cursor-pointer transition-[background,color,transform] duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-text hover:-translate-y-px',
+  pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-[0.08em] uppercase no-underline cursor-pointer transition-[background,color,transform] duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent hover:-translate-y-px',
 };
 
 // variant のクラス文字列。react-router `Link`/`NavLink` の className にそのまま渡せる。
