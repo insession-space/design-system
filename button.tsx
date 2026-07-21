@@ -56,7 +56,7 @@ const VARIANT: Record<ButtonVariant, string> = {
 };
 
 // DS の padding。primary/accent/danger/live は 12/22。ghost は横を詰める(テキストボタン)。
-// xs はポップオーバー/モバイル向けのコンパクト(#517)。
+// xs はポップオーバー/モバイル向けのコンパクト(#517)。DS の xs 仕様(px-3/py-1.5, text-xs)に準拠(#854)。
 const SIZE: Record<ButtonSize, string> = {
   xs: 'text-xs px-3 py-1.5',
   sm: 'text-sm px-4 py-2',
