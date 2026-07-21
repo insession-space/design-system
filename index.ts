@@ -50,6 +50,11 @@ export { default as Radio, type RadioProps } from './radio.tsx';
 export { default as SearchField, type SearchFieldProps } from './search-field.tsx';
 export { default as Spinner, type SpinnerProps } from './spinner.tsx';
 export {
+  default as SplitModal,
+  type SplitModalItem,
+  type SplitModalProps,
+} from './split-modal.tsx';
+export {
   StatusBadge,
   type StatusBadgeProps,
   StatusDot,
