@@ -26,6 +26,7 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   warning: true,
   edit: true,
   link: true,
+  lock: true,
   volume_off: true,
   volume_up: true,
   extension: true,
