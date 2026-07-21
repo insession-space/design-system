@@ -1,6 +1,6 @@
 {
   "name": "@in-session/ui",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "description": "InSession の純粋 leaf UI（アプリ依存なし。i18n 等は props で注入する）",
