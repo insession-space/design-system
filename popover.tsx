@@ -19,9 +19,14 @@ export type PopoverProps = {
   role?: string;
   // パネル（浮く面）に足す追加クラス（幅・最大高さ等の文脈調整用）。
   panelClassName?: string;
-  // パネルの影ユーティリティ。既定は DS の popover 影。暗い面から強く分離させたい
-  // ポップオーバーは 'shadow-popover-strong' を渡す（#564）。
+  // パネルの影ユーティリティ。既定は DS の popover 影（UserMenu/🧩 スイッチャーと同じ。#867）。
   panelShadow?: string;
+  // 既定の内側 padding(p-3) を出すか。ヘッダー/リストが独自 padding を持つ通知センターのような
+  // パネルは false にして呼び出し側で表現する（既定 true = 従来挙動）。
+  panelPadding?: boolean;
+  // 既定の最大高さ(max-h-80) + 内部スクロールを出すか。呼び出し側で独自の高さ/内部スクロール
+  // (例: ヘッダー固定+リストだけスクロール)を組みたい場合は false にする（既定 true = 従来挙動）。
+  panelScroll?: boolean;
   // max-sm でトリガー追従（placement アンカー）をやめ、position:fixed + 左右対称ガター(12px)で
   // ビューポートに固定するモバイルシート表示にする。上端はトリガー直下に合わせる。sm 以上は
   // 従来どおり placement 通りのトリガー追従。既定 false（他 consumer の従来挙動は不変）。
@@ -38,8 +43,10 @@ const PLACEMENT: Record<PopoverPlacement, string> = {
 };
 
 // パネル本体の見た目（面・境界・角丸・入場アニメ）。位置と影は呼び出し側の設定で足す。
-const PANEL =
-  'z-(--z-dropdown) min-w-[220px] max-h-80 overflow-y-auto p-3 bg-surface border border-solid border-border-strong rounded-card animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
+// max-w は mobileSheet の左右ガター(12px×2=24px)と揃え、mobileSheet を使わない呼び出し側でも
+// 極小幅のビューポートで横にはみ出さないようにする(#867)。
+const PANEL_BASE =
+  'z-(--z-dropdown) min-w-[220px] max-w-[calc(100vw-24px)] bg-surface border border-solid border-border-strong rounded-card animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
 
 export default function Popover({
   open,
@@ -51,6 +58,8 @@ export default function Popover({
   role = 'menu',
   panelClassName = '',
   panelShadow = 'shadow-popover',
+  panelPadding = true,
+  panelScroll = true,
   mobileSheet = false,
   closeOnEsc = true,
   closeOnOutside = true,
@@ -89,7 +98,7 @@ export default function Popover({
         <div
           role={role}
           aria-label={ariaLabel}
-          className={`${PANEL} ${positioning} ${panelShadow} ${panelClassName}`.trim()}
+          className={`${PANEL_BASE} ${panelScroll ? 'max-h-80 overflow-y-auto' : ''} ${panelPadding ? 'p-3' : ''} ${positioning} ${panelShadow} ${panelClassName}`.trim()}
           style={
             mobileSheet ? ({ '--popover-sheet-top': `${sheetTop}px` } as CSSProperties) : undefined
           }
