@@ -29,13 +29,13 @@ const PANE_CONTENT: Record<string, { title: string; description: string }> = {
   tetris: { title: 'Tetris', description: '並走プレイ + スペース内ランキング。' },
 };
 
-function SplitModalDemo() {
+function SplitModalDemo({ openLabel, asSheet }: { openLabel: string; asSheet?: boolean }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('watch-party');
   const current = PANE_CONTENT[value];
   return (
     <>
-      <Button onClick={() => setOpen(true)}>設定を開く</Button>
+      <Button onClick={() => setOpen(true)}>{openLabel}</Button>
       {open && (
         <SplitModal
           items={ITEMS}
@@ -49,6 +49,7 @@ function SplitModalDemo() {
           ariaLabel="プラグイン設定"
           title={current.title}
           description={current.description}
+          asSheet={asSheet}
         >
           <div className="flex items-center justify-between rounded-card border border-solid border-border bg-tint-5 px-4 py-3">
             <span className="text-smd font-semibold text-text">有効にする</span>
@@ -68,44 +69,10 @@ export const Interactive: Story = {
       title="実動デモ"
       note="左レールの項目クリックで右ペインが切り替わる。広い画面はレール+コンテンツの横並び、狭い画面はドリルダウン(一覧→タップで詳細)に自動で切り替わる。"
     >
-      <SplitModalDemo />
+      <SplitModalDemo openLabel="設定を開く" />
     </Section>
   ),
 };
-
-function AsSheetDemo() {
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('watch-party');
-  const current = PANE_CONTENT[value];
-  return (
-    <>
-      <Button onClick={() => setOpen(true)}>シート形式で開く</Button>
-      {open && (
-        <SplitModal
-          items={ITEMS}
-          value={value}
-          onSelect={setValue}
-          onClose={() => setOpen(false)}
-          navLabel="プラグイン設定ナビ"
-          navTitle="プラグイン"
-          closeLabel="閉じる"
-          backLabel="戻る"
-          ariaLabel="プラグイン設定"
-          title={current.title}
-          description={current.description}
-          asSheet
-        >
-          <div className="flex items-center justify-between rounded-card border border-solid border-border bg-tint-5 px-4 py-3">
-            <span className="text-smd font-semibold text-text">有効にする</span>
-            <span className="rounded-pill bg-tint-8 border border-solid border-border px-3 py-1 text-sm text-mint-soft">
-              ON
-            </span>
-          </div>
-        </SplitModal>
-      )}
-    </>
-  );
-}
 
 export const AsBottomSheet: Story = {
   render: () => (
@@ -113,7 +80,7 @@ export const AsBottomSheet: Story = {
       title="BottomSheet 外殻(asSheet)"
       note="asSheet を渡すとモバイルのスペース固有機能向けに外殻を BottomSheet にできる(#581 6b)。"
     >
-      <AsSheetDemo />
+      <SplitModalDemo openLabel="シート形式で開く" asSheet />
     </Section>
   ),
 };
