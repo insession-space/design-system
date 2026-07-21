@@ -17,6 +17,10 @@ import Modal from './modal.tsx';
 //   「セクション一覧 → タップで詳細（戻る導線つき）」のドリルダウンにする。
 //   ネイティブの設定アプリと同じ体験で、セクションが何個あっても破綻しない。
 
+// ドリルダウンに切り替えるビューポート幅の上限。タブレット〜狭いPCウィンドウでも
+// レール214px+本文の2カラムは窮屈なため 768px にしている（#861）。
+const NARROW_MAX_WIDTH = 768;
+
 export type SplitModalItem = {
   id: string;
   label: string;
@@ -62,7 +66,7 @@ export type SplitModalProps = {
   narrow?: boolean;
 };
 
-// ビューポートが狭いか。既存の設定モーダルが使っていた 560px を境界に合わせる。
+// ビューポートが狭いか。境界値は NARROW_MAX_WIDTH（呼び出し側で明示的に上書きしない限り）。
 //
 // matchMedia の change だけに頼らないのは、iframe を属性でリサイズすると matches は変わるのに
 // change イベントが発火しないため（プレビュー/埋め込み環境で切り替わらなくなる）。
@@ -108,7 +112,7 @@ export default function SplitModal({
   className = '',
   narrow,
 }: SplitModalProps) {
-  const autoNarrow = useNarrowViewport(560);
+  const autoNarrow = useNarrowViewport(NARROW_MAX_WIDTH);
   const isNarrow = narrow ?? autoNarrow;
   // ドリルダウンで詳細を開いているか。広い画面へ戻ったら一覧状態に畳んでおく
   // （次に狭くなったときに一覧から始まる）。
