@@ -253,6 +253,14 @@
   --z-sticky: 10; /* スペースのトップバー(sticky) */
   --z-nav: 20; /* サイドバー・ヘッダーのメニュー */
   --z-dropdown: 30; /* 検索候補などのドロップダウン */
+  --z-popover-portal: 35; /* Popover の portal 版(createPortal で document.body 直下 + position:fixed。
+                             #885)。クリップ元の親パネル自身も --z-dropdown を使うため、それより手前に
+                             出す必要がある。foundation/ui が自分で使うトークンなので、プロダクト側の
+                             スケール(InSession は 55)に依らずここを既定値の単一ソースにする。
+                             【注意】この値はプロダクト側の定義(例: InSession の style.css は 55)と
+                             意図的に一致しない — 各プロダクトは自身の --z-dropdown のスケールに合わせて
+                             --z-popover-portal を上書きする前提で、"35" を「正しい値」として参照しては
+                             いけない(foundation/ui 単体利用時のフォールバックに過ぎない)。 */
   --z-snackbar: 90; /* 操作完了フィードバック(Snackbar) */
   --z-modal: 100; /* モーダル(backdrop 含む) */
 
