@@ -1,0 +1,32 @@
+{
+  "projectId": "b683a5a6-eea2-4cf5-af15-f848f9415a4f",
+  "shape": "storybook",
+  "readmeHeader": ".design-sync/conventions.md",
+  "pkg": "@in-session/ui",
+  "entry": "foundation/ui/index.ts",
+  "buildCmd": "cd foundation/ui && npx tsc -p tsconfig.json --noEmit false --declaration --emitDeclarationOnly --outDir dist",
+  "storybookStatic": ".design-sync/sb-reference",
+  "storybookConfigDir": ".storybook",
+  "extraEntries": ["../../.design-sync/ds-surface.tsx"],
+  "provider": { "component": "DsSurface" },
+  "extraFonts": [
+    "../../products/insession/apps/web/node_modules/@fontsource/jetbrains-mono/400.css",
+    "../../products/insession/apps/web/node_modules/@fontsource/jetbrains-mono/700.css"
+  ],
+  "overrides": {
+    "Avatar": { "cardMode": "column" },
+    "Icon": { "viewport": "900x1400" }
+  },
+  "titleMap": {
+    "ChatLog (EventBubble)": null,
+    "ChatLog(EventBubble)": null,
+    "Navigation": null,
+    "Status": "StatusBadge",
+    "Icons": "Icon",
+    "Controls": "Checkbox",
+    "Primitives": "Avatar",
+    "Colors": null,
+    "Tokens": null,
+    "Typography": null
+  }
+}
