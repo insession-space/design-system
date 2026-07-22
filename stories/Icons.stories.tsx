@@ -102,6 +102,7 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   meeting_room: true,
   pending: true,
   sticker: true,
+  picture_in_picture: true,
 };
 
 const ICON_NAMES = Object.keys(ICON_NAME_MAP) as IconName[];

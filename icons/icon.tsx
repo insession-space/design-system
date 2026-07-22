@@ -164,6 +164,9 @@ const PATHS = {
   meeting_room: 'M14 6v15H3v-2h2V3h9v1h5v15h2v2h-4V6h-3zm-4 5v2h2v-2h-2z',
   pending:
     'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-5 11c-.83 0-1.5-.67-1.5-1.5S6.17 10 7 10s1.5.67 1.5 1.5S7.83 13 7 13zm5 0c-.83 0-1.5-.67-1.5-1.5S11.17 10 12 10s1.5.67 1.5 1.5S12.83 13 12 13zm5 0c-.83 0-1.5-.67-1.5-1.5S16.17 10 17 10s1.5.67 1.5 1.5S17.83 13 17 13z',
+  // 自動 Picture-in-Picture(#909)のトップバー開閉ボタン用。Material Icons picture_in_picture_alt 由来。
+  picture_in_picture:
+    'M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z',
 };
 
 // 通常の Material Icons(0 0 24 24)とは異なる viewBox を持つアイコン(Material Symbols由来。
