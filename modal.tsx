@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import Icon from './icons/icon.tsx';
 
 // 汎用モーダルの外殻（純粋 leaf UI）。backdrop・本体・×閉じボタン・Esc・背景クリックで閉じる、を
@@ -48,20 +48,25 @@ export default function Modal({
   title,
   footer,
 }: ModalProps) {
+  // PiP(Document Picture-in-Picture)等、別ドキュメントへ createPortal されるケースに対応するため、
+  // Esc リスナーは自身の描画先(backdropRef の ownerDocument)の window から張る(メインドキュメントの
+  // 消費側は ownerDocument が常に main document なので挙動は従来と完全に同一)。
+  const backdropRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (!closeOnEsc) return undefined;
+    const win = backdropRef.current?.ownerDocument?.defaultView ?? window;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    win.addEventListener('keydown', onKey);
+    return () => win.removeEventListener('keydown', onKey);
   }, [onClose, closeOnEsc]);
 
   const Box: any = as;
   const ds = title != null || footer != null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" ref={backdropRef} onClick={onClose}>
       {ds ? (
         // DS 構造（トークンのユーティリティ）。
         <Box
