@@ -167,6 +167,8 @@ const PATHS = {
   // 自動 Picture-in-Picture(#909)のトップバー開閉ボタン用。Material Icons picture_in_picture_alt 由来。
   picture_in_picture:
     'M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z',
+  // レスポンシブ拡張PiP(#926)の「ルームに戻る」ボタン用。Material Icons open_in_full 由来。
+  open_in_full: 'M3 3h7v2H5v5H3V3zm18 0v7h-2V5h-5V3h7zM3 21v-7h2v5h5v2H3zm18 0h-7v-2h5v-5h2v7z',
 };
 
 // 通常の Material Icons(0 0 24 24)とは異なる viewBox を持つアイコン(Material Symbols由来。

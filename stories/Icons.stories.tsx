@@ -103,6 +103,7 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   pending: true,
   sticker: true,
   picture_in_picture: true,
+  open_in_full: true,
 };
 
 const ICON_NAMES = Object.keys(ICON_NAME_MAP) as IconName[];
