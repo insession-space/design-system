@@ -25,6 +25,7 @@ export {
 } from './button.tsx';
 export { type CheckboxProps, default as Checkbox } from './checkbox.tsx';
 export { type ChipAvatar, type ChipProps, default as Chip } from './chip.tsx';
+export { type ComposerProps, default as Composer } from './composer.tsx';
 export {
   type ConfirmModalProps,
   type ConfirmTone,
