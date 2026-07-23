@@ -16,6 +16,7 @@ export {
   type CountChipProps,
 } from './badge.tsx';
 export { type BottomSheetProps, default as BottomSheet } from './bottom-sheet.tsx';
+export { MOBILE_LAYOUT_MQ } from './breakpoints.ts';
 export {
   type ButtonProps,
   type ButtonSize,
