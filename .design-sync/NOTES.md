@@ -21,6 +21,8 @@
 
 ## Re-sync risks（次回同期の監視リスト）
 
+- **RingTimer / StepFlow は手動シード済み（#974・2026-07-23）**: DS プロジェクトの `components/components/{RingTimer,StepFlow}/` と `_preview/{RingTimer,StepFlow}.js` は、コンバータ不在の環境から手書きで先行登録した（bundle 未収載のため preview は自己完結実装）。ソース正は `foundation/ui/{ring-timer,step-flow}.tsx` + `apps/web/src/stories/{RingTimer,StepFlow}.stories.tsx`。**次回のフル同期でコンバータ生成物に置き換えること**（置き換われば preview も bundle 参照になる）。
+
 - **sb-reference 再ビルドでフォント注入が消える**: `.design-sync/sb-reference/iframe.html` への JetBrains Mono @font-face 注入（`fonts-jbm/`）は手動。sb-reference を作り直したら再注入しないと比較が両側フォールバックになり、フォント欠落が見えなくなる。
 - **buildCmd の d.ts 生成 + sed 書き換えは必須前提**: `foundation/ui/dist/` が無い/古いと発見0件または古い Props で同期される。config の buildCmd（tsc emit + `.tsx'`→`.js'` sed）を必ず先に実行。
 - **オーバーレイ系（Modal/BottomSheet/ConfirmModal/Popover/SplitModal）は閉状態のみ検証済み**: 開いたオーバーレイの中身は storybook 側もクリック起動のため両側未検証。オーバーレイの見た目を変えた場合は手動確認が要る。

@@ -47,6 +47,7 @@ export { default as Modal, type ModalProps } from './modal.tsx';
 export { default as Popover, type PopoverPlacement, type PopoverProps } from './popover.tsx';
 export { type OpenProfile, ProfileModalContext, useOpenProfile } from './profile-modal.tsx';
 export { default as Radio, type RadioProps } from './radio.tsx';
+export { default as RingTimer, type RingTimerProps } from './ring-timer.tsx';
 export { default as SearchField, type SearchFieldProps } from './search-field.tsx';
 export { default as Spinner, type SpinnerProps } from './spinner.tsx';
 export {
@@ -61,6 +62,11 @@ export {
   type StatusDotProps,
   type StatusTone,
 } from './status.tsx';
+export {
+  default as StepFlow,
+  type StepFlowProps,
+  type StepFlowStep,
+} from './step-flow.tsx';
 export { default as Stepper, type StepperProps } from './stepper.tsx';
 export { default as Tabs, type TabItem, type TabsProps } from './tabs.tsx';
 export {
