@@ -18,7 +18,7 @@ export const Tones: Story = {
       title="トーン (DS)"
       note="mono 大文字 + セマンティック tint。dot で先頭に同色ドット。継続状態は StatusBadge を使う。"
     >
-      <div className="flex flex-wrap items-center gap-[9px]">
+      <div className="flex flex-wrap items-center gap-2.25">
         <Lozenge tone="success" dot>
           LIVE
         </Lozenge>

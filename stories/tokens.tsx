@@ -45,7 +45,7 @@ export function ColorSwatch({ varName, label }: { varName: string; label: string
   const resolved = useResolvedVar(varName);
   return (
     <div className="rounded-card border border-solid border-border overflow-hidden bg-surface">
-      <div className="h-[72px]" style={{ background: `var(${varName})` }} />
+      <div className="h-18" style={{ background: `var(${varName})` }} />
       <div className="p-3">
         <div className="text-smd font-semibold text-text">{label}</div>
         <code className="text-2xs text-text-faint">{varName}</code>
@@ -88,7 +88,7 @@ export function BoxSwatch({
   return (
     <div className="flex flex-col items-center gap-2">
       <div
-        className={`w-24 h-[72px] bg-tint-13 border border-solid border-border-strong ${boxClassName ?? ''}`}
+        className={`w-24 h-18 bg-tint-13 border border-solid border-border-strong ${boxClassName ?? ''}`}
       />
       <div className="text-smd font-semibold text-text">{label}</div>
       <code className="text-2xs text-text-faint">{varName}</code>

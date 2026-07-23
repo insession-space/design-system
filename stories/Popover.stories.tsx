@@ -20,7 +20,7 @@ function MenuPopoverDemo() {
       open={open}
       onClose={() => setOpen(false)}
       ariaLabel="ステージ切替"
-      panelClassName="min-w-[200px]"
+      panelClassName="min-w-50"
       trigger={
         <button
           type="button"

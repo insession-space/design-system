@@ -21,7 +21,7 @@ function ChipRow() {
     { key: 'recent', label: '最近' },
   ];
   return (
-    <div className="flex flex-wrap items-center gap-[9px]">
+    <div className="flex flex-wrap items-center gap-2.25">
       {items.map((it) => (
         <Chip key={it.key} selected={sel === it.key} onClick={() => setSel(it.key)}>
           {it.label}
@@ -38,7 +38,7 @@ export const Variants: Story = {
       note="既定=surface-2 + border。selected=accent tint + accent 枠 + チェック。icon 付きも可。"
     >
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-[9px]">
+        <div className="flex flex-wrap items-center gap-2.25">
           <Chip>デフォルト</Chip>
           <Chip icon={<Icon name="settings" size={16} />}>アイコン付き</Chip>
           <Chip selected>選択中</Chip>
