@@ -165,6 +165,14 @@
   --text-label--font-weight: 600;
   --text-label--letter-spacing: 0.14em;
 
+  /* 単体の tracking-* ユーティリティとして使う letter-spacing トークン(#950)。標準スケール
+     (tracking-wide=0.025em / -wider=0.05em / -widest=0.1em)に無い中間値を、badge/status/
+     link/lozenge 等の uppercase caps ラベルで使うぶんだけ切り出す(apps/web/src/style.css の
+     --tracking-label: 0.14em(#943)と同じ命名感)。tracking-[0.1em] の任意値は標準の
+     tracking-widest(=0.1em)へ置換すればよいのでトークン化不要。 */
+  --tracking-tag: 0.06em; /* badge.tsx(variant="new") / status.tsx の極小 uppercase バッジ */
+  --tracking-pill: 0.08em; /* lozenge.tsx / link.tsx(variant="pill") の uppercase caps */
+
   /* 半径: DS の 3 段スケール sm6 / md10 / lg16 + pill999 へ準拠(#463)。
      既存の chip / card / panel トークン名は保ちつつ値を最寄りの DS 値へ寄せる
      (chip 8→6=sm、card 14→16=lg、panel 20→16=lg。いずれも DS 値・変化は最小)。
@@ -195,16 +203,27 @@
      トークンへ color-mix で α を載せる形に移行し、ダークは従来どおり黒・ライトは
      ソフトな影へ自動追従させる(#459)。 */
   --color-shadow: #000;
-  /* 新 DS(#463) elevation: 既定(ダーク)は DS の dark 影値。ライトは [data-theme="light"] で上書き。
-     soft=elev-1(card) / popover=elev-2 / overlay=shadow(modal)。 */
-  --shadow-soft: 0 2px 6px -2px rgba(0, 0, 0, 0.5);
-  --shadow-popover: 0 16px 30px -16px rgba(0, 0, 0, 0.7);
-  --shadow-overlay: 0 26px 64px -32px rgba(0, 0, 0, 0.85);
+  /* 新 DS(#463) elevation: ダーク既定値(単体利用アプリはダーク前提。ファイル冒頭コメント参照)。
+     soft=elev-1(card) / popover=elev-2 / overlay=shadow(modal)。
+     #867 と同じ理由で @theme に実値を直書きしない: Tailwind v4 は @theme の --shadow-* を
+     ビルド時にリテラル展開して `.shadow-*{--tw-shadow:<実値>}` を生成するため、後から
+     :root[data-theme] 等の unlayered セレクタで同名変数を上書きしてもユーティリティには
+     一切効かない(apps/web/src/style.css の同種コメント参照。この非対称が #867 の原因だった)。
+     実値は下の unlayered `:root { --elev-* }` に置き、ここは var() 参照だけにする。
+     foundation/ui は現状ダーク単一トーンで [data-theme] オーバーレイを持たないが、将来
+     consumer 側が --elev-* を上書きしても shadow-* ユーティリティが追従できるようにしておく。
+     値は変更していない(参照構造のみ変更)。 */
+  --shadow-soft: var(--elev-soft);
+  --shadow-popover: var(--elev-popover);
+  --shadow-overlay: var(--elev-overlay);
 
   /* フォーカスリング: キーボードフォーカスの発光(シアンの薄いリング + 柔らかいグロー)。
      input:focus 等で生値だったものをトークン化(#445)。新規部品は focus-visible:shadow-focus で使う。
      アウトライン色/幅/offset は @theme static 側(--color-focus-ring / --focus-ring-*)。 */
-  /* 新 DS(#463): focus は info ブルーの 3px リングのみ(外側の 24px ブルームは廃止)。 */
+  /* 新 DS(#463): focus は info ブルーの 3px リングのみ(外側の 24px ブルームは廃止)。
+     shadow-soft/-popover/-overlay と違い theme 別オーバーライドを持たない(apps/web/src/style.css
+     の --shadow-focus も同様に literal のまま。#867 の問題はテーマ切替時の非追従なので、
+     テーマ差分を持たないこの値は @theme 直書きのままで実害が無い)ため --elev-* 化していない。 */
   --shadow-focus: 0 0 0 3px rgba(91, 139, 240, 0.16);
 
   /* モーション: イージング */
@@ -273,4 +292,15 @@
   /* 無効状態(disabled)の DS 標準の一組。部品ごとの ad hoc な opacity をこの一本に寄せる(#445)。
      ユーティリティでは opacity-(--disabled-opacity)、カーソルは disabled:cursor-not-allowed。 */
   --disabled-opacity: 0.4;
+}
+
+/* エレベーションの実値(#950)。上の @theme 内コメントのとおり、Tailwind v4 が --shadow-* を
+   ビルド時にリテラル展開するため実値はここ(@theme の外・unlayered な素の :root)に置き、
+   @theme 側は var() 参照だけを持つ(apps/web/src/style.css の #867 対応と同じ形)。
+   ダーク単一値(foundation/ui はダーク前提。ファイル冒頭コメント参照)。値は元 @theme に
+   書かれていたものをそのまま移設しただけで変更なし。 */
+:root {
+  --elev-soft: 0 2px 6px -2px rgba(0, 0, 0, 0.5);
+  --elev-popover: 0 16px 30px -16px rgba(0, 0, 0, 0.7);
+  --elev-overlay: 0 26px 64px -32px rgba(0, 0, 0, 0.85);
 }

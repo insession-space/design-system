@@ -15,7 +15,7 @@ export type InputProps = {
   className?: string;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, 'className'>;
 
-const LABEL = 'font-mono text-xs font-semibold tracking-[0.1em] uppercase transition-colors';
+const LABEL = 'font-mono text-xs font-semibold tracking-widest uppercase transition-colors';
 // field(ラッパー)。surface-2 / border 1.5px / radius md / pad 12x14。focus リング/枠色は状態で足す。
 const FIELD =
   'flex items-center w-full bg-surface-2 border-[1.5px] border-solid rounded-md px-3.5 py-3 transition-[border-color,box-shadow] duration-(--dur-fast)';

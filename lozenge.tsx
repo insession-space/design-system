@@ -40,7 +40,7 @@ export default function Lozenge({
 }: LozengeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 font-mono text-xs font-semibold uppercase tracking-[0.08em] ${TONE[tone]} ${className}`.trim()}
+      className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 font-mono text-xs font-semibold uppercase tracking-pill ${TONE[tone]} ${className}`.trim()}
     >
       {dot && <span className={`h-1.5 w-1.5 rounded-pill ${DOT[tone]}`} aria-hidden="true" />}
       {children}
