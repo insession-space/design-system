@@ -146,6 +146,10 @@ export default function SplitModal({
           <div className="min-w-0">
             <h4 className="m-0 text-lg font-extrabold text-text">{title}</h4>
             {description && (
+              // max-w-[52ch] は意図的な据え置き(#950)。可読な行長(1行あたり文字数)を確保する
+              // ための「文字数」基準の制約で、px/rem のスケールトークンに載せる性質の値ではない
+              // (52ch は一般的な可読上限の目安。テキストコンテンツ量に応じた相対値なので
+              // トークン化しても再利用の意味が薄い)。
               <p className="mt-1.5 mb-0 max-w-[52ch] text-[13px] leading-relaxed text-text-dim">
                 {description}
               </p>

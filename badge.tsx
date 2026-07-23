@@ -83,7 +83,7 @@ export function Badge({
   return (
     <span
       className={`inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 font-mono text-xs font-semibold ${TONE[legacyTone]} ${shapeClass}${
-        legacyNew ? ' uppercase tracking-[0.06em]' : ''
+        legacyNew ? ' uppercase tracking-tag' : ''
       } ${className}`.trim()}
     >
       {showDot && (
