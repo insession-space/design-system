@@ -1,5 +1,11 @@
 # @in-session/ui
 
+## 1.1.3
+
+### Patch Changes
+
+- 24e2a30: foundation/ui 自体の DS 逸脱を解消: --shadow-_ を間接参照（--elev-_）化しテーマ上書き可能に、tracking 任意値を tracking-tag/pill トークン化、rounded-[2px] を rounded-xs へ。loophub の light 影上書きを --elev-\* に追随、help のテーマコピーに tracking トークンを補完
+
 ## 1.1.2
 
 ### Patch Changes
