@@ -51,18 +51,21 @@
   --color-link: var(--color-mint-soft);
   --color-link-hover: var(--color-mint);
 
-  /* カラー: アクセント(コーラル)ティント面。rgba(accent, α) を段階トークン化(数値=α×100)。
-     tinted surface + 細ボーダーの控えめな面表現に使う。ライト/ダーク共通(半透明のため
-     どちらの背景でも機能する) */
-  --color-tint-3: rgba(255, 90, 54, 0.03);
-  --color-tint-5: rgba(255, 90, 54, 0.05);
-  --color-tint-7: rgba(255, 90, 54, 0.07);
-  --color-tint-8: rgba(255, 90, 54, 0.08);
-  --color-tint-10: rgba(255, 90, 54, 0.1);
-  --color-tint-12: rgba(255, 90, 54, 0.12);
-  --color-tint-13: rgba(255, 90, 54, 0.13);
-  --color-tint-16: rgba(255, 90, 54, 0.16);
-  --color-tint-22: rgba(255, 90, 54, 0.22);
+  /* カラー: アクセント(コーラル)ティント面。段階トークン化(数値=元 rgba の α×100)。
+     tinted surface + 細ボーダーの控えめな面表現に使う。塗りは不透過(下が透けない)。
+     テーマ背景(--color-bg)へ同率で合成した値なので、既定背景上の見え方は旧 rgba 版と
+     同一のまま、consumer 側の --color-bg 上書き(ライトテーマ等)にも自動追従する。
+     透明のまま使いたい装飾(グラデーション/グロー)はトークンではなく
+     color-mix(in srgb, var(--color-accent) N%, transparent) をその場で使うこと。 */
+  --color-tint-3: color-mix(in srgb, rgb(255 90 54) 3%, var(--color-bg));
+  --color-tint-5: color-mix(in srgb, rgb(255 90 54) 5%, var(--color-bg));
+  --color-tint-7: color-mix(in srgb, rgb(255 90 54) 7%, var(--color-bg));
+  --color-tint-8: color-mix(in srgb, rgb(255 90 54) 8%, var(--color-bg));
+  --color-tint-10: color-mix(in srgb, rgb(255 90 54) 10%, var(--color-bg));
+  --color-tint-12: color-mix(in srgb, rgb(255 90 54) 12%, var(--color-bg));
+  --color-tint-13: color-mix(in srgb, rgb(255 90 54) 13%, var(--color-bg));
+  --color-tint-16: color-mix(in srgb, rgb(255 90 54) 16%, var(--color-bg));
+  --color-tint-22: color-mix(in srgb, rgb(255 90 54) 22%, var(--color-bg));
 
   /* カラー: セマンティック(状態表現)。新4色パレットと対応させる(#457)。
      成功=グリーン、情報=ブルー、警告=アンバー、危険=旧来の #ff6b6b を維持(新パレットに
@@ -71,22 +74,24 @@
      ライト値は下のオーバーレイヤーでコントラスト確保のため少し濃くする。
      使い方: text-success / bg-success-surface / border-success-border(warning/danger/info も同様)。 */
   --color-success: #31c47e;
-  --color-success-surface: rgba(49, 196, 126, 0.12);
+  /* *-surface / *-surface-strong は tint-* と同じく不透過(テーマ背景へ合成。透過なし)。
+     border は枠線用途で下面が多様なため半透明のまま。 */
+  --color-success-surface: color-mix(in srgb, rgb(49 196 126) 12%, var(--color-bg));
   /* success-surface-strong: Lozenge/Chip/CountChip 等の視認性改善用に一段濃い塗り(#765)。 */
-  --color-success-surface-strong: rgba(49, 196, 126, 0.2);
+  --color-success-surface-strong: color-mix(in srgb, rgb(49 196 126) 20%, var(--color-bg));
   --color-success-border: rgba(49, 196, 126, 0.3);
   --color-warning: #f5b54a;
-  --color-warning-surface: rgba(245, 181, 74, 0.12);
+  --color-warning-surface: color-mix(in srgb, rgb(245 181 74) 12%, var(--color-bg));
   /* warning-surface-strong: 同上(#765)。 */
-  --color-warning-surface-strong: rgba(245, 181, 74, 0.2);
+  --color-warning-surface-strong: color-mix(in srgb, rgb(245 181 74) 20%, var(--color-bg));
   --color-warning-border: rgba(245, 181, 74, 0.3);
   --color-danger: #ff6b6b;
-  --color-danger-surface: rgba(255, 107, 107, 0.12);
+  --color-danger-surface: color-mix(in srgb, rgb(255 107 107) 12%, var(--color-bg));
   --color-danger-border: rgba(255, 107, 107, 0.3);
   --color-info: #5b8bf0;
-  --color-info-surface: rgba(91, 139, 240, 0.12);
+  --color-info-surface: color-mix(in srgb, rgb(91 139 240) 12%, var(--color-bg));
   /* info-surface-strong: 同上(#765)。 */
-  --color-info-surface-strong: rgba(91, 139, 240, 0.2);
+  --color-info-surface-strong: color-mix(in srgb, rgb(91 139 240) 20%, var(--color-bg));
   --color-info-border: rgba(91, 139, 240, 0.3);
 
   /* カラー: オーバーレイ面(ポップオーバー/スナックバー/ヘッダーエラー等、前面に浮く面)。
