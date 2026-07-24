@@ -99,6 +99,7 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   drag_indicator: true,
   chevron_left: true,
   flag: true,
+  block: true,
   meeting_room: true,
   pending: true,
   sticker: true,
