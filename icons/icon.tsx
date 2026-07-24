@@ -175,6 +175,8 @@ const PATHS = {
   // ホワイトボード「ギャラリーへ保存」ボタン用(#962)。フロッピーディスク(保存の定番アイコン)。
   // Material Icons save 由来。
   save: 'M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z',
+  // チャットメッセージのピン留め(#1052)。Material Icons push_pin 由来。
+  push_pin: 'M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z',
 };
 
 // 通常の Material Icons(0 0 24 24)とは異なる viewBox を持つアイコン(Material Symbols由来。
