@@ -149,7 +149,7 @@ export default function Composer({
           aria-label={sendLabel}
           title={sendLabel}
           disabled={!canSubmit}
-          className={`inline-flex shrink-0 items-center justify-center rounded-pill transition-colors duration-(--dur-fast) ${btnSize} ${
+          className={`inline-flex shrink-0 cursor-pointer items-center justify-center rounded-pill border-none bg-transparent p-0 transition-colors duration-(--dur-fast) ${btnSize} ${
             canSubmit ? 'text-mint-soft' : 'text-text-dim'
           } enabled:hover:bg-tint-5 enabled:hover:text-mint-soft disabled:cursor-not-allowed disabled:opacity-35`}
         >
