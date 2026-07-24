@@ -105,6 +105,7 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   picture_in_picture: true,
   open_in_full: true,
   save: true,
+  push_pin: true,
 };
 
 const ICON_NAMES = Object.keys(ICON_NAME_MAP) as IconName[];
