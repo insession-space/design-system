@@ -180,7 +180,13 @@ scripts/              check-styles.mjs（配布 CSS の欠損検査）
 tsup.config.ts        配布物（js + d.ts）のビルド
 ```
 
-配布されるのは `dist/`（`index.js` / `index.d.ts` / `styles.css`）と `theme.css` / `base.css` / `components.css`。
+配布されるのは `dist/`（`index.js` / `index.d.ts` / `styles.css`）と `theme.css` / `base.css` / `components.css` / `LICENSE`。
+
+## ライセンス
+
+[MIT](./LICENSE) © INSESSION Space
+
+1.4.0 までは `package.json` の `license` が `UNLICENSED` のままだった。public リポジトリで npm にも公開しているのに、この表記では **InSession / loophub 以外は法的に使えない**（`UNLICENSED` は「許諾しない」の明示）。他プロダクトへ配る前提と矛盾していたので MIT に改めた。
 
 ## 履歴
 
