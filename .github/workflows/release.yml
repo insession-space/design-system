@@ -34,6 +34,17 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
+      # ⚠ npm の Trusted Publishing(OIDC)は npm CLI 11.5.1 以降でしか実装されていない。
+      # Node の同梱 npm では届かないため、明示的に上げる:
+      #   Node 22.23.1 → npm 10.9.8 / Node 24.0.0 → npm 11.3.0（どちらも 11.5.1 未満）
+      # これが無いと npm は OIDC 交換を行わず、認証情報なしで publish しようとして
+      # `E404 Not Found - PUT https://registry.npmjs.org/...` で失敗する。npm は書き込み
+      # 権限不足を 403 ではなく 404 で返すため、「パッケージが無い」ように見えて紛らわしい
+      # （実際には存在する）。1.4.0 の publish がこれで失敗した。
+      # publish は changesets が内部で `npm publish` を呼ぶので、npm CLI 自体の版が効く。
+      - name: Ensure npm supports trusted publishing
+        run: npm install -g npm@11
+
       - run: pnpm install --frozen-lockfile
 
       # publish されるのは dist なので、publish 前に必ず作り直す。

@@ -152,13 +152,28 @@ pnpm changeset      # 変更の intent を積む
 
 **publish は npm の Trusted Publishing（OIDC）で行う方針。トークンは使わない。** `release.yml` は `id-token: write` を持ち、`NPM_TOKEN` を**意図的に env へ渡していない**（changesets/action は env に `NPM_TOKEN` があればトークン publish を優先するため、渡すと OIDC が使われなくなる）。
 
-### ⚠ この自動リリース経路は、2つの設定が揃うまで動かない
+### ⚠ OIDC publish が成立するには3つの条件が揃う必要がある
 
-1.4.0 の publish 試行で**両方とも未設定であることが判明した**。どちらも一度設定すれば恒久的に効く。
+1.4.0 の publish 試行で**3つとも欠けていることが判明した**。
 
-**① npm 側: Trusted Publisher の登録（未設定 → publish が 404 で失敗する）**
+**① runner の npm が 11.5.1 以降であること（最初にここで詰まった）**
+
+**Trusted Publishing の OIDC 交換を実装しているのは npm CLI 本体で、11.5.1 以降が必要。** Node の同梱 npm では届かない。
+
+| | 同梱 npm |
+| --- | --- |
+| Node 22.23.1 | 10.9.8 |
+| Node 24.0.0 | 11.3.0 |
+
+どちらも 11.5.1 未満なので、**Node のバージョン選択では解決しない**。`release.yml` は `npm install -g npm@11` を明示的に実行している。これを外すと npm は OIDC 交換を行わず、認証情報なしで publish しようとして下記の 404 になる。
+
+publish は changesets が内部で `npm publish` を呼ぶので、pnpm ではなく **npm CLI 自体の版**が効く。
+
+**② npm 側: Trusted Publisher の登録**
 
 npm の package settings で、このリポジトリを Trusted Publisher として登録する。未登録だと OIDC トークンが認証情報に交換されないため、**既存パッケージへの `PUT` が `E404 Not Found` で拒否される**（npm は権限不足を 403 ではなく 404 で返す。パッケージの存在を隠すため）。
+
+> 📌 ① と ② はどちらが欠けても**まったく同じ 404** になる。エラー文言では切り分けられないので、まず runner の npm 版を確認すること（`npm -v` を1行足すだけでよい）。
 
 > https://www.npmjs.com/package/@insession/design-system/access → Trusted Publisher
 >
@@ -170,7 +185,9 @@ npm の package settings で、このリポジトリを Trusted Publisher とし
 > | Workflow filename | `release.yml` |
 > | Environment | （空欄。`release.yml` は environment を使わない） |
 
-**② GitHub org 側: Actions による PR 作成の許可（未設定 → Version PR が作られない）**
+**③ GitHub org 側: Actions による PR 作成の許可（未設定 → Version PR が作られない）**
+
+これは publish ではなく**採番**の側の条件。① ② が揃っていなくても、ここが欠けると Version PR が作られないので採番が進まない。
 
 `release.yml` はワークフロー側で `pull-requests: write` を宣言しているが、それとは別に **org のポリシー**が Actions による PR 作成を禁止していると弾かれる。
 
