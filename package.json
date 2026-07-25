@@ -78,5 +78,8 @@
   "engines": {
     "node": ">=22.18"
   },
-  "packageManager": "pnpm@10.12.1"
+  "packageManager": "pnpm@10.12.1",
+  "dependencies": {
+    "@base-ui/react": "1.6.0"
+  }
 }

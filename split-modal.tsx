@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useState } from 'react';
 import BottomSheet from './bottom-sheet.tsx';
 import Icon, { type IconName } from './icons/icon.tsx';
-import Modal from './modal.tsx';
+import { Modal } from './modal.tsx';
 
 // 設定系モーダルの2ペイン外殻（純粋 leaf UI）。左にセクションナビ、右にそのセクションの中身。
 // スペース設定(space-core)とアカウント設定(account)が同じ nav 構造を各々でベタ書きしていたのを
@@ -301,15 +301,26 @@ export default function SplitModal({
 
   // レールの面を外殻の角丸まで届かせるため、legacy .modal の padding/gap を潰して
   // overflow-hidden を掛ける（utilities レイヤーは legacy より後なので上書きできる）。
-  // × は Modal の絶対配置ではなく右ペイン内（DS の位置）に置くので closeLabel は渡さない。
+  // × は Modal の絶対配置ではなく右ペイン内（DS の位置）に置くので Modal.Close は使わない。
+  // Dialog 化(compound 分解)はスコープ外なので、新 Modal API へ追随させるだけに留める
+  // （title/footer は渡さないので variant は既定の 'legacy' のまま）。
   return (
-    <Modal
-      onClose={onClose}
-      width={width}
-      className={`gap-0 overflow-hidden p-0 text-left max-h-[calc(100dvh-40px)] ${className}`.trim()}
-      ariaLabel={ariaLabel}
+    <Modal.Root
+      open
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose();
+      }}
     >
-      {inner}
-    </Modal>
+      <Modal.Portal>
+        <Modal.Backdrop />
+        <Modal.Popup
+          aria-label={ariaLabel}
+          style={{ width }}
+          className={`gap-0 overflow-hidden p-0 text-left max-h-[calc(100dvh-40px)] ${className}`.trim()}
+        >
+          {inner}
+        </Modal.Popup>
+      </Modal.Portal>
+    </Modal.Root>
   );
 }

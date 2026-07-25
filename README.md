@@ -114,6 +114,38 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 
 > 📌 1.4.x までは `theme.css` がダーク単一トーンで、ライトは**消費側が自前で持つ**契約だった。その結果、同じライト値が insession-app（`apps/web`）と loophub（`apps/web` / `apps/lp`）に重複していた。1.5.0 でここへ一本化した（移設前に3者の値を突き合わせ、**loophub の17トークンは insession-app の30トークンの部分集合で値も完全一致**であることを確認している）。
 
+## Base UI ベースのプリミティブ（v2 以降）
+
+`Popover` / `Menu` / `Modal` / `ConfirmModal` / `Tabs` は **[Base UI](https://base-ui.com)（`@base-ui/react`）へ振る舞いを委譲した compound API**。パートを組み合わせて使う。
+
+```tsx
+<Popover.Root open={open} onOpenChange={(o) => !o && close()}>
+  <Popover.Trigger>開く</Popover.Trigger>
+  <Popover.Portal>
+    <Popover.Positioner side="bottom" align="end">
+      <Popover.Popup>{children}</Popover.Popup>
+    </Popover.Positioner>
+  </Popover.Portal>
+</Popover.Root>
+```
+
+自前で持っていた配置計算・外側クリック・Esc・フォーカス管理をやめたことで、**衝突回避（フリップ/シフト）・フォーカストラップ・スクロールロック・矢印キーナビ・typeahead** が付いた。**見た目は移行前と同じ**（トークンのユーティリティは DS 側に残っている）。
+
+**v1 からの移行手順は `CHANGELOG.md` の 2.0.0 の項に props 単位の対応表がある。** 以下は移行時に踏みやすい2点だけ。
+
+### ⚠ Base UI の Menu パートは `Popover.Popup` の中では使えない
+
+`Menu.Item` / `RadioItem` / `Separator` などは `Menu.Root` の React context を要求するため、`Popover.Popup` の中に置くと **`MenuRootContext is missing` で throw する**（型検査もビルドも通り、Popover を開いた瞬間に初めて落ちるので気づきにくい）。用途で使い分ける。
+
+| やりたいこと | 使うもの |
+| --- | --- |
+| 独立して開閉するメニュー（矢印キーナビ・typeahead が効く） | `Menu.Root` / `Trigger` / `Portal` / `Positioner` / `Popup` / `Item` … |
+| Popover のパネルにヘッダとメニュー行を混在させる（通知センター等） | `Menu.PlainList` / `Menu.PlainItem`（振る舞いを持たない見た目のみ。v1 の `Menu` / `MenuItem` と同じ props） |
+
+### ⚠ Modal を別ドキュメント（PiP）へ出すなら `container` を明示する
+
+v1 は `ownerDocument` から描画先を自動検出していたが、Base UI の Portal は明示指定が必要。Document Picture-in-Picture へモーダルを出す場合は `<Modal.Portal container={pipDocument.body}>` を渡す。
+
 ## 開発
 
 ```bash
