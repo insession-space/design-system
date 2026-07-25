@@ -18,10 +18,22 @@ pnpm add @insession/design-system
 ```css
 @import "tailwindcss";
 @import "@insession/design-system/theme.css";
-@source "../../node_modules/@insession/design-system/dist";
+/* パスは「この CSS ファイルから、自分のパッケージの node_modules」への相対パス。下記の注意を読むこと */
+@source "../node_modules/@insession/design-system/dist";
 ```
 
-> ⚠ **`@source` は必須。** これが無いとコンポーネント内のクラス名から Tailwind ユーティリティが生成されず、**ビルドは通るのにスタイルだけが静かに消える**（クラス名は DOM に出るが対応する CSS が無い状態になる）。パスは各アプリの `style.css` から `node_modules` への相対パスに合わせる。pnpm では `node_modules` 配下が symlink になるため、**初回セットアップ時は必ず実ビルドして見た目を目視確認する**こと。
+> ⚠ **`@source` は必須。** これが無いとコンポーネント内のクラス名から Tailwind ユーティリティが生成されず、**ビルドは通るのにスタイルが部分的に欠ける**。クラス名は DOM に出るのに対応する CSS が無い状態で、エラーもワーニングも出ない。
+>
+> **しかも「全崩れ」にはならない。** Vite のモジュールグラフ経由で一部のクラスは拾われるため、一見それらしく描画される。実測では CSS の約4割が欠けた状態でビルドが緑になった。
+>
+> ⚠ **pnpm workspace では `@source` をリポジトリルートの `node_modules` に向けてはいけない。** pnpm は依存を**それを宣言したパッケージ自身の `node_modules`** にリンクし、ルートには置かない。したがって `apps/web/src/style.css` からの正しいパスは `../node_modules/...`（= `apps/web/node_modules/...`）で、`../../../node_modules/...`（リポジトリルート）は**空振りする**。
+>
+> | 消費側の構成 | `style.css` の位置 | 正しい `@source` |
+> | --- | --- | --- |
+> | pnpm workspace | `apps/<app>/src/style.css` | `../node_modules/@insession/design-system/dist` |
+> | 単一パッケージ | `src/style.css` | `../node_modules/@insession/design-system/dist` |
+>
+> **CI でビルド成果物を検査すること。** 生成CSSに DS 由来のユーティリティ（アプリのソースには書かれていないもの。例 `bg-accent` / `rounded-card`）が入っているかを確かめれば、この事故を機械的に防げる。loophub の `scripts/check-ds-styles.mjs` が実装例。
 
 ```tsx
 import { Button, Badge, Modal } from '@insession/design-system';
