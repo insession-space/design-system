@@ -1,21 +1,31 @@
 /* Storybook のプレビュー土台。配布物には含めない（.storybook/ は files に入らない）。
  *
- * 旧モノレポでは apps/web/src/style.css（8,700行超）を読み込んでトークンと body の見た目を
- * 得ていた。単独リポジトリ化に伴い、このパッケージ自身の theme.css を単一ソースにし、
- * カタログの描画に必要な最小限の body 規則だけをここに置く。
+ * ── 方針: カタログを「消費側と同じ経路」で描く ─────────────────
+ * コンポーネントのスタイルは **publish される dist/styles.css だけ** から供給する。カタログ自身が
+ * 最も素朴な消費側（Tailwind を持たないアプリが styles.css を1枚読むだけ）の再現になるので、
+ * 配布 CSS に欠損があればカタログで即座に見える。
  *
- * ここは「消費側アプリがやるべきこと」の最小例そのものでもある:
- *   1. @import "tailwindcss"
- *   2. @import "@insession/design-system/theme.css"
- *   3. @source でパッケージ本体を走査対象に加える（ui のユーティリティ生成のため）
+ * 以前はここで `@import "tailwindcss"` + `@source ".."` を書き、Storybook のビルド時に
+ * コンポーネントのユーティリティを生成していた。これは publish される中身とは別経路なので、
+ * 「カタログでは正しく見えるのに消費側では崩れる」を見逃す構造だった（実際に .modal /
+ * .bottom-sheet / @keyframes の欠損を長く見逃していた）。
+ *
+ * ── stories 自身のユーティリティだけは生成する ───────────────
+ * カタログのページ組み（グリッド・見出し・余白）は stories/ が Tailwind ユーティリティで書いて
+ * いるので、その分だけを生成する。`source(none)` で自動ソース検出を切り、走査対象を stories/ に
+ * 限定しているのが要点 — これを外すとコンポーネント本体も走査され、配布 CSS の欠損を
+ * カタログが埋めてしまって上記の見逃しが再発する。
  */
 
-@import "tailwindcss";
-@import "../theme.css";
+/* 1) 配布 CSS（トークン + 部品 CSS + コンポーネントが使うユーティリティ）。
+      pnpm storybook / build-storybook は事前に build:css を走らせる。 */
+@import "../dist/styles.css";
 
-/* ui コンポーネント内のクラス名からユーティリティを生成させる。
- * 消費側アプリでは node_modules/@insession/design-system/dist を指す。 */
-@source "..";
+/* 2) stories/ が使うユーティリティのみを追加生成する。theme.css はトークン定義を
+      Tailwind に教えるために読む（:root への出力は 1) と重複するが無害）。 */
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@import "../theme.css";
+@source "../stories";
 
 /* theme.css はトークン契約のみでリセットを持たないため、カタログ表示用の最小限を足す。
  * theme.css は「ダーク単一トーン」前提（ライトテーマのオーバーレイを含まない）。 */

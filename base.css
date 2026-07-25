@@ -1,0 +1,75 @@
+/* @insession/design-system — このパッケージのコンポーネントが前提にする最小リセット。
+ *
+ * dist/styles.css（プリビルド配布 CSS）に @layer base として同梱される。
+ *
+ * ── なぜ Tailwind の preflight を配らないのか ──────────────────
+ * preflight は `* { margin: 0; padding: 0; border: 0 }` や見出し/リスト/リンク/メディアの
+ * 既定値まで潰すため、消費側アプリのページ全体の見た目を書き換えてしまう。ライブラリが
+ * 勝手に持ち込んでよい範囲を超えるので配らない。
+ *
+ * 実際の運用もそうなっている: insession-app は `@import "tailwindcss/theme.css"` +
+ * `utilities.css` の2本だけを読み、preflight を意図的に外している。つまりこのパッケージの
+ * コンポーネントは「preflight 無し」で描画されるのが本来の姿で、ここもそれに揃える。
+ *
+ * ── ここに入れる基準 ────────────────────────────────
+ * 「入れないとコンポーネントが壊れる」かつ「消費側のコンテンツを壊さない」ものだけ。
+ *   - box-sizing: 固定 w/h と border を併用する部品（Checkbox / Radio / Toggle の 22px 枠など）が
+ *     content-box では設計サイズにならない。border-box は insession-app / loophub の双方が
+ *     既に前提にしている（前者は legacy レイヤーの `*`、後者は preflight 経由）。
+ *   - フォームコントロール: font / color を継承させ、ブラウザ既定の OS ボタン外観（灰色の面・
+ *     枠・小さい font）を消す。UA スタイルシートは作者スタイルに常に負けるので、ここに置けば
+ *     Tailwind の無い消費側でも部品が意図どおり描画される。
+ *
+ * 逆に、見出し・段落・リスト・リンク・メディアの既定値は **触らない**。消費側の文章が崩れるし、
+ * insession-app の現在の描画（例: Modal 既定経路の <p> はブラウザ既定マージンを持つ）もそのまま
+ * 保たれる。
+ *
+ * ── レイヤーであることの意味 ──────────────────────────
+ * @layer base に入っているので、**レイヤーに属さない消費側の CSS が常に勝つ**。したがって
+ * 消費側が独自の button リセットや box-sizing 方針を持っていても、こちらが押し負ける側になる。
+ * ライブラリとしてはそれが正しい向き。
+ */
+
+@layer base {
+  *,
+  ::before,
+  ::after,
+  ::backdrop {
+    box-sizing: border-box;
+  }
+
+  /* フォントと色を継承させる（ブラウザ既定の system-ui / 小さい font-size を使わせない）。
+     margin/padding/border/background を落とすのは、部品側が自前で面と枠を組み立てるため。
+     このパッケージの入力系（Input / SearchField / Composer）と button 系は全て bg / border を
+     明示しているので、ここは「明示漏れとブラウザ既定への保険」として働く。 */
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+
+  button,
+  input:where([type="button"], [type="reset"], [type="submit"]) {
+    appearance: button;
+  }
+
+  ::placeholder {
+    opacity: 1;
+  }
+
+  :disabled {
+    cursor: default;
+  }
+}

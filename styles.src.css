@@ -1,0 +1,55 @@
+/* @insession/design-system — 配布 CSS（dist/styles.css）のビルド入力。
+ *
+ * このファイル自体は publish しない（package.json の files に含めない）。Tailwind CLI が
+ * これをコンパイルして dist/styles.css を作り、消費側はその1枚を読むだけで済む:
+ *
+ *   import '@insession/design-system/styles.css';
+ *
+ * ── これで何が要らなくなるか ──────────────────────────
+ * 従来はコンポーネント内のクラス名から Tailwind ユーティリティを生成するのが**消費側の責務**
+ * だった。消費側が Tailwind v4 を使い、`@source` でこのパッケージの dist を走査対象に加える、
+ * という契約である。この契約には2つの問題があった:
+ *
+ *   1. Tailwind v4 を使っていないプロダクトは、そもそもこのパッケージを使えない。
+ *   2. `@source` の指定を間違えると **ビルドは緑のままスタイルだけが静かに欠ける**。
+ *      クラス名は DOM に出るのに対応する CSS が無く、エラーもワーニングも出ない。しかも
+ *      Vite のモジュールグラフ経由で一部は拾われるため「全崩れ」にならず気づきにくい
+ *      （実測で CSS の約4割が欠けた状態でビルドが通った）。
+ *
+ * ユーティリティの生成をこちら側（publish 時）に移すことで、両方とも消える。消費側に
+ * Tailwind は要らず、`@source` の設定ミスという失敗モード自体が無くなる。
+ *
+ * ── preflight を含めない ────────────────────────────
+ * `@import "tailwindcss"` はトークン + preflight + ユーティリティの3点セットだが、preflight は
+ * 消費側のページ全体の既定値を書き換えるのでライブラリが配ってはいけない。ここでは
+ * theme.css と utilities.css だけを読み、コンポーネントが実際に必要とする最小限のリセットは
+ * base.css に自前で持つ。insession-app も同じ構成（preflight 無し）で動いており、実運用と一致する。
+ *
+ * ── レイヤー順 ───────────────────────────────────
+ * utilities を最後に置く。これにより消費側が `<Modal className="…">` のようにユーティリティを
+ * 足したとき、components.css の部品スタイルを上書きできる。なおレイヤーに属さない消費側の CSS は
+ * ここの全てより強いので、消費側が最終的な決定権を持つ。
+ *
+ * ⚠ DOM に出るクラス名（`inline-flex` `bg-accent` `px-[22px]` …）は**公開契約ではない**。
+ * 消費側はこれらを CSS のフックにしてはいけない。将来セマンティックなクラス名
+ * （`.ds-button--accent` 等）へ移行する予定で、そのとき import する側は変えずに済む。
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+/* デザイントークンの契約（@theme）。 */
+@import "./theme.css";
+
+/* コンポーネントが前提にする最小リセット。 */
+@import "./base.css";
+
+/* ユーティリティで表現していない部品 CSS と @keyframes。 */
+@import "./components.css";
+
+/* ユーティリティ生成の走査対象。コンポーネント本体のみを見る。
+ * stories/ は含めない（カタログ専用のクラスまで配布 CSS に混ざる）。 */
+@source "./*.tsx";
+@source "./icons/*.tsx";
