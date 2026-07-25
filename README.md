@@ -27,6 +27,18 @@ pnpm add @insession/design-system
 import { Button, Badge, Modal } from '@insession/design-system';
 ```
 
+### ⚠ `minimumReleaseAge` を設定している環境では除外指定が必要
+
+サプライチェーン対策で pnpm の `minimumReleaseAge`（publish 直後の版を install させない待機時間・**分単位**）を設定している場合、**publish したての DS が数日間 install できない**。自前のパッケージなので除外して問題ない。消費側リポジトリの `pnpm-workspace.yaml` に書いてコミットすると、開発者ごとのグローバル設定に依存せず揃う。
+
+```yaml
+# pnpm-workspace.yaml
+minimumReleaseAgeExclude:
+  - "@insession/design-system"
+```
+
+> 除外するのは**自分たちが publish する first-party パッケージだけ**にすること。サードパーティへの待機は攻撃対策として意味があるので外さない。
+
 ### テーマ
 
 `theme.css` は**ダーク単一トーン**で、`[data-theme]` のライトテーマオーバーレイを含まない。ライト/ダークを切り替えるアプリは自分側でオーバーレイを持つ。
@@ -68,6 +80,15 @@ pnpm changeset      # 変更の intent を積む
 ```
 
 `main` に push されると Version PR が作られ、それをマージすると `release.yml` が npm publish する。
+
+`package.json` の `publishConfig.registry` で公開レジストリを明示している。**これを外さないこと** — 開発機の `~/.npmrc` が社内プロキシを `registry` に設定していると、publish がプロキシ宛になって公開レジストリに出ない。
+
+ローカルから手で publish する場合も同様に宛先を確認する。
+
+```bash
+npm whoami --registry https://registry.npmjs.org   # 公開レジストリでのログイン確認
+pnpm build && npm publish                          # publishConfig.registry が効く
+```
 
 ## 構成
 

@@ -26,8 +26,10 @@
   "sideEffects": [
     "*.css"
   ],
+  "//publishConfig": "registry を明示するのは必須。開発機の ~/.npmrc が社内プロキシ(npm.flatt.tech 等)を registry に設定している場合、これが無いと npm publish がプロキシ宛になり公開レジストリへ出ない。",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "scripts": {
     "build": "tsup",
