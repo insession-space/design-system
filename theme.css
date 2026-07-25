@@ -23,15 +23,16 @@
  * （アプリのソースには書かれていないもの。例 bg-accent / rounded-card）が
  * 入っているかを確かめれば機械的に防げる。
  *
- * ── ライトテーマについて ────────────────────────────────
- * このファイルはダーク単一トーンで、[data-theme] のライトテーマオーバーレイを含まない。
- * ライト/ダークを切り替えるアプリは自分側で [data-theme] オーバーレイを持つ。
+ * ── ライト/ダークについて ───────────────────────────────
+ * **ダークが既定**で、下の @theme の値がそのままダークのトーン。ライトは
+ * `<html data-theme="light">` のときだけ効くオーバーレイ(ファイル末尾)で与える。
+ * したがって:
+ *   - ダーク固定のプロダクトは何もしなくてよい(オーバーレイは不活性)
+ *   - ライト/ダークを切り替えるプロダクトは html の data-theme を書き換えるだけ
+ *   - `data-theme="dark"` と「属性なし」はどちらもダークになる(:root の @theme 値)
  *
- * ── insession-app との関係(歴史的経緯) ─────────────────────
- * insession-app の apps/web は巨大な legacy CSS と共存させるため、同じトークンを
- * src/style.css にインラインで持ち、このファイルを import しない。両者の値は
- * 揃えて保守する(insession-app 側が増やしたトークンのうち、このパッケージの
- * コンポーネントが参照しないものはここに持ち込まない)。
+ * ⚠ ダーク側の再宣言は**置かない**。@theme の値が既定として効くので、同じ値を
+ * `[data-theme="dark"]` にも書くと保守箇所が二重になるだけで、得るものが無い。
  */
 
 @theme {
@@ -328,10 +329,96 @@
 /* エレベーションの実値(#950)。上の @theme 内コメントのとおり、Tailwind v4 が --shadow-* を
    ビルド時にリテラル展開するため実値はここ(@theme の外・unlayered な素の :root)に置き、
    @theme 側は var() 参照だけを持つ(insession-app の apps/web/src/style.css の #867 対応と同じ形)。
-   ダーク単一値(このパッケージはダーク前提。ファイル冒頭コメント参照)。値は元 @theme に
-   書かれていたものをそのまま移設しただけで変更なし。 */
+   ここはダーク(既定)値。ライト値は下のオーバーレイで上書きする。 */
 :root {
   --elev-soft: 0 2px 6px -2px rgba(0, 0, 0, 0.5);
   --elev-popover: 0 16px 30px -16px rgba(0, 0, 0, 0.7);
   --elev-overlay: 0 26px 64px -32px rgba(0, 0, 0, 0.85);
+}
+
+/* ── ライトテーマのオーバーレイ ─────────────────────────────
+ *
+ * `<html data-theme="light">` のときだけ効く。属性が無いか "dark" のときは
+ * 上の @theme / :root の値(= ダーク)がそのまま使われるので、**ダーク固定の
+ * プロダクトはこのブロックを意識しなくてよい**（不活性なまま）。
+ *
+ * ── なぜセレクタで上書きできるのか ────────────────────────
+ * @theme の出力は静的な CSS 変数宣言に過ぎず、生成後は普通の CSS 変数として
+ * 通常の cascade に従う。加えて:
+ *   - このブロックは **unlayered**（どの @layer にも属さない）ので、@theme の出力が
+ *     乗る theme レイヤーより必ず強い
+ *   - セレクタの詳細度も `:root[data-theme="light"]`(0,2,0) > `:root`(0,1,0)
+ * どちらの理由でも勝つので、消費側の取り込み方（レイヤー付き import か否か）に
+ * 依らず効く。
+ *
+ * ── 上書きしなくてよいトークン ──────────────────────────
+ * ティント面(--color-tint-*)とセマンティック面(--color-*-surface / *-surface-strong)は
+ * `color-mix(… , var(--color-bg))` の合成で定義してあるので、ここで --color-bg が
+ * 変わればそのまま追従する。リンク色(--color-link / --color-link-hover)と
+ * --color-accent も --color-mint / --color-mint-soft の var() 参照なので追従する。
+ * したがってここに書くのは**参照元の生値だけ**。
+ *
+ * ── 値の出自 ──────────────────────────────────────
+ * insession-app(apps/web)と loophub(apps/web / apps/lp)が各自の style.css に持って
+ * いた `[data-theme="light"]` オーバーレイを、ここへ一本化したもの。移設前に3者の値を
+ * 突き合わせ、**loophub の17トークンは insession-app の30トークンの部分集合で値も完全一致**
+ * であることを確認している。insession-app 固有で DS が持たない3つ
+ * (--color-visibility-public / -followers / -community)は移していない。
+ *
+ * ⚠ ダーク側(`[data-theme="dark"]`)の再宣言は置かない。@theme の値が既定として効くため
+ * 同じ値の二重管理になるだけ。移設元にはあったが、意図的に持ち込んでいない。
+ *
+ * ⚠ セレクタは `:root[...]` なので html 要素だけに効く。要素単位で部分的にテーマを
+ * 切り替えたいプロダクトは、自分側で `[data-theme="light"]` 版を足すこと。
+ */
+:root[data-theme="light"] {
+  /* 背景面(奥 → 手前)。ダークの3段ランプに対応する明るいトーン。 */
+  --color-bg: #e9e9e6;
+  --color-bg-elevated: #f4f1e9;
+  --color-surface: #ffffff;
+  --color-surface-2: rgba(244, 241, 233, 0.96);
+  --color-surface-3: #ebe7dc;
+  --color-surface-hover: #f1ede3;
+
+  /* 境界。 */
+  --color-border: #e2ded3;
+  --color-border-strong: #d6d2c6;
+
+  /* テキスト階層。ダークと明暗を反転させる。 */
+  --color-text: #17160f;
+  --color-text-dim: #5c5b52;
+  --color-text-faint: #a3a197;
+
+  /* 中立塗り(Primary ボタン等)。ダークでは明色 + 暗い文字、ライトでは逆になる。 */
+  --color-fill: #17160f;
+  --color-on-fill: #f1eee6;
+
+  /* ブランドパレット。白背景でのコントラスト確保のため、ダークより濃い値にする。
+     mint-soft はダークでは「淡いコーラル」だが、ライトでは白地に載るため
+     逆に濃いコーラルになる(テキスト/リンクの静止色に使うため)。 */
+  --color-mint: #ff5a36;
+  --color-mint-soft: #c8431f;
+  --color-cyan: #3b6fe0;
+  --color-violet: #1fa463;
+
+  /* セマンティック(状態表現)の地の色。白背景での可読性のため少し濃くする。
+     対応する *-surface / *-border はこれらの var() 合成なので追従する。 */
+  --color-success: #1fa463;
+  --color-warning: #e0930f;
+  --color-danger: #d8433d;
+  --color-info: #3b6fe0;
+
+  /* 影の色。ダークは黒だが、ライトで黒を使うと濁るのでウォームグレーにする。 */
+  --color-shadow: #b4afa0;
+
+  /* スナックバー。面(--color-snackbar-surface)は**ライトでも暗いまま**にする
+     (操作フィードバックは前面に浮く別レイヤーという扱いで、意図的にテーマへ追従させない)。
+     文字色系だけライトの danger に合わせる。 */
+  --color-snackbar-danger: var(--color-danger);
+  --color-snackbar-danger-border: color-mix(in srgb, var(--color-danger) 30%, transparent);
+
+  /* エレベーション。ライトでは黒の落ち影が強すぎるため、青みを含むグレーで薄く出す。 */
+  --elev-soft: 0 2px 6px -2px rgba(20, 20, 26, 0.12);
+  --elev-popover: 0 12px 24px -14px rgba(20, 20, 26, 0.4);
+  --elev-overlay: 0 20px 46px -28px rgba(20, 20, 26, 0.42);
 }
