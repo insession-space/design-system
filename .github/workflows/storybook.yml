@@ -1,0 +1,59 @@
+name: Storybook
+
+# DS プリミティブのカタログを GitHub Pages で公開する。
+#
+# なぜこのリポジトリでホストするのか:
+#   カタログは元々 insession-app（モノレポ）で公開していたが、org 移管で
+#   **private リポジトリの GitHub Pages が使えなくなった**（Free プランでは
+#   private Pages 非対応。`Page is disabled because current plan does not support
+#   private GitHub Pages` で deploy が 422 になる）。
+#   design-system は public なので Pages が使え、かつ DS プリミティブのカタログは
+#   本来ここが正しい置き場所（リポジトリ分割でストーリーもここへ移設済み）。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時実行は最新の1本だけ（進行中のデプロイは中断しない）。
+concurrency:
+  group: storybook-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build Storybook
+        run: pnpm build-storybook
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: storybook-static
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
