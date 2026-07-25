@@ -150,7 +150,40 @@ pnpm changeset      # 変更の intent を積む
 
 `main` に push されると Version PR が作られ、それをマージすると `release.yml` が npm publish する。
 
-**publish は npm の Trusted Publishing（OIDC）で行う。トークンは使わない。** `release.yml` は `id-token: write` を持ち、`NPM_TOKEN` を**意図的に env へ渡していない**（changesets/action は env に `NPM_TOKEN` があればトークン publish を優先するため、渡すと OIDC が使われなくなる）。
+**publish は npm の Trusted Publishing（OIDC）で行う方針。トークンは使わない。** `release.yml` は `id-token: write` を持ち、`NPM_TOKEN` を**意図的に env へ渡していない**（changesets/action は env に `NPM_TOKEN` があればトークン publish を優先するため、渡すと OIDC が使われなくなる）。
+
+### ⚠ この自動リリース経路は、2つの設定が揃うまで動かない
+
+1.4.0 の publish 試行で**両方とも未設定であることが判明した**。どちらも一度設定すれば恒久的に効く。
+
+**① npm 側: Trusted Publisher の登録（未設定 → publish が 404 で失敗する）**
+
+npm の package settings で、このリポジトリを Trusted Publisher として登録する。未登録だと OIDC トークンが認証情報に交換されないため、**既存パッケージへの `PUT` が `E404 Not Found` で拒否される**（npm は権限不足を 403 ではなく 404 で返す。パッケージの存在を隠すため）。
+
+> https://www.npmjs.com/package/@insession/design-system/access → Trusted Publisher
+>
+> | 項目 | 値 |
+> | --- | --- |
+> | Publisher | GitHub Actions |
+> | Organization or user | `insession-space` |
+> | Repository | `design-system` |
+> | Workflow filename | `release.yml` |
+> | Environment | （空欄。`release.yml` は environment を使わない） |
+
+**② GitHub org 側: Actions による PR 作成の許可（未設定 → Version PR が作られない）**
+
+`release.yml` はワークフロー側で `pull-requests: write` を宣言しているが、それとは別に **org のポリシー**が Actions による PR 作成を禁止していると弾かれる。
+
+```
+HttpError: GitHub Actions is not permitted to create or approve pull requests.
+```
+
+> https://github.com/organizations/insession-space/settings/actions → Workflow permissions →
+> **「Allow GitHub Actions to create and approve pull requests」** をON
+
+リポジトリ側（`Settings → Actions → General`）の同名項目は、org が許可するまで変更できない（API は `409 Conflict` を返す）。
+
+> 📌 **1.3.1 までの publish は OIDC ではなく手動だった。** レジストリ上の 1.3.1 は `_npmUser` が個人アカウントで **provenance attestation を持たない**（`dist.attestations: null`）。Trusted Publishing 経由なら必ず provenance が付くので、OIDC は使われていない。`release.yml` が導入されてから実際に走ったのは 1.4.0 が初回で、そこで上記2点の未設定が露見した。
 
 `package.json` の `publishConfig.registry` で公開レジストリを明示している。**これを外さないこと** — 開発機の `~/.npmrc` が社内プロキシを `registry` に設定していると、publish がプロキシ宛になって公開レジストリに出ない。
 

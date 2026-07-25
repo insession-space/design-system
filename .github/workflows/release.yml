@@ -52,5 +52,12 @@ jobs:
         # ⚠ NPM_TOKEN は意図的に渡さない。
         # changesets/action は「env に NPM_TOKEN があればトークン publish、無ければ
         # OIDC（Trusted Publishing）」の順で選ぶため、トークンを渡すと OIDC が使われなくなる。
-        # 1.3.1 の初回 publish は OIDC で成功している（トークン無し・2FA プロンプト無し）。
         # OIDC が使えない状況に戻す場合のみ、ここに NPM_TOKEN を足すこと。
+        #
+        # ⚠ この job が動くには、リポジトリ外の設定が2つ必要（README「リリース」節を参照）:
+        #   1. npm 側で Trusted Publisher の登録（insession-space/design-system + release.yml）。
+        #      未登録だと OIDC トークンが認証情報に交換されず、publish が E404 で失敗する。
+        #   2. GitHub org 側で「Allow GitHub Actions to create and approve pull requests」をON。
+        #      未許可だと Version PR の作成が弾かれる（採番と push までは成功する）。
+        # 1.4.0 の publish 試行で両方とも未設定であることが判明した（1.3.1 までは手動 publish
+        # だったため露見していなかった。レジストリ上の 1.3.1 は provenance を持たない）。
