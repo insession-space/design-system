@@ -120,6 +120,7 @@ export {
   type TabsRootProps,
   type TabsTabProps,
 } from './tabs.tsx';
+export { default as Textarea, type TextareaProps } from './textarea.tsx';
 export {
   default as Toast,
   type ToastProps,
