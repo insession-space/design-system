@@ -1,0 +1,306 @@
+/* @insession/design-system — Tailwind ユーティリティで表現していない部品 CSS。
+ *
+ * ── なぜこのファイルが必要か ───────────────────────────
+ * このパッケージの一部のコンポーネントは、**パッケージのどこにも定義が無いクラス名**と
+ * **@keyframes** を参照していた。定義は消費側 insession-app の巨大な legacy CSS
+ * （products/insession/apps/web/src/style.css）にしか存在せず、publish された中身だけでは
+ * 完成しない状態だった。結果として insession-app の外では以下が静かに崩れていた:
+ *
+ *   .modal / .modal-backdrop / .modal-close   → Modal の既定経路（title/footer を渡さない呼び方）
+ *                                               と、それに載る ConfirmModal / ProfileModal
+ *   .bottom-sheet*                            → BottomSheet 全体
+ *   .google-icon                              → GoogleIcon
+ *   @keyframes card-in / fade-in              → Modal（既定経路・DS 構造の両方）・BottomSheet
+ *   @keyframes pop-in                         → Badge
+ *   @keyframes snackbar-in                    → Toast（variant="snackbar"）
+ *   @keyframes ring-timer-urgent-pulse        → RingTimer（urgent 脈動）
+ *
+ * ここへ移植して、パッケージ単体で完成するようにした。値は insession-app の legacy CSS の
+ * 実値をそのまま持ってきており、短縮エイリアス変数（--surface / --text-dim 等）だけを
+ * theme.css の正式なトークン名（--color-surface / --color-text-dim 等）へ書き換えている。
+ *
+ * ── レイヤー ─────────────────────────────────────
+ * @layer components に置く。Tailwind の utilities レイヤーより先に来るので、消費側が
+ * `className` でユーティリティを足せば上書きできる（例 `<Modal className="w-[600px]">`）。
+ * また、レイヤーに属さない消費側の CSS はこれらより常に強い。
+ *
+ * ⚠ insession-app は自分の legacy CSS でこれらを定義済みなので、このファイルを読み込む必要は
+ * ない（読み込むと二重定義になる。insession-app の legacy は @layer legacy にあり、こちらの
+ * @layer components より弱いため、こちらが勝ってしまう点に注意）。
+ */
+
+@layer components {
+  /* ---- Modal（既定経路: title/footer を渡さない呼び方） ---- */
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    /* 透過した暗幕 + 軽いブラー（背景が少し透ける表現）。 */
+    background: color-mix(in srgb, #000 32%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: fade-in 0.2s ease both;
+  }
+
+  .modal {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-card);
+    padding: 34px 34px 30px;
+    width: min(400px, 92vw);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: var(--shadow-overlay);
+    animation: card-in 0.4s var(--ease-spring) both;
+  }
+
+  /* 既定経路のモーダルは中央寄せの h2 と、装飾済みの submit ボタンを前提にしている
+     （ConfirmModal の <h2>、および消費側のフォーム型モーダル）。 */
+  .modal h2 {
+    font-size: 17px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+
+  /* ⚠ この規則は「ホストアプリがグローバルな `button {}` で塗りを与えている」前提の互換規則で、
+     余白と字間だけを足す。単体では塗りが付かない（このパッケージは消費側の raw な HTML 要素に
+     グローバルスタイルを当てない方針なので、塗りは持ち込まない）。
+     新しい消費側は既定経路に raw な <button>/<input> を置かず、DS 構造（title/footer）+ <Button> /
+     <Input> を使うこと。 */
+  .modal button[type="submit"] {
+    margin-top: 6px;
+    padding: 14px;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+  }
+
+  /* モーダル右上のクローズアイコン。
+     移植元では グローバルな `button {}` ルールが背景・枠・カーソルを与えていたため、
+     単体で完成するよう明示的に書き下している。 */
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-text-dim);
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background 0.18s ease,
+      color 0.18s ease;
+  }
+
+  .modal-close:hover {
+    background: color-mix(in srgb, var(--color-text) 6%, transparent);
+    color: var(--color-text);
+  }
+
+  /* ---- BottomSheet ---- */
+
+  /* ⚠ 移植元には `@media (min-width: 769px) { .bottom-sheet-backdrop { display: none } }` が
+     あるが、これは「デスクトップでは常設 sidebar を使う」という insession-app 固有の方針なので
+     持ち込まない。汎用の BottomSheet が自分でデスクトップ表示を封じるのは正しくない。
+     ブレークポイントで出し分けたい消費側は自分で制御する。 */
+  .bottom-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: flex-end;
+    background: color-mix(in srgb, var(--color-bg) 55%, transparent);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    animation: card-in 0.2s var(--ease-spring) both;
+  }
+
+  .bottom-sheet {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    /* シートは --color-bg / 上端 22px 角丸 / 下辺なし / 強めの上向き影。 */
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-bottom: none;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+    box-shadow: 0 -16px 34px -18px color-mix(in srgb, var(--color-shadow) 80%, transparent);
+    transition: height 0.28s var(--ease-spring);
+  }
+
+  .bottom-sheet--mid {
+    height: 68dvh;
+  }
+
+  .bottom-sheet--full {
+    height: 94dvh;
+  }
+
+  .bottom-sheet-handle-area {
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 10px 0 6px;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .bottom-sheet-handle {
+    width: 38px;
+    height: 5px;
+    border-radius: var(--radius-pill);
+    background: var(--color-text-dim);
+  }
+
+  /* 移植元ではグローバルな `button {}` ルールに寄りかかっていた分を明示的に書き下している。
+     ⚠ 1点だけ移植元と異なる: × グリフを中央に置くための flex 指定を足した。移植元は
+     padding: 0 の 36px 角丸ボックスに flex 指定が無く、グリフが左上に寄っていた（モバイル
+     専用の導線なので露見しにくい状態だった）。既存の消費側 insession-app は自分の legacy CSS で
+     描画を続けるため、この修正の影響を受けるのは新しい消費側だけ。 */
+  .bottom-sheet-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-text-dim);
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: none;
+    transition:
+      background 0.18s ease,
+      color 0.18s ease;
+  }
+
+  .bottom-sheet-close:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+
+  .bottom-sheet-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---- GoogleIcon ---- */
+
+  .google-icon {
+    flex-shrink: 0;
+  }
+
+  /* ---- @keyframes ----
+   * コンポーネントは `animate-[card-in_0.4s_var(--ease-spring)_both]` のような Tailwind の
+   * arbitrary animation ユーティリティでこれらを参照する。ユーティリティ側は名前を書くだけで
+   * @keyframes 本体は生成しないため、ここが定義の単一ソースになる。 */
+
+  /* Modal（既定経路・DS 構造）/ BottomSheet backdrop の入場。 */
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* .modal-backdrop の暗幕フェード。 */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Badge の出現。 */
+  @keyframes pop-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    60% {
+      transform: scale(1.04);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Toast（variant="snackbar"）の固定表示。translate(-50%, …) で終わるので、
+     中央寄せの transform はこのキーフレームが担う（ユーティリティ側では持たない）。 */
+  @keyframes snackbar-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 14px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  /* RingTimer の urgent 脈動。 */
+  @keyframes ring-timer-urgent-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.07);
+    }
+  }
+
+  /* ---- モーションの抑制 ----
+   * 移植元は `*, *::before, *::after` にグローバルな抑制をかけているが、ライブラリが消費側の
+   * アニメーション全部を止めてよい理由は無いので、このパッケージが自分で動かすものだけを止める。
+   * ユーティリティで animate-* を当てている部品（Modal の DS 構造 / Badge / Toast / RingTimer）は
+   * クラス名が一意でないため、animation を持つ要素を横断で止める指定を @layer components 内に
+   * 置く（レイヤー外の消費側 CSS には勝てないので、消費側が上書きしたい場合はそれが通る）。 */
+  @media (prefers-reduced-motion: reduce) {
+    .modal-backdrop,
+    .modal,
+    .bottom-sheet-backdrop {
+      animation: none;
+    }
+
+    .bottom-sheet {
+      transition: none;
+    }
+  }
+}

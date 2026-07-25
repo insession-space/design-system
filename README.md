@@ -14,31 +14,67 @@ InSession と loophub が共有するデザインシステム。**純粋 leaf UI
 pnpm add @insession/design-system
 ```
 
-アプリの CSS で、Tailwind → トークン → `@source` の3点を書く。
+**CSS を1枚読むだけ。Tailwind は要らない。**
 
-```css
-@import "tailwindcss";
-@import "@insession/design-system/theme.css";
-/* パスは「この CSS ファイルから、自分のパッケージの node_modules」への相対パス。下記の注意を読むこと */
-@source "../node_modules/@insession/design-system/dist";
+```ts
+import '@insession/design-system/styles.css';
 ```
-
-> ⚠ **`@source` は必須。** これが無いとコンポーネント内のクラス名から Tailwind ユーティリティが生成されず、**ビルドは通るのにスタイルが部分的に欠ける**。クラス名は DOM に出るのに対応する CSS が無い状態で、エラーもワーニングも出ない。
->
-> **しかも「全崩れ」にはならない。** Vite のモジュールグラフ経由で一部のクラスは拾われるため、一見それらしく描画される。実測では CSS の約4割が欠けた状態でビルドが緑になった。
->
-> ⚠ **pnpm workspace では `@source` をリポジトリルートの `node_modules` に向けてはいけない。** pnpm は依存を**それを宣言したパッケージ自身の `node_modules`** にリンクし、ルートには置かない。したがって `apps/web/src/style.css` からの正しいパスは `../node_modules/...`（= `apps/web/node_modules/...`）で、`../../../node_modules/...`（リポジトリルート）は**空振りする**。
->
-> | 消費側の構成 | `style.css` の位置 | 正しい `@source` |
-> | --- | --- | --- |
-> | pnpm workspace | `apps/<app>/src/style.css` | `../node_modules/@insession/design-system/dist` |
-> | 単一パッケージ | `src/style.css` | `../node_modules/@insession/design-system/dist` |
->
-> **CI でビルド成果物を検査すること。** 生成CSSに DS 由来のユーティリティ（アプリのソースには書かれていないもの。例 `bg-accent` / `rounded-card`）が入っているかを確かめれば、この事故を機械的に防げる。loophub の `scripts/check-ds-styles.mjs` が実装例。
 
 ```tsx
 import { Button, Badge, Modal } from '@insession/design-system';
 ```
+
+`styles.css` は publish 時にプリビルドされた配布 CSS で、**デザイントークン + 部品 CSS + このパッケージが使う Tailwind ユーティリティ**を全部含む（約 53KB / gzip 約 9KB）。消費側のビルド設定に依存しないので、Tailwind を使っていないプロダクトでも、v3 のプロダクトでも、そのまま使える。
+
+> ⚠ **DOM に出るクラス名（`inline-flex` `bg-accent` `px-[22px]` …）は公開契約ではない。** CSS のフックにしないこと。将来セマンティックなクラス名（`.ds-button--accent` 等）へ移行する予定で、そのとき `import` する側は変えずに済む設計にしている。
+
+### 3つの CSS 入口
+
+| 入口 | 中身 | 使うとき |
+| --- | --- | --- |
+| `@insession/design-system/styles.css` | トークン + 部品 CSS + ユーティリティ（プリビルド） | **既定。** これ1枚で完結する |
+| `@insession/design-system/theme.css` | デザイントークン（`@theme`）のみ | Tailwind を使う消費側が、**自分のマークアップ**にも DS トークン（`bg-accent` 等）を使いたいとき |
+| `@insession/design-system/components.css` | 部品 CSS と `@keyframes` のみ | 後述の `@source` 方式を続ける消費側が、ユーティリティで表現できない部品 CSS だけを足すとき |
+
+自分のマークアップでも DS トークンを使いたい Tailwind 消費側は、両方読むのが素直（`:root` への変数出力は重複するが無害）。
+
+```css
+@import "tailwindcss";
+@import "@insession/design-system/theme.css";   /* 自分のマークアップで bg-accent 等を使うため */
+```
+
+```ts
+import '@insession/design-system/styles.css';    /* DS 自身の描画のため */
+```
+
+### レイヤーと上書き
+
+`styles.css` の中身は `@layer theme, base, components, utilities` に入っている。つまり:
+
+- **消費側が `className` でユーティリティを足せば部品 CSS を上書きできる**（`<Modal className="w-[600px]">`）。
+- **レイヤーに属さない消費側の CSS は、この CSS のすべてより強い。** 最終的な決定権は消費側にある。
+
+**preflight（Tailwind のグローバルリセット）は配らない。** 消費側のページ全体の既定値を書き換えてしまうため。コンポーネントが実際に必要とする最小限（`box-sizing` とフォームコントロールのフォント継承）だけを `@layer base` に持っている（`base.css`）。
+
+### 従来方式（`@source` で dist を走査する）から移行する
+
+1.3.x までは「消費側の Tailwind v4 が `@source` でこのパッケージの `dist` を走査してユーティリティを生成する」契約だった。この方式は**まだ動く**が、新規採用は非推奨。
+
+```css
+/* 従来方式。動くが非推奨 */
+@import "tailwindcss";
+@import "@insession/design-system/theme.css";
+@import "@insession/design-system/components.css";   /* ★ 1.4.0 以降はこれも必要 */
+@source "../node_modules/@insession/design-system/dist";
+```
+
+非推奨にした理由:
+
+- **Tailwind v4 を使っていないプロダクトが採用できない。**
+- **`@source` の指定を間違えると、ビルドは緑のままスタイルだけが静かに欠ける。** クラス名は DOM に出るのに対応する CSS が無く、エラーもワーニングも出ない。しかも Vite のモジュールグラフ経由で一部は拾われるため「全崩れ」にならず気づきにくい（実測で CSS の約4割が欠けた状態でビルドが緑になった）。
+- **pnpm workspace では `@source` をリポジトリルートの `node_modules` に向けても空振りする。** pnpm は依存を*それを宣言したパッケージ自身の* `node_modules` にリンクし、ルートには置かない。正しいパスは `apps/<app>/src/style.css` から見て `../node_modules/...`。
+
+`styles.css` へ移行すると、この失敗モード自体が消える（ユーティリティ生成が publish 時に済んでいるため）。
 
 ### ⚠ `minimumReleaseAge` を設定している環境では除外指定が必要（将来の pnpm 更新時）
 
@@ -68,10 +104,23 @@ minimumReleaseAgeExclude:
 ```bash
 pnpm install
 pnpm storybook      # カタログ（http://localhost:6006）
-pnpm build          # dist（js + d.ts）を tsup で生成
+pnpm build          # dist を生成（build:js = tsup で js + d.ts / build:css = 配布 CSS）
 pnpm typecheck
 pnpm check          # Biome lint + format
+pnpm check:styles   # 配布 CSS がコンポーネントの参照を満たしているか（要 pnpm build）
 ```
+
+### `pnpm check:styles` が守っているもの
+
+このパッケージは長らく「**publish された中身だけでは完成しない**」状態だった。コンポーネントが `className="modal-backdrop"` や `animate-[card-in_…]` を参照しているのに、その定義はパッケージ内に無く、消費側 insession-app の legacy CSS にしか存在しなかった。クラス名は DOM に出るのに CSS が無いので、**型検査もビルドも lint も緑のまま、insession-app 以外では見た目だけが静かに崩れる**（Modal 既定経路 / BottomSheet / GoogleIcon / 各種アニメーションが該当した）。
+
+人間のレビューで気づける類の欠損ではないので、`scripts/check-styles.mjs` が CI で機械的に検査する:
+
+1. ソースの `animate-[NAME_…]` に対し `@keyframes NAME` が配布 CSS にあるか
+2. `className` に書かれた素のクラス名が、配布 CSS にセレクタとして存在するか
+3. トークンが `:root` に出ているか / preflight を巻き込んでいないか / ユーティリティ生成が生きているか
+
+**Storybook も同じ理由で「消費側と同じ経路」で描く。** `.storybook/preview.css` は `dist/styles.css` だけからコンポーネントのスタイルを取り、stories 自身のページ組みの分だけを `source(none)` + `@source "../stories"` で追加生成する。ここでコンポーネント本体を走査対象に戻すと、配布 CSS の欠損をカタログが埋めてしまい、上記の見逃しが再発する。
 
 ### 消費側と同時に開発する（ローカル参照）
 
@@ -89,7 +138,7 @@ pnpm build
 
 ### ⚠ minify を有効にしないこと
 
-`tsup.config.ts` は `minify: false` にしている。消費側の Tailwind が `dist` を `@source` で走査してユーティリティを生成するため、**クラス名の文字列リテラルが壊れると上記の「スタイルが静かに消える」障害を引き起こす**。
+`tsup.config.ts` は `minify: false`、`build:css` も minify しない。従来方式（`@source` で `dist` を走査してユーティリティを生成する）の消費側がまだ居るため、**クラス名の文字列リテラルが壊れると上記の「スタイルが静かに消える」障害を引き起こす**。配布 CSS は gzip で約 9KB に落ちるので、minify の実利はほとんど無い。
 
 ## リリース
 
@@ -119,13 +168,19 @@ pnpm build && npm publish --otp=<code>             # 2FA 有効時は OTP が必
 ```
 index.ts              公開窓口（外部はここ経由で import する）
 theme.css             デザイントークンの契約（@theme）
+base.css              コンポーネントが前提にする最小リセット（preflight は配らない）
+components.css        ユーティリティで表現していない部品 CSS と @keyframes
+styles.src.css        配布 CSS のビルド入力（publish しない）
 *.tsx                 プリミティブ（button / input / modal / popover / …）
 icons/                アイコン（icon.tsx の PATHS が単一ソース）
 stories/              Storybook のカタログ
-.storybook/           Storybook 設定（preview.css がトークン読み込みの最小例）
+.storybook/           Storybook 設定（preview.css が消費側と同じ経路の再現）
+scripts/              check-styles.mjs（配布 CSS の欠損検査）
 .design-sync/         DesignSync（claude.ai/design 連携）の設定
-tsup.config.ts        配布物ビルド
+tsup.config.ts        配布物（js + d.ts）のビルド
 ```
+
+配布されるのは `dist/`（`index.js` / `index.d.ts` / `styles.css`）と `theme.css` / `base.css` / `components.css`。
 
 ## 履歴
 

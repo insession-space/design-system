@@ -8,19 +8,25 @@
     "type": "git",
     "url": "git+https://github.com/insession-space/design-system.git"
   },
-  "//": "ビルド成果物(dist)を配布する。theme.css はパッケージ直下に置いたまま ./theme.css として公開する(tsup は CSS を処理しないため)。react はホストと同一インスタンスを使うため peerDependency。",
+  "//": "ビルド成果物(dist)を配布する。CSS はパッケージ直下に置いたまま公開する(tsup は CSS を処理しないため)。react はホストと同一インスタンスを使うため peerDependency。",
+  "//exports": "CSS の入口は3つ。./styles.css が既定(トークン + 部品 CSS + このパッケージが使うユーティリティを全部含むプリビルド。消費側に Tailwind は不要)。./theme.css はトークンだけ(消費側が Tailwind で自分のマークアップに DS トークンを使いたい場合の @theme 統合用)。./components.css は部品 CSS だけ(Tailwind + @source 方式を続ける消費側が、ユーティリティで表現できない部品 CSS だけを足すため)。",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./theme.css": "./theme.css"
+    "./styles.css": "./dist/styles.css",
+    "./theme.css": "./theme.css",
+    "./base.css": "./base.css",
+    "./components.css": "./components.css"
   },
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "theme.css",
+    "base.css",
+    "components.css",
     "CHANGELOG.md"
   ],
   "sideEffects": [
@@ -31,13 +37,17 @@
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
+  "//scripts": "build は js/d.ts(tsup) と配布 CSS(Tailwind CLI) の2本立て。build:css は minify しない — dist を @source で走査する従来方式の消費側がまだ居るため、クラス名の文字列リテラルを壊さない。check:styles は「DOM に出るのに CSS が無い」欠損を検出する回帰ネット。",
   "scripts": {
-    "build": "tsup",
+    "build": "pnpm build:js && pnpm build:css",
+    "build:js": "tsup",
+    "build:css": "tailwindcss -i styles.src.css -o dist/styles.css",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "check": "biome check .",
+    "check:styles": "node scripts/check-styles.mjs",
     "format": "biome format --write .",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static",
+    "storybook": "pnpm build:css && storybook dev -p 6006",
+    "build-storybook": "pnpm build:css && storybook build -o storybook-static",
     "changeset": "changeset",
     "changeset:version": "changeset version"
   },
@@ -51,6 +61,7 @@
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@storybook/addon-docs": "^10.5.0",
     "@storybook/react-vite": "^10.5.0",
+    "@tailwindcss/cli": "^4.3.3",
     "@tailwindcss/vite": "^4.3.2",
     "@types/node": "^22.10.0",
     "@types/react": "^19.2.0",

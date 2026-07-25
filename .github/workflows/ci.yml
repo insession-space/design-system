@@ -32,18 +32,32 @@ jobs:
       - name: Lint & format check
         run: pnpm check
 
-      # 配布物（js + d.ts）が生成できること。
+      # 配布物（js + d.ts + 配布 CSS）が生成できること。
       - name: Build dist
         run: pnpm build
 
-      # publish される中身が意図どおりか（dist と theme.css が入っているか）を検証する。
+      # 配布 CSS がコンポーネントの参照を満たしていること。
+      # 「クラス名は DOM に出るのに CSS が無い」という、型検査もビルドも lint も緑のまま
+      # 通ってしまう欠損を検出する唯一のチャネル（詳細は scripts/check-styles.mjs）。
+      - name: Verify distributed CSS
+        run: pnpm check:styles
+
+      # publish される中身が意図どおりか（dist と CSS 群が入っているか）を検証する。
       # ここが崩れると「publish は成功したのに消費側で解決できない」が起きる。
       - name: Verify package contents
         run: |
           npm pack --dry-run --json > /tmp/pack.json
           node -e '
             const files = require("/tmp/pack.json")[0].files.map((f) => f.path);
-            const required = ["dist/index.js", "dist/index.d.ts", "theme.css", "package.json"];
+            const required = [
+              "dist/index.js",
+              "dist/index.d.ts",
+              "dist/styles.css",
+              "theme.css",
+              "base.css",
+              "components.css",
+              "package.json",
+            ];
             const missing = required.filter((f) => !files.includes(f));
             if (missing.length) {
               console.error("同梱されていないファイル:", missing.join(", "));

@@ -211,6 +211,9 @@
   --radius-card: 16px;
   --radius-panel: 16px;
   --radius-pill: 999px;
+  /* ボトムシート上端の角丸。BottomSheet の .bottom-sheet が参照する(components.css)。
+     insession-app 側の同名トークンと値を揃えて保守する。 */
+  --radius-sheet: 22px;
 
   /* グロー(旧 #457 ブランドの hover 発光)は新 DS で廃止(#463)。新 DS の hover は「ふわっと光る」
      ではなく surface-hover への面変化 / filled は brightness(.93) / カード等は translateY(-2px) の
