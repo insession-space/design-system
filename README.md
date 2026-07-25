@@ -5,7 +5,7 @@ InSession と loophub が共有するデザインシステム。**純粋 leaf UI
 アプリ固有のロジックには依存しない（i18n の `t`・ルーター・認証などは全て props で注入する）。依存は `react` / `react-dom` の peer だけ。
 
 - npm: [`@insession/design-system`](https://www.npmjs.com/package/@insession/design-system)
-- 消費側: `insession-space/insession-app`（InSession 本体・admin・lp・help）、`insession-space/loophub`（web・lp）
+- 消費側: `insession-space/insession-app`（InSession 本体・admin・lp・help）、`insession-space/loophub-app`（web・lp）
 
 ## セットアップ（消費側アプリ）
 
