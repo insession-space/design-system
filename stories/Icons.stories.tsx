@@ -1,9 +1,9 @@
-import { GoogleIcon, Icon, type IconName, PersonIcon } from '@in-session/ui';
+import { GoogleIcon, Icon, type IconName, PersonIcon } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 
 // アイコンギャラリー。Icon(Material Icons 由来の path data 集)の全 IconName を一覧する。
-// 実装(foundation/ui/icons/icon.tsx の PATHS/EXTRA_PATHS)とズレないよう、キーの網羅は
+// 実装(icons/icon.tsx の PATHS/EXTRA_PATHS)とズレないよう、キーの網羅は
 // Record<IconName, true> の型チェックに委ねる(足りない/余分なキーがあれば typecheck が落ちる)。
 // GoogleIcon / PersonIcon は props 不要の専用 SVG アイコンで、別セクションに含める。
 const meta: Meta = {

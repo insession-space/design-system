@@ -1,4 +1,4 @@
-import { Spinner } from '@in-session/ui';
+import { Spinner } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 

@@ -1,4 +1,4 @@
-import { Button, ConfirmModal } from '@in-session/ui';
+import { Button, ConfirmModal } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';

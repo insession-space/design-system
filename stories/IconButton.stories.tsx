@@ -1,4 +1,4 @@
-import { Icon, IconButton, type IconButtonVariant } from '@in-session/ui';
+import { Icon, IconButton, type IconButtonVariant } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 

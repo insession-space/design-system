@@ -1,4 +1,4 @@
-import { Button, SplitModal, type SplitModalItem } from '@in-session/ui';
+import { Button, SplitModal, type SplitModalItem } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';

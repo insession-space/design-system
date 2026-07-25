@@ -1,4 +1,4 @@
-import { Checkbox, Radio } from '@in-session/ui';
+import { Checkbox, Radio } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';

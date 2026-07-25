@@ -1,4 +1,4 @@
-// @in-session/ui — 純粋 leaf UI の公開窓口。外部はここ経由で import する。
+// @insession/design-system — 純粋 leaf UI の公開窓口。外部はここ経由で import する。
 
 export {
   type AvatarProps,

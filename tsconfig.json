@@ -1,12 +1,41 @@
 {
-  // @in-session/ui は React + ESM の leaf UI。tsc は型検査専用（noEmit）。
-  "extends": "../../tsconfig.base.json",
+  // @insession/design-system は React + ESM の leaf UI。tsc は型検査専用（noEmit）。
+  // 配布物(dist)の生成は tsup が行う（tsup.config.ts）。
+  // 旧モノレポでは ../../tsconfig.base.json を extends していたが、単独リポジトリになったため
+  // 共通方針をここへインライン化した（値は insession-app の tsconfig.base.json と揃えて保守する）。
   "compilerOptions": {
+    "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
-    "types": ["node"]
+    "types": ["node"],
+
+    // import/export を持たないファイルも常にモジュール扱いにする。
+    "moduleDetection": "force",
+    // index.ts が './avatar.tsx' のように拡張子付きで import するため必須（noEmit 前提）。
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // 高シグナル・低コストなバグ検出フラグ。
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // strict は段階導入（insession-app と同じ方針を引き継ぐ）。
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+
+    // stories/ は消費側と同じ書き方（パッケージ名 import）を保つため自己参照を許可する。
+    "baseUrl": ".",
+    "paths": {
+      "@insession/design-system": ["./index.ts"]
+    }
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["dist", "node_modules", "storybook-static"]
 }

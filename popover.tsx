@@ -365,7 +365,7 @@ export default function Popover({
   // z-index: portal は body 直下に出るため、クリップ元の親パネル自身(参加者パネル等。
   // --z-dropdown を使用)より確実に手前へ出す専用トークンを使う。既存の z-(--z-dropdown) と
   // 同じ CSS変数参照記法ではなく `z-[var(--z-popover-portal,35)]` という
-  // 任意値記法にしてあるのは、foundation/ui/theme.css を import しない consumer(例:
+  // 任意値記法にしてあるのは、このパッケージの theme.css を import しない consumer(例:
   // products/insession/apps/help は自前で z スケールを定義し theme.css を読み込まない)で
   // --z-popover-portal が未定義になり、無指定の var() が invalid → z-index:auto に静かに
   // 落ちて背面に沈む事故を防ぐため(#885)。フォールバック値 35 は theme.css の

@@ -1,4 +1,4 @@
-import { Lozenge } from '@in-session/ui';
+import { Lozenge } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 

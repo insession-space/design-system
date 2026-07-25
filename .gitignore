@@ -1,0 +1,22 @@
+node_modules/
+dist/
+storybook-static/
+*.tsbuildinfo
+
+# design-sync (claude.ai/design) working state
+.design-sync/sb-reference/
+.design-sync/learnings/
+.design-sync/.cache/
+.design-sync/node_modules
+.design-sync/*.log
+.design-sync/previews/
+.design-sync/upload-list.txt
+.ds-sync/
+ds-bundle/
+
+.DS_Store
+.env
+.env.local
+
+# npm pack の成果物
+*.tgz

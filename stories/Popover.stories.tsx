@@ -1,4 +1,4 @@
-import { Icon, Menu, MenuItem, Popover } from '@in-session/ui';
+import { Icon, Menu, MenuItem, Popover } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';

@@ -1,4 +1,4 @@
-import { Avatar, Badge, CountChip, EmptyNote, Icon, Stepper } from '@in-session/ui';
+import { Avatar, Badge, CountChip, EmptyNote, Icon, Stepper } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';
@@ -60,7 +60,7 @@ export const Pills: Story = {
   render: () => (
     <Section
       title="ピル / チップ"
-      note="rounded-pill の小要素。件数は @in-session/ui の CountChip（animated でタブ用の出現アニメ）。"
+      note="rounded-pill の小要素。件数は @insession/design-system の CountChip（animated でタブ用の出現アニメ）。"
     >
       <div className="flex flex-wrap items-center gap-4">
         <CountChip>3</CountChip>
@@ -81,7 +81,7 @@ export const Badges: Story = {
   render: () => (
     <Section
       title="バッジ"
-      note="小さな一過性の強調に使う。@in-session/ui の Badge（live / new）。"
+      note="小さな一過性の強調に使う。@insession/design-system の Badge（live / new）。"
     >
       <div className="flex flex-wrap items-center gap-4">
         <Badge variant="live">LIVE</Badge>
@@ -95,7 +95,7 @@ export const Avatars: Story = {
   render: () => (
     <Section
       title="アバター"
-      note="@in-session/ui の Avatar。画像 or 名前先頭1文字の fallback 円。size / bgColor / className を注入。"
+      note="@insession/design-system の Avatar。画像 or 名前先頭1文字の fallback 円。size / bgColor / className を注入。"
     >
       <div className="flex flex-wrap items-center gap-4">
         <Avatar name="Alice" bgColor="hsl(180 65% 45%)" size={42} className="auth-avatar text-xl" />
@@ -116,7 +116,7 @@ export const EmptyNotes: Story = {
   render: () => (
     <Section
       title="空メッセージ"
-      note="@in-session/ui の EmptyNote。variant で余白/揃えを切替（default / compact / dropdown）。"
+      note="@insession/design-system の EmptyNote。variant で余白/揃えを切替（default / compact / dropdown）。"
     >
       <div className="flex flex-col gap-3 max-w-md">
         <EmptyNote>まだ何もありません</EmptyNote>
@@ -149,7 +149,7 @@ export const Steppers: Story = {
   render: () => (
     <Section
       title="ステッパー"
-      note="@in-session/ui の Stepper。− / 値 / ＋ の数値増減。min/max/step を注入し clamp は内包。"
+      note="@insession/design-system の Stepper。− / 値 / ＋ の数値増減。min/max/step を注入し clamp は内包。"
     >
       <StepperDemo />
     </Section>

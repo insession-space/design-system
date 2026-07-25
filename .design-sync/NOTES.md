@@ -1,8 +1,21 @@
-# design-sync NOTES — InSession UI (@in-session/ui)
+# design-sync NOTES — InSession Design System (@insession/design-system)
+
+> **⚠ リポジトリ分割（2026-07-25）で前提が2つ変わった。以下の初回同期メモを読む前に必ず確認すること。**
+>
+> 1. **配布形態が「ソース直配布」→「dist ビルド配布」に変わった。** `exports['.']` は
+>    `./dist/index.js`（型は `./dist/index.d.ts`）で、生成は `tsup`（`pnpm build`）が担う。
+>    旧 `buildCmd` の `tsc --emitDeclarationOnly` + `sed` による `.tsx'`→`.js'` 書き換えは
+>    **不要になった**（tsup が正しい指定子で d.ts を出す）。`config.json` の `buildCmd` は
+>    `pnpm build` に更新済み。
+> 2. **パッケージが単独リポジトリのルートになった。** 旧 `foundation/ui/…` は全て
+>    リポジトリ直下（`index.ts` / `theme.css` / `*.tsx`）。`stories/` も直下に移動した。
+>
+> 下記メモ中の `foundation/ui/…` や `apps/web/…` というパスは旧モノレポ時代の記述として
+> 読むこと（当時の経緯を残すためあえて書き換えていない）。
 
 ## セットアップの学び（初回同期 2026-07-22）
 
-- [GENERAL] `@in-session/ui` は**ビルドなしのソース直配布**（`exports['.']` = `./index.ts`、dist なし）。converter へは `--entry foundation/ui/index.ts` を渡す（esbuild が .tsx を直接バンドル、bundle 90KB）。
+- [GENERAL] `@insession/design-system` は**ビルドなしのソース直配布**（`exports['.']` = `./index.ts`、dist なし）。converter へは `--entry foundation/ui/index.ts` を渡す（esbuild が .tsx を直接バンドル、bundle 90KB）。
 - [GENERAL] コンポーネント発見は `.d.ts` の PascalCase export 基準なので、`buildCmd`（config 記載）で `tsc --emitDeclarationOnly --outDir dist` を**同期前に必ず実行**する。さらに2点必要:
   1. 生成された d.ts の re-export 指定子が `./avatar.tsx` のままだと ts-morph が解決できず 0 symbols になる → `sed` で `.tsx'`→`.js'` に書き換える（buildCmd に含めた）。`--rewriteRelativeImportExtensions` は宣言ファイルには効かなかった。
   2. `foundation/ui/package.json` に `"types": "dist/index.d.ts"` を追加した（dts 抽出のエントリ解決が `pj.types || 'index.d.ts'` のため。コミット済み想定）。

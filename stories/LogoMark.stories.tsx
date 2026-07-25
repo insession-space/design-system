@@ -1,4 +1,4 @@
-import { LogoMark, type LogoMarkVariant } from '@in-session/ui';
+import { LogoMark, type LogoMarkVariant } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 

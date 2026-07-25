@@ -1,14 +1,28 @@
-/* @in-session/ui — デザインシステム(DS)のトークン契約。
+/* @insession/design-system — デザインシステム(DS)のトークン契約。
  *
- * ui コンポーネント(button / input / spinner 等)が参照する @theme トークンを一元管理する。
- * apps/web は歴史的経緯(巨大な legacy CSS と共存させるため)で同じトークンを src/style.css に
- * インラインで持つ。ui パッケージを単体で使うアプリ(apps/admin など)は Tailwind の
- * `@import "tailwindcss"` に続けてこのファイルを `@import "@in-session/ui/theme.css"` し、
- * さらに `@source` で packages/ui を走査対象に加えること(ui のユーティリティ生成のため)。
+ * このパッケージのコンポーネント(button / input / spinner 等)が参照する @theme トークンを
+ * 一元管理する。
  *
- * 値は apps/web/src/style.css の @theme(ダーク既定)から抜き出したもの。ライトテーマの
- * オーバーレイは含めない(単体利用アプリはダーク前提)。web 側と値を揃えて保守する。
- * 生成方法: apps/web/src/style.css の `@theme { … }` と `@theme static { … }` を転記。
+ * ── 消費側アプリのセットアップ ──────────────────────────────
+ *   @import "tailwindcss";
+ *   @import "@insession/design-system/theme.css";
+ *   @source "../../node_modules/@insession/design-system/dist";
+ *
+ * ⚠ `@source` は必須。これが無いとコンポーネント内のクラス名から Tailwind
+ * ユーティリティが生成されず、**ビルドは通るのにスタイルだけが静かに消える**。
+ * パスは各アプリの style.css から node_modules への相対パスに合わせること。
+ * pnpm では node_modules 配下が symlink になるため、初回セットアップ時は
+ * 実際にビルドして見た目を目視確認すること。
+ *
+ * ── ライトテーマについて ────────────────────────────────
+ * このファイルはダーク単一トーンで、[data-theme] のライトテーマオーバーレイを含まない。
+ * ライト/ダークを切り替えるアプリは自分側で [data-theme] オーバーレイを持つ。
+ *
+ * ── insession-app との関係(歴史的経緯) ─────────────────────
+ * insession-app の apps/web は巨大な legacy CSS と共存させるため、同じトークンを
+ * src/style.css にインラインで持ち、このファイルを import しない。両者の値は
+ * 揃えて保守する(insession-app 側が増やしたトークンのうち、このパッケージの
+ * コンポーネントが参照しないものはここに持ち込まない)。
  */
 
 @theme {
@@ -172,7 +186,7 @@
 
   /* 単体の tracking-* ユーティリティとして使う letter-spacing トークン(#950)。標準スケール
      (tracking-wide=0.025em / -wider=0.05em / -widest=0.1em)に無い中間値を、badge/status/
-     link/lozenge 等の uppercase caps ラベルで使うぶんだけ切り出す(apps/web/src/style.css の
+     link/lozenge 等の uppercase caps ラベルで使うぶんだけ切り出す(insession-app の apps/web/src/style.css の
      --tracking-label: 0.14em(#943)と同じ命名感)。tracking-[0.1em] の任意値は標準の
      tracking-widest(=0.1em)へ置換すればよいのでトークン化不要。 */
   --tracking-tag: 0.06em; /* badge.tsx(variant="new") / status.tsx の極小 uppercase バッジ */
@@ -213,9 +227,9 @@
      #867 と同じ理由で @theme に実値を直書きしない: Tailwind v4 は @theme の --shadow-* を
      ビルド時にリテラル展開して `.shadow-*{--tw-shadow:<実値>}` を生成するため、後から
      :root[data-theme] 等の unlayered セレクタで同名変数を上書きしてもユーティリティには
-     一切効かない(apps/web/src/style.css の同種コメント参照。この非対称が #867 の原因だった)。
+     一切効かない(insession-app の apps/web/src/style.css の同種コメント参照。この非対称が #867 の原因だった)。
      実値は下の unlayered `:root { --elev-* }` に置き、ここは var() 参照だけにする。
-     foundation/ui は現状ダーク単一トーンで [data-theme] オーバーレイを持たないが、将来
+     このパッケージは現状ダーク単一トーンで [data-theme] オーバーレイを持たないが、将来
      consumer 側が --elev-* を上書きしても shadow-* ユーティリティが追従できるようにしておく。
      値は変更していない(参照構造のみ変更)。 */
   --shadow-soft: var(--elev-soft);
@@ -226,7 +240,7 @@
      input:focus 等で生値だったものをトークン化(#445)。新規部品は focus-visible:shadow-focus で使う。
      アウトライン色/幅/offset は @theme static 側(--color-focus-ring / --focus-ring-*)。 */
   /* 新 DS(#463): focus は info ブルーの 3px リングのみ(外側の 24px ブルームは廃止)。
-     shadow-soft/-popover/-overlay と違い theme 別オーバーライドを持たない(apps/web/src/style.css
+     shadow-soft/-popover/-overlay と違い theme 別オーバーライドを持たない(insession-app の apps/web/src/style.css
      の --shadow-focus も同様に literal のまま。#867 の問題はテーマ切替時の非追従なので、
      テーマ差分を持たないこの値は @theme 直書きのままで実害が無い)ため --elev-* 化していない。 */
   --shadow-focus: 0 0 0 3px rgba(91, 139, 240, 0.16);
@@ -279,12 +293,12 @@
   --z-dropdown: 30; /* 検索候補などのドロップダウン */
   --z-popover-portal: 35; /* Popover の portal 版(createPortal で document.body 直下 + position:fixed。
                              #885)。クリップ元の親パネル自身も --z-dropdown を使うため、それより手前に
-                             出す必要がある。foundation/ui が自分で使うトークンなので、プロダクト側の
+                             出す必要がある。このパッケージが自分で使うトークンなので、プロダクト側の
                              スケール(InSession は 55)に依らずここを既定値の単一ソースにする。
                              【注意】この値はプロダクト側の定義(例: InSession の style.css は 55)と
                              意図的に一致しない — 各プロダクトは自身の --z-dropdown のスケールに合わせて
                              --z-popover-portal を上書きする前提で、"35" を「正しい値」として参照しては
-                             いけない(foundation/ui 単体利用時のフォールバックに過ぎない)。 */
+                             いけない(このパッケージ単体利用時のフォールバックに過ぎない)。 */
   --z-snackbar: 90; /* 操作完了フィードバック(Snackbar) */
   --z-modal: 100; /* モーダル(backdrop 含む) */
 
@@ -301,8 +315,8 @@
 
 /* エレベーションの実値(#950)。上の @theme 内コメントのとおり、Tailwind v4 が --shadow-* を
    ビルド時にリテラル展開するため実値はここ(@theme の外・unlayered な素の :root)に置き、
-   @theme 側は var() 参照だけを持つ(apps/web/src/style.css の #867 対応と同じ形)。
-   ダーク単一値(foundation/ui はダーク前提。ファイル冒頭コメント参照)。値は元 @theme に
+   @theme 側は var() 参照だけを持つ(insession-app の apps/web/src/style.css の #867 対応と同じ形)。
+   ダーク単一値(このパッケージはダーク前提。ファイル冒頭コメント参照)。値は元 @theme に
    書かれていたものをそのまま移設しただけで変更なし。 */
 :root {
   --elev-soft: 0 2px 6px -2px rgba(0, 0, 0, 0.5);

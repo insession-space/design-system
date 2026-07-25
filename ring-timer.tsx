@@ -4,8 +4,8 @@ import type { CSSProperties } from 'react';
 // secondsLeft/totalSeconds を毎フレーム渡すだけの純粋表示部品(リレーゲーム等の残り時間表示 #974)。
 // conic-gradient + mask でリングを描き(mask の #000 はアルファ用のクリップ指定でありトークン違反ではない)、
 // 中央に残り秒数 + caption(i18n は持たないため注入)を重ねる。urgent(secondsLeft <= urgentThreshold)
-// では accent 色へ切り替え、ゆっくり脈動させる。脈動の keyframes は apps/web/src/style.css に定義
-// (foundation/ui 自体は keyframes を持たない既存流儀。badge.tsx の pop-in / modal.tsx の card-in と同じ)。
+// では accent 色へ切り替え、ゆっくり脈動させる。脈動の keyframes は insession-app の apps/web/src/style.css に定義
+// (このパッケージ自体は keyframes を持たない既存流儀。badge.tsx の pop-in / modal.tsx の card-in と同じ)。
 // prefers-reduced-motion は同ファイル末尾のグローバルルールで自動的に止まる(spinner.tsx と同じ扱い)。
 export type RingTimerProps = {
   secondsLeft: number;

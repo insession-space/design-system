@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 // 汎用Bottom Sheet(純粋 leaf UI。#284)。モバイルのChat/Participants導線のために新設。
-// Modal(packages/ui/modal.tsx)と同じ「backdrop + 本体 + Esc/背景クリックで閉じる」の方針を
+// Modal(modal.tsx)と同じ「backdrop + 本体 + Esc/背景クリックで閉じる」の方針を
 // 踏襲しつつ、下からせり出す・ドラッグで高さを変えられる点が異なるため別コンポーネントにする。
 // 開いた直後は中途高さ(MID_RATIO)、上ドラッグでフルハイト(FULL_RATIO)まで拡張できる。
 // 下ドラッグで一定以下まで縮めると close する。i18n はこのパッケージに持たないため、

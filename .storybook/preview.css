@@ -1,0 +1,27 @@
+/* Storybook のプレビュー土台。配布物には含めない（.storybook/ は files に入らない）。
+ *
+ * 旧モノレポでは apps/web/src/style.css（8,700行超）を読み込んでトークンと body の見た目を
+ * 得ていた。単独リポジトリ化に伴い、このパッケージ自身の theme.css を単一ソースにし、
+ * カタログの描画に必要な最小限の body 規則だけをここに置く。
+ *
+ * ここは「消費側アプリがやるべきこと」の最小例そのものでもある:
+ *   1. @import "tailwindcss"
+ *   2. @import "@insession/design-system/theme.css"
+ *   3. @source でパッケージ本体を走査対象に加える（ui のユーティリティ生成のため）
+ */
+
+@import "tailwindcss";
+@import "../theme.css";
+
+/* ui コンポーネント内のクラス名からユーティリティを生成させる。
+ * 消費側アプリでは node_modules/@insession/design-system/dist を指す。 */
+@source "..";
+
+/* theme.css はトークン契約のみでリセットを持たないため、カタログ表示用の最小限を足す。
+ * theme.css は「ダーク単一トーン」前提（ライトテーマのオーバーレイを含まない）。 */
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}

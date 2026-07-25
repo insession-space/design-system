@@ -1,4 +1,4 @@
-import { BottomSheet, Button } from '@in-session/ui';
+import { BottomSheet, Button } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';

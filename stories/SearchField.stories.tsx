@@ -1,4 +1,4 @@
-import { SearchField } from '@in-session/ui';
+import { SearchField } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';

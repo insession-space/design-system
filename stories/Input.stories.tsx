@@ -1,4 +1,4 @@
-import { Input } from '@in-session/ui';
+import { Input } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 

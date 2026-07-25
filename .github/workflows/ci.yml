@@ -1,0 +1,58 @@
+name: CI
+
+# 決定論的な検証チャネル（モデルのトークンを使わずに壊れを検出する）。
+# 優先度は 型検査(tsc) > バグ検出 lint > フォーマット。加えて配布物が壊れていないかを見る。
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint & format check
+        run: pnpm check
+
+      # 配布物（js + d.ts）が生成できること。
+      - name: Build dist
+        run: pnpm build
+
+      # publish される中身が意図どおりか（dist と theme.css が入っているか）を検証する。
+      # ここが崩れると「publish は成功したのに消費側で解決できない」が起きる。
+      - name: Verify package contents
+        run: |
+          npm pack --dry-run --json > /tmp/pack.json
+          node -e '
+            const files = require("/tmp/pack.json")[0].files.map((f) => f.path);
+            const required = ["dist/index.js", "dist/index.d.ts", "theme.css", "package.json"];
+            const missing = required.filter((f) => !files.includes(f));
+            if (missing.length) {
+              console.error("同梱されていないファイル:", missing.join(", "));
+              console.error("実際の中身:\n" + files.join("\n"));
+              process.exit(1);
+            }
+            console.log("package contents OK (" + files.length + " files)");
+          '
+
+      # カタログがビルドできること（stories がプリミティブと乖離していないかの検出も兼ねる）。
+      - name: Build Storybook
+        run: pnpm build-storybook

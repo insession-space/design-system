@@ -1,4 +1,4 @@
-import { Chip, Icon } from '@in-session/ui';
+import { Chip, Icon } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';

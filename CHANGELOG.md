@@ -1,4 +1,10 @@
-# @in-session/ui
+# @insession/design-system
+
+> **このパッケージは `@in-session/ui` から `@insession/design-system` へ改名されました**
+> （リポジトリ分割時。旧モノレポ `insession-space/insession-app` の `foundation/ui` が
+> `insession-space/design-system` として独立し、npm へ公開されました）。
+> 以下の履歴は改名前の記述をそのまま残しています（当時のパッケージ名は `@in-session/ui`、
+> ソースの置き場所は `packages/ui` → `foundation/ui` でした）。
 
 ## 1.3.1
 
