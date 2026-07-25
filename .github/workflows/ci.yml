@@ -57,6 +57,8 @@ jobs:
               "base.css",
               "components.css",
               "package.json",
+              // 公開パッケージなのでライセンス本文の同梱は必須。
+              "LICENSE",
             ];
             const missing = required.filter((f) => !files.includes(f));
             if (missing.length) {
