@@ -15,7 +15,7 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
-  # npm の Trusted Publishing（OIDC）で使う。NPM_TOKEN を使う場合も害はない。
+  # npm の Trusted Publishing（OIDC）に必須。これが無いと publish できない。
   id-token: write
 
 jobs:
@@ -49,4 +49,8 @@ jobs:
           title: 'chore: version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # ⚠ NPM_TOKEN は意図的に渡さない。
+        # changesets/action は「env に NPM_TOKEN があればトークン publish、無ければ
+        # OIDC（Trusted Publishing）」の順で選ぶため、トークンを渡すと OIDC が使われなくなる。
+        # 1.3.1 の初回 publish は OIDC で成功している（トークン無し・2FA プロンプト無し）。
+        # OIDC が使えない状況に戻す場合のみ、ここに NPM_TOKEN を足すこと。

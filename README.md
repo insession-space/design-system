@@ -27,9 +27,16 @@ pnpm add @insession/design-system
 import { Button, Badge, Modal } from '@insession/design-system';
 ```
 
-### ⚠ `minimumReleaseAge` を設定している環境では除外指定が必要
+### ⚠ `minimumReleaseAge` を設定している環境では除外指定が必要（将来の pnpm 更新時）
 
-サプライチェーン対策で pnpm の `minimumReleaseAge`（publish 直後の版を install させない待機時間・**分単位**）を設定している場合、**publish したての DS が数日間 install できない**。自前のパッケージなので除外して問題ない。消費側リポジトリの `pnpm-workspace.yaml` に書いてコミットすると、開発者ごとのグローバル設定に依存せず揃う。
+サプライチェーン対策で pnpm の `minimumReleaseAge`（publish 直後の版を install させない待機時間・**分単位**）を設定している場合、**publish したての DS が待機時間中 install できなくなる**。自前のパッケージなので除外して問題ない。
+
+> 実測メモ: `~/.npmrc` に `minimum-release-age=7200`（= 5日）がある環境で 1.3.1 の publish 直後に
+> `pnpm install` したが**ブロックされなかった**。pnpm 10.12.1 はこの設定を強制しないため（`pnpm config get`
+> が値を返すのは単に設定を読み出しているだけで、機能の有無とは無関係）。**pnpm を更新すると効き始めて
+> 詰まる**ので、先に除外を入れておくのが安全。
+
+消費側リポジトリの `pnpm-workspace.yaml` に書いてコミットすると、開発者ごとのグローバル設定に依存せず揃う。
 
 ```yaml
 # pnpm-workspace.yaml
@@ -81,13 +88,17 @@ pnpm changeset      # 変更の intent を積む
 
 `main` に push されると Version PR が作られ、それをマージすると `release.yml` が npm publish する。
 
+**publish は npm の Trusted Publishing（OIDC）で行う。トークンは使わない。** `release.yml` は `id-token: write` を持ち、`NPM_TOKEN` を**意図的に env へ渡していない**（changesets/action は env に `NPM_TOKEN` があればトークン publish を優先するため、渡すと OIDC が使われなくなる）。
+
 `package.json` の `publishConfig.registry` で公開レジストリを明示している。**これを外さないこと** — 開発機の `~/.npmrc` が社内プロキシを `registry` に設定していると、publish がプロキシ宛になって公開レジストリに出ない。
 
-ローカルから手で publish する場合も同様に宛先を確認する。
+### ローカルから publish する場合
+
+npm はアカウントの 2FA か「bypass 2FA 付き granular access token」を要求するので、CI（OIDC）経由が基本。どうしても手で出す場合:
 
 ```bash
 npm whoami --registry https://registry.npmjs.org   # 公開レジストリでのログイン確認
-pnpm build && npm publish                          # publishConfig.registry が効く
+pnpm build && npm publish --otp=<code>             # 2FA 有効時は OTP が必要
 ```
 
 ## 構成
