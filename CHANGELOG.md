@@ -1,5 +1,201 @@
 # @insession/design-system
 
+## 3.0.0
+
+### Major Changes
+
+- 37c20fe: フォーム系プリミティブ（Checkbox / Radio / Toggle / Input / Textarea）を Base UI へ移行した（#22）
+
+  `@base-ui/react` の `checkbox` / `radio` + `radio-group` / `switch` / `field` へ振る舞いを委譲し、DS 側はトークンベースの見た目だけを持つ構造にした（#6 で Popover / Menu / Modal / ConfirmModal / Tabs に対して行ったのと同じ方針）。**見た目は移行前と同じ**（算出スタイルを実測して確認済み）。
+
+  ## 破壊的変更
+
+  ### `Checkbox` — `onChange` → `onCheckedChange`
+
+  Base UI の Checkbox は `<button role="checkbox">`（実体は `<span>`）を描画し、フォーム連携用の `<input>` を内部に隠し持つ。DS から `React.ChangeEvent` を組み立てて渡すことはできないため、状態通知を `onCheckedChange(checked)` に変えた。
+
+  ```tsx
+  <Checkbox checked={v} onChange={(e) => set(e.target.checked)} />   // 2.x
+  <Checkbox checked={v} onCheckedChange={(c) => set(c)} />           // 3.0
+  ```
+
+  `label` / `disabled` / `name` / `id` / `className` はそのまま。`defaultChecked` / `readOnly` / `required` が使えるようになった。
+
+  ### `Radio` — 単体コンポーネント → `Radio.Group` + `Radio.Item`
+
+  Base UI の Radio は選択状態を親の RadioGroup（`value` / `onValueChange`）から解決する設計で、個々の Radio が `checked` を受け取る形にはできない。矢印キーでのグループ内移動と roving tabIndex（グループ全体で tab stop が 1 つだけ）は、この構造が前提。
+
+  ```tsx
+  // 2.x
+  {
+    opts.map((o) => (
+      <Radio
+        key={o.key}
+        name="visibility"
+        checked={val === o.key}
+        onChange={() => setVal(o.key)}
+        label={o.label}
+      />
+    ));
+  }
+
+  // 3.0
+  <Radio.Group
+    name="visibility"
+    value={val}
+    onValueChange={setVal}
+    aria-label="公開範囲"
+  >
+    {opts.map((o) => (
+      <Radio.Item key={o.key} value={o.key} label={o.label} />
+    ))}
+  </Radio.Group>;
+  ```
+
+  `Radio.Group` は既定で縦積み（`flex flex-col gap-2.5`）。横並びにしたいときは `className` で上書きする。
+
+  ## 非破壊の変更
+
+  - **`Toggle`** — props（`checked` / `onChange`（引数なしトグル）/ `label` / `disabled`）は移行前と完全に同じ。内部が Base UI の Switch になり、隠しネイティブ input による form 連携（`name` / `value` / `form`）と `readOnly` が使えるようになった
+  - **`Input` / `Textarea`** — props シグネチャは移行前と同じ。内部で `useId` + `htmlFor` の手組みをやめ、Field.Label / Field.Control の自動紐付けに委譲した。`Input` から見た目の定数（`FIELD_LABEL` / `FIELD_BOX_BASE` / `FIELD_CONTROL`）と状態関数（`fieldLabelColor` / `fieldBoxState`）を export し、Textarea と共有するようにした（移行前は同じ文字列を二重に持っていた）
+
+  ## a11y の改善（実測で確認）
+
+  - **エラーが入力欄に紐付くようになった。** `error` を渡すと `aria-invalid="true"` + `aria-describedby` がエラー要素に張られる（移行前は素の `<span>` で、支援技術からエラーが入力欄に紐付いていなかった）
+  - **Radio に roving tabIndex が付いた。** グループ内の tab stop が 1 つだけになり、矢印キーで選択を移動できる（移行前は全ての Radio が tab stop で、矢印キーは効かなかった）
+  - Checkbox / Radio のラベルクリックが Field.Label 経由になった（`<button>` は HTML 仕様上 labelable element ではないため `<label htmlFor>` が使えない）。**二重トグルが起きないことを実測で確認済み**
+
+  ## 移行時の落とし穴（消費側が同種の実装をするとき用）
+
+  **`disabled:` は効かない。`data-disabled:` を使うこと。** Base UI の Checkbox / Radio / Switch が描画するのは `<span>` で（`nativeButton` の既定が false）、CSS の `:disabled` 疑似クラスはフォーム要素にしか適用されない。この移行でも一度踏んでおり、型検査もビルドも通ったまま disabled が視覚的に無効化されない状態になった（実測で `opacity: 1` / `cursor: pointer` のままだった）。
+
+  **状態別のクラスは `data-checked:` バリアントではなく `className` の関数形（`(state) => string`）で排他的に出している。** 同一プロパティ（`background-color` / `border-color`）のユーティリティを 1 つのクラス属性に同時に並べると、勝敗が配布 CSS の出力順で決まってしまうため（#21 / #17 と同じ構図）。
+
+  **`cursor` は `<label>` に継承されない。** ラベルテキスト上だけカーソルが変わらない状態になるため、`cursor-[inherit]` を明示して行に追従させている。なお Tailwind に `cursor-inherit` ユーティリティは無く、子孫セレクタ記法（`[&_label]:cursor-pointer`）は**ソース走査で拾われず配布 CSS に生成されなかった**（`check:styles` は素のクラス名しか見ないのでこの欠損を検出できない）。
+
+  **disabled が親から降ってくる経路がある。** `<Radio.Group disabled>` では各 `Radio.Item` の `disabled` prop は `undefined` のままなので、それだけを見ると円だけ無効化されてラベル側が通常表示で残る。`has-[>[data-disabled]]`（**直接の子**に限定）で拾っている。子孫全体（`has-[[data-disabled]]`）にすると、ラベル内に `data-disabled` を持つ装飾ノードがあるだけで誤判定する。
+
+  ## その他
+
+  - `Toggle` の `checked` にデフォルト値を持たせていない。常に `checked` を渡すと `Switch.Root` が必ず controlled 扱いになり、`defaultChecked` が無視される（`<Toggle defaultChecked />` が初期 ON にならない）
+  - Storybook に回帰ネットを追加した: `Controls > Switches`（Toggle は story が無く見た目の回帰を検出できなかった）/ `Controls > RadioGroupDisabled`（親から降る disabled）/ `Controls > Uncontrolled`（`defaultChecked` / `defaultValue`）
+  - `Checkbox` の `indeterminate` は対応しない（移行前も持っておらず、DS に中間状態のアイコンが無いため）
+
+- 9849eff: オーバーレイ系プリミティブ（BottomSheet / Toast）を Base UI へ移行した（#23）
+
+  これで DS のプリミティブは**すべて Base UI ベース**になった（#6 でオーバーレイ、#22 でフォーム系、本 PR で残り）。
+
+  ## `BottomSheet` — Base UI の Drawer へ（**props は非破壊**）
+
+  `open` / `onClose` / `ariaLabel` / `closeLabel` / `closeOnEsc` は移行前と同じ。内部で捨てたものが大きい。
+
+  - **Pointer Events による自前のドラッグ実装（約 60 行）** — `setPointerCapture` / `pointermove` / スナップ計算を全部やめ、Drawer の `snapPoints={[0.68, 0.94]}` に置き換えた（`MID_RATIO` / `FULL_RATIO` の値はそのまま）
+  - `window` への `keydown` リスナーによる Esc close → Drawer 標準
+  - backdrop クリック + 中身側の `stopPropagation` → `Drawer.Backdrop` 標準
+  - `if (!open) return null` の手動アンマウント → `Drawer.Portal`
+
+  併せて、移行前に無かった**フォーカストラップ・スクロールロック・閉じた後のフォーカス復帰**が付いた。
+
+  高さの扱いが変わっている（見た目の結果は同じ）。移行前は `mode('mid'|'full')` を state で持って `.bottom-sheet--mid`(68dvh) / `--full`(94dvh) を切り替えていたが、**高さは常にフル（94dvh）にして「どこまでせり出すか」を transform で表現する**方式にした。`.bottom-sheet--mid` は使わなくなったので削除した。
+
+  > ⚠ **Base UI の Drawer は位置を自分で当てず、CSS 変数として出すだけ。** `components.css` の `.bottom-sheet` に `transform: translateY(calc(var(--drawer-snap-point-offset, 0px) + var(--drawer-swipe-movement-y, 0px)))` を足して反映している。これを書かないと**シートが常にフルハイトで表示される**（型検査もビルドも通る）。
+
+  `SplitModal` は BottomSheet / Modal の API が変わっていないため**変更不要**（768px 以下のドリルダウン維持を実測で確認）。
+
+  ## `Toast` — Base UI の Toast へ（**破壊的変更**）
+
+  **`<Toast title=… />` を自分で置く使い方は廃止した。** Base UI の Toast は「Provider が持つキューに add して Viewport が描画する」命令的 API で、`ToastRoot` は `toast` オブジェクトと ToastProviderContext を要求するため、見た目部品として単体で置くことはできない。
+
+  ```tsx
+  // 2.x — 表示制御は消費側が useState で持っていた
+  {
+    show && (
+      <Toast
+        tone="success"
+        title="保存しました"
+        onClose={() => setShow(false)}
+      />
+    );
+  }
+
+  // 3.0 — アプリのルートに Provider + Viewport を1度だけ置く
+  <Toast.Provider>
+    <App />
+    <Toast.Viewport />
+  </Toast.Provider>;
+
+  // 呼び出し側
+  const toast = Toast.useToast();
+  toast.add({
+    title: "保存しました",
+    description: "…",
+    data: { tone: "success" },
+  });
+  ```
+
+  `tone` / `variant` / `icon` は `data` に載せる（`ToastData` 型）。`variant='snackbar'` の legacy 互換パレットは維持し、**ピクセル同一を実測で確認済み**（pill / `radius 999px` / `bg rgba(16,22,25,.94)`）。
+
+  得られたもの: **キュー管理・`timeout` による自動 dismiss・スワイプで閉じる・複数トーストの重ね表示・aria-live リージョンへの通知**。移行前は `role="status"` を要素に直接置いていただけで、後から出たトーストが読み上げられる保証が無かった。
+
+  > ⚠ DS は本来「アプリ依存を持たない純粋 leaf UI」の方針だが、**Toast だけは Provider を持つ**（＝消費側のアプリ構造に踏み込む）。キュー管理を伴う通知はアプリ全体で 1 つの出口を共有する必要があり、部品単体では成立しないため。方針からの意図的な逸脱。
+
+  ## 移行時の落とし穴
+
+  **`useToastManager` はトップレベルからは型としてしか export されていない**（`@base-ui/react/toast` の `index.d.ts` が `export type * from "./useToastManager.js"`）。値として使うには名前空間経由（`Toast.useToastManager`）で参照する。
+
+  ## カタログ（Storybook）についての注意
+
+  `Components/Toast` のカタログ上では **DS トーストの左 3px tone ボーダーが 1px の既定ボーダー色で表示される**。`.storybook/preview.css` が `dist/styles.css` を読んだ**後に** stories 用のユーティリティを追加生成する構成のため、stories が使っている `.border`（`border-width: 1px`）が `.border-l-[3px]` より後に出力されて勝つのが原因。**配布 CSS だけを読む消費側では正しく 3px / tone 色が出る**ことを実測で確認済み（この現象は移行前の Toast も同じクラス構成だったため、本 PR による回帰ではない）。
+
+- bedd05c: 残りのプリミティブを Base UI へ移行し、`useDismiss` を削除した（#33）
+
+  棚卸ししたところ、振る舞いを持つプリミティブがまだ残っていた。ここで片付けて **DS のプリミティブはすべて Base UI ベース**になった（#6 オーバーレイ → #22 フォーム系 → #23 BottomSheet / Toast → 本 PR）。
+
+  ## 破壊的変更
+
+  ### `useDismiss` を削除した
+
+  `Popover` を Base UI 化（#6）した時点で役目を終えており、**DS 内の利用はゼロ**だった（`index.ts` から export だけが残っていた）。消費側がまだ import している場合は、`Popover.Root` の `closeOnEsc` / `closeOnOutside`、または Base UI の `useDismiss` 相当へ置き換えること。
+
+  ### `Stepper` は値が `<input>` になった
+
+  表示専用の `<span>` から `NumberField.Input` に変わり、**値を直接編集できる**ようになった。`value` / `min` / `max` / `step` / `onChange` / `disabled` / `decLabel` / `incLabel` はそのまま。`valueLabel`（入力欄の aria-label）を追加した — 編集可能になったので、何の数値なのかを支援技術へ伝えるために渡すことを推奨する。
+
+  ## 得られたもの
+
+  |                         | 移行先                         | 効果                                                                                                                                                                                                               |
+  | ----------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+  | `Stepper`               | `number-field`                 | **矢印キー（↑↓）で増減できる**（PageUp/Down は largeStep）。値の直接入力。min/max による端の disabled 判定と clamp が自動に（移行前は `disabled={disabled \|\| value <= min}` と `Math.min/max` を手書きしていた） |
+  | `Avatar`                | `avatar`                       | **壊れた `src` で fallback 円に切り替わる**。移行前は無条件で `<img>` を描いていたため、URL が壊れていても画像が割れたまま残った                                                                                   |
+  | `SearchField`           | `field` + `input`              | **#22 の取りこぼしだった。** label と control が自動で紐付く。Input と見た目の定数を共有し、二重管理を解消                                                                                                         |
+  | `Button` / `IconButton` | `button`                       | `focusableWhenDisabled` が使えるようになった（**disabled なボタンはキーボードナビから消える**問題への対処）。`render` prop で `<a>` 等に差し替えも可能                                                             |
+  | `RingTimer`             | `progress`                     | `role="progressbar"` + `aria-valuenow/min/max` + `aria-valuetext` が付いた。描画は従来どおり conic-gradient                                                                                                        |
+  | `StepFlow`              | （Base UI ではなくネイティブ） | `<ol>`/`<li>` + `aria-current="step"`。下記参照                                                                                                                                                                    |
+
+  ## `StepFlow` は Progress に載せなかった
+
+  当初 `progress` へ載せる想定だったが、**`role="progressbar"` は不適切**と判断して見送った。progressbar は「40% 完了」のような単一の数値を伝えるロールで、**要素の中身が読み上げ対象から外れる**。StepFlow が伝えたいのは「どのステップに居るか」という**ラベル付きの位置**なので、数値に潰すと情報が減る。
+
+  代わりにネイティブの正しいセマンティクス（順序付きリスト + `aria-current="step"`）を与えた。移行前は素の `<div>` の入れ子で、順序も現在位置も伝わっていなかった。見た目は変わらない（`list-none` / `m-0` / `p-0` でマーカーと既定余白を消している。実測で確認済み）。
+
+  ## `Avatar` は DS 経路だけ移行した
+
+  **legacy 経路（`status` / `ring` を使わない呼び出し）は据え置き。** 「素の img/span を返す」後方互換に消費側の `.avatar` / `.auth-avatar` が依存しており、`Avatar.Root` でラップすると DOM が 1 階層増えて既存の CSS セレクタが外れるため。同じ理由で、legacy 経路には fallback 切り替えも入らない（後方互換とのトレードオフ）。
+
+  なお DS 経路では、画像の有無に関わらず Root に背景色を置くようにした（移行前は `src` があるとき `bg-transparent`）。読み込み失敗時に fallback の文字が地なしで出てしまうため。**透過 PNG のときだけ移行前と差が出る**が、fallback が成立する方を優先した。
+
+  ## 移行時の落とし穴
+
+  **`focusableWhenDisabled` を使うと `disabled` 属性が `aria-disabled` に置き換わる**（`utils/useFocusableWhenDisabled.js`）。そのとき CSS の `:disabled` / `:enabled` 疑似クラスはマッチしなくなり、**disabled が視覚的に無効化されないうえ hover まで効いてしまう**。`Button` / `IconButton` / `Stepper` のボタンは `disabled:` / `enabled:hover:` をやめ、**`data-disabled:` / `hover:not-data-disabled:`** に統一した（Base UI Button は state の disabled を常に `data-disabled` として出すので、これで両方の経路を 1 つの書き方で拾える）。
+
+  **`FIELD_BOX_BASE` から縦 padding を外した。** Input / Textarea は `py-3`、SearchField は `py-2.5` と一段浅いが、共通側に `py-3` を持たせると呼び出し側の `py-2.5` では打ち消せない（同一プロパティのユーティリティは配布 CSS の出力順で決まる。#21 と同じ構図で、実測でも `py-3` が勝って padding が 12px になっていた）。**縦 padding は各コンポーネントが必ず自分で指定する**契約にした。
+
+  **`check-styles.mjs` はコメント内のクラス属性も実クラス名として拾う。** ソースを正規表現で走査するため、コメントに例を書くと存在しないクラスで検査が落ちる（実際に踏んだ）。
+
+  ## 別途対応が必要な発見（#35 に切り出した）
+
+  **`border-[1.5px]` が配布 CSS に生成されていない。** `Input` / `Textarea` / `SearchField` の field 枠は 1.5px のつもりだが、実測では **1px** で描かれている（`dist/styles.css` に `.border-\[1\.5px\]` が 0 件）。**移行前から同じ**なので本 PR による回帰ではないが、DS 全体で意図した枠幅が出ていない。直すと見た目が変わる（1px → 1.5px）ため、意図的な変更として別途判断する。`check:styles` は任意値クラスを検査対象にしていないので、この種の欠損を今後も拾えない点も #35 に含めた。
+
 ## 2.1.0
 
 ### Minor Changes
