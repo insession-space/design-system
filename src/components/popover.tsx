@@ -11,7 +11,16 @@ import { createContext, useContext } from 'react';
 // 使い方(compound): <Popover.Root><Popover.Trigger/><Popover.Portal><Popover.Positioner
 // side="bottom" align="start"><Popover.Popup>...</Popover.Popup></Popover.Positioner>
 // </Popover.Portal></Popover.Root>
-// Portal を挟まなければ従来の「非 portal(トリガーの兄弟として絶対配置)」相当になる。
+//
+// ⚠ **Popover.Portal は省略できない**(必須)。以前ここには「Portal を挟まなければ従来の
+// 『非 portal(トリガーの兄弟として絶対配置)』相当になる」と書いていたが**誤り**だった。
+// Base UI の Popover.Positioner は usePopoverPortalContext() で Portal の存在を必須にしており、
+// 無いと**レンダー中に throw する**(dev: `Base UI: <Popover.Portal> is missing.` /
+// prod: minify されて `Base UI error #45`)。React のレンダー中の例外なのでツリーごと落ち、
+// error boundary を挟んでいない画面では**全体が真っ白**になる。実際に消費側 2 箇所
+// (insession-app のヘッダー通知ベル・admin のアカウントメニュー)がこの誤記を根拠に Portal を
+// 省き、staging で画面真っ白を踏んだ(insession-app#1113)。Menu も同じ制約
+// (Menu.Positioner → Menu.Portal 必須。prod は `Base UI error #32`)。
 
 // パネル本体の見た目(面・境界・角丸・影・入場アニメ)。padding と最大高さスクロールは
 // **ここに含めない** — 下記 POPOVER_POPUP_PADDING / POPOVER_POPUP_SCROLL として分離し、

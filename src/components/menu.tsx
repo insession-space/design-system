@@ -13,6 +13,12 @@ import { mergePopupClassName, POPOVER_POSITIONER_BASE, popupBase } from './popov
 // 使い方(compound): <Menu.Root><Menu.Trigger/><Menu.Portal><Menu.Positioner
 // side="bottom" align="start"><Menu.Popup><Menu.Item onClick={...}>...</Menu.Item>
 // </Menu.Popup></Menu.Positioner></Menu.Portal></Menu.Root>
+//
+// ⚠ **Menu.Portal は省略できない**(必須)。Base UI の Menu.Positioner は
+// useMenuPortalContext() で Portal の存在を必須にしており、無いと**レンダー中に throw する**
+// (dev: `Base UI: <Menu.Portal> is missing.` / prod: minify されて `Base UI error #32`)。
+// レンダー中の例外なのでツリーごと落ち、error boundary の無い画面は**全体が真っ白**になる。
+// Popover 側も同じ制約(prod は #45)で、実際に消費側が踏んでいる(popover.tsx のコメント参照)。
 
 const DEFAULT_SIDE_OFFSET = 8;
 
