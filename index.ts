@@ -40,7 +40,15 @@ export {
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
 export { default as PersonIcon } from './icons/person-icon.tsx';
-export { default as Input, type InputProps } from './input.tsx';
+export {
+  default as Input,
+  FIELD_BOX_BASE,
+  FIELD_CONTROL,
+  FIELD_LABEL,
+  fieldBoxState,
+  fieldLabelColor,
+  type InputProps,
+} from './input.tsx';
 export { default as Link, type LinkProps, type LinkVariant, linkClass } from './link.tsx';
 export { default as LogoMark, type LogoMarkProps, type LogoMarkVariant } from './logo-mark.tsx';
 export { default as Lozenge, type LozengeProps, type LozengeTone } from './lozenge.tsx';
@@ -94,7 +102,7 @@ export {
   type PopoverTriggerProps,
 } from './popover.tsx';
 export { type OpenProfile, ProfileModalContext, useOpenProfile } from './profile-modal.tsx';
-export { default as Radio, type RadioProps } from './radio.tsx';
+export { Radio, type RadioGroupProps, type RadioItemProps } from './radio.tsx';
 export { default as RingTimer, type RingTimerProps } from './ring-timer.tsx';
 export { default as SearchField, type SearchFieldProps } from './search-field.tsx';
 export { default as Spinner, type SpinnerProps } from './spinner.tsx';

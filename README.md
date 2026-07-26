@@ -116,7 +116,9 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 
 ## Base UI ベースのプリミティブ（v2 以降）
 
-`Popover` / `Menu` / `Modal` / `ConfirmModal` / `Tabs` は **[Base UI](https://base-ui.com)（`@base-ui/react`）へ振る舞いを委譲した compound API**。パートを組み合わせて使う。
+`Popover` / `Menu` / `Modal` / `ConfirmModal` / `Tabs`（v2 以降）と `Checkbox` / `Radio` / `Toggle` / `Input` / `Textarea`（v3 以降）は **[Base UI](https://base-ui.com)（`@base-ui/react`）へ振る舞いを委譲**している。DS 側はトークンベースの見た目だけを持つ。
+
+オーバーレイ系はパートを組み合わせる compound API。
 
 ```tsx
 <Popover.Root open={open} onOpenChange={(o) => !o && close()}>
@@ -158,6 +160,25 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 ### ⚠ Modal を別ドキュメント（PiP）へ出すなら `container` を明示する
 
 v1 は `ownerDocument` から描画先を自動検出していたが、Base UI の Portal は明示指定が必要。Document Picture-in-Picture へモーダルを出す場合は `<Modal.Portal container={pipDocument.body}>` を渡す。
+
+### フォーム系プリミティブ（v3 以降）
+
+`Checkbox` / `Radio` / `Toggle` / `Input` / `Textarea` も Base UI へ委譲した。**`Toggle` / `Input` / `Textarea` は props シグネチャが変わっていない。** 変わったのは次の2つ。
+
+```tsx
+{/* Checkbox: onChange(ChangeEvent) → onCheckedChange(checked) */}
+<Checkbox checked={v} onCheckedChange={setV} label="通知を受け取る" />
+
+{/* Radio: 単体 → Radio.Group + Radio.Item（矢印キー移動 / roving tabIndex が付く） */}
+<Radio.Group value={val} onValueChange={setVal} aria-label="公開範囲">
+  <Radio.Item value="all" label="全員に公開" />
+  <Radio.Item value="private" label="非公開" />
+</Radio.Group>
+```
+
+`Input` / `Textarea` に `error` を渡すと `aria-invalid` と `aria-describedby` が張られ、支援技術からエラーが入力欄に紐付く（v2 までは素の `<span>` で紐付いていなかった）。
+
+> ⚠ **Base UI の Checkbox / Radio / Switch に `disabled:` ユーティリティは効かない。** これらが描画するのは `<span>`（`nativeButton` の既定が false）で、CSS の `:disabled` 疑似クラスはフォーム要素にしか適用されないため。**`data-disabled:` を使うこと。** 型検査もビルドも通ってしまい、disabled が視覚的に無効化されないまま出荷される（この移行でも一度踏んだ）。`Menu.Item` も同じ理由で `data-disabled:` を使っている。
 
 ## 開発
 
