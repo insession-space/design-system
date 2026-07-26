@@ -1,5 +1,21 @@
 # @insession/design-system
 
+## 3.2.0
+
+### Minor Changes
+
+- 3af9806: フィードの 1 件分を組み立てる複合コンポーネント `FeedItem` / `FeedItemAttachment` を追加した。
+
+  プリミティブ（`src/components/`）と区別するため、複合コンポーネントの置き場所として `src/ui-kit/` を新設した。Storybook のカテゴリは `UI Kit/`。
+
+  `FeedItem` は見た目だけを持ち、文言の解決（i18n）・データ更新・画面遷移は呼び出し側の責務にしている。`timeLabel` / `message` は整形済みの文字列を受け取り、アバター・サムネイル・アクションはスロットで差す。
+
+### Patch Changes
+
+- 65a2dab: `PageHeader` の `title` に ReactNode を渡せなかったのを修正した。`PageHeaderProps` が `Omit<ComponentProps<'div'>, 'className'>` を広げていたため、HTML の `title` 属性(`string`)と `title: ReactNode` が交差して `ReactNode & string` に潰れ、要素を渡すと型エラーになっていた（アイコンやブランドドット付きの見出しが書けない）。`title` も Omit するようにした。
+
+  他のプリミティブの props（`gap` / `align` / `padding` / `elevation` / `size` / `wrap` など）は `div` の HTMLAttributes に同名が無く衝突しないことを型レベルで確認済み。
+
 ## 3.1.0
 
 ### Minor Changes
