@@ -358,13 +358,16 @@ pnpm build && npm publish --otp=<code>             # 2FA 有効時は OTP が必
 ## 構成
 
 ```
-index.ts              公開窓口（外部はここ経由で import する）
-theme.css             デザイントークンの契約（@theme）
-base.css              コンポーネントが前提にする最小リセット（preflight は配らない）
-components.css        ユーティリティで表現していない部品 CSS と @keyframes
-styles.src.css        配布 CSS のビルド入力（publish しない）
-*.tsx                 プリミティブ（button / input / modal / popover / …）
-icons/                アイコン（icon.tsx の PATHS が単一ソース）
+src/                  出荷物のソース（ここだけが dist に入る）
+  index.ts            公開窓口（外部はここ経由で import する）
+  components/         プリミティブ（button / input / modal / popover / …）
+  icons/              アイコン（icon.tsx の PATHS が単一ソース）
+  breakpoints.ts      レイアウト用のメディアクエリ定数
+  styles/
+    theme.css         デザイントークンの契約（@theme）
+    base.css          コンポーネントが前提にする最小リセット（preflight は配らない）
+    components.css    ユーティリティで表現していない部品 CSS と @keyframes
+    styles.src.css    配布 CSS のビルド入力（publish しない）
 stories/              Storybook のカタログ
 .storybook/           Storybook 設定（preview.css が消費側と同じ経路の再現）
 .storybook/public/    成果物へそのままコピーされる静的ファイル（CNAME = 公開ドメイン）
@@ -373,7 +376,11 @@ scripts/              check-styles.mjs（配布 CSS の欠損検査）
 tsup.config.ts        配布物（js + d.ts）のビルド
 ```
 
-配布されるのは `dist/`（`index.js` / `index.d.ts` / `styles.css`）と `theme.css` / `base.css` / `components.css` / `LICENSE`。
+配布されるのは `dist/`（`index.js` / `index.d.ts` / `styles.css`）と `src/styles/` の `theme.css` / `base.css` / `components.css`、および `LICENSE`。
+
+> 📌 CSS の import パス（`@insession/design-system/theme.css` 等）は `exports` のキーであってリポジトリ内の配置とは独立している。ソースが `src/styles/` へ移っても**消費側の書き方は変わらない**。
+
+⚠ `src/styles/styles.src.css` の `@source "../components/*.tsx"` / `@source "../icons/*.tsx"` は配布 CSS のユーティリティ生成の走査対象。ここを壊すと**ビルドは緑のまま CSS だけが静かに欠ける**（`pnpm check:styles` が検出する）。ソースを移動するときは必ず一緒に直すこと。
 
 ## ライセンス
 

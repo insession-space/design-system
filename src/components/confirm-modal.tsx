@@ -1,7 +1,7 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import type { ReactNode } from 'react';
+import Icon, { type IconName } from '../icons/icon.tsx';
 import Button, { type ButtonVariant } from './button.tsx';
-import Icon, { type IconName } from './icons/icon.tsx';
 
 // 確認ダイアログ（純粋 leaf UI）。Base UI の AlertDialog を土台に DS
 // (claude design "INSESSION Design System" #663) の Confirm 体裁「tone のアイコン円 + 見出し + 本文 +

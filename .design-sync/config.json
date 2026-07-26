@@ -4,7 +4,7 @@
   "shape": "storybook",
   "readmeHeader": ".design-sync/conventions.md",
   "pkg": "@insession/design-system",
-  "entry": "index.ts",
+  "entry": "src/index.ts",
   "//buildCmd": "d.ts は tsup が生成する（旧: tsc の emitDeclarationOnly を直接叩いていた）。dist/index.d.ts が dts 抽出のエントリになる。",
   "buildCmd": "pnpm build",
   "storybookStatic": ".design-sync/sb-reference",

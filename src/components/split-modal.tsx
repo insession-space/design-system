@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useState } from 'react';
+import Icon, { type IconName } from '../icons/icon.tsx';
 import BottomSheet from './bottom-sheet.tsx';
-import Icon, { type IconName } from './icons/icon.tsx';
 import { Modal } from './modal.tsx';
 
 // 設定系モーダルの2ペイン外殻（純粋 leaf UI）。左にセクションナビ、右にそのセクションの中身。

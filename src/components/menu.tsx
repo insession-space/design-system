@@ -1,7 +1,7 @@
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
-import Icon from './icons/icon.tsx';
+import Icon from '../icons/icon.tsx';
 import { mergePopupClassName, POPOVER_POSITIONER_BASE, popupBase } from './popover.tsx';
 
 // ポップオーバーの上に載せるメニュー。Base UI(floating-ui ベース)の Menu へ委譲する薄い

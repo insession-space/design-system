@@ -8,7 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/insession-space/design-system.git"
   },
-  "//": "ビルド成果物(dist)を配布する。CSS はパッケージ直下に置いたまま公開する(tsup は CSS を処理しないため)。react はホストと同一インスタンスを使うため peerDependency。",
+  "//": "ビルド成果物(dist)を配布する。CSS は tsup が処理しないため src/styles/ のソースをそのまま公開する(exports のキーは ./theme.css 等のまま変えないので消費側の import は不変)。react はホストと同一インスタンスを使うため peerDependency。",
   "//exports": "CSS の入口は3つ。./styles.css が既定(トークン + 部品 CSS + このパッケージが使うユーティリティを全部含むプリビルド。消費側に Tailwind は不要)。./theme.css はトークンだけ(消費側が Tailwind で自分のマークアップに DS トークンを使いたい場合の @theme 統合用)。./components.css は部品 CSS だけ(Tailwind + @source 方式を続ける消費側が、ユーティリティで表現できない部品 CSS だけを足すため)。",
   "exports": {
     ".": {
@@ -16,22 +16,23 @@
       "import": "./dist/index.js"
     },
     "./styles.css": "./dist/styles.css",
-    "./theme.css": "./theme.css",
-    "./base.css": "./base.css",
-    "./components.css": "./components.css"
+    "./theme.css": "./src/styles/theme.css",
+    "./base.css": "./src/styles/base.css",
+    "./components.css": "./src/styles/components.css"
   },
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "theme.css",
-    "base.css",
-    "components.css",
+    "src/styles/theme.css",
+    "src/styles/base.css",
+    "src/styles/components.css",
     "CHANGELOG.md",
     "LICENSE"
   ],
+  "//sideEffects": "CSS は副作用ありとして tree-shaking から守る。ソースが src/styles/ へ移ったため、ディレクトリを問わず一致する **/*.css で書く（bundler は '/' を含まないグロブに **/ を補う実装が多いが、明示して曖昧さを消す）。",
   "sideEffects": [
-    "*.css"
+    "**/*.css"
   ],
   "//publishConfig": "registry を明示するのは必須。開発機の ~/.npmrc が社内プロキシ(npm.flatt.tech 等)を registry に設定している場合、これが無いと npm publish がプロキシ宛になり公開レジストリへ出ない。",
   "publishConfig": {
@@ -42,7 +43,7 @@
   "scripts": {
     "build": "pnpm build:js && pnpm build:css",
     "build:js": "tsup",
-    "build:css": "tailwindcss -i styles.src.css -o dist/styles.css",
+    "build:css": "tailwindcss -i src/styles/styles.src.css -o dist/styles.css",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "check": "biome check .",
     "check:styles": "node scripts/check-styles.mjs",

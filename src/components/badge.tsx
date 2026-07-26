@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import Icon, { type IconName } from './icons/icon.tsx';
+import Icon, { type IconName } from '../icons/icon.tsx';
 
 // Badge（非対話の status/meta ラベル。純粋 leaf UI）。claude design "INSESSION Design System" 準拠（#463 / #663）。
 // タップできる要素は Chip、継続的な状態の点+枠は StatusBadge、mono-caps の状態タグは Lozenge を使う

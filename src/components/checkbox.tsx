@@ -2,7 +2,7 @@ import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import { Field } from '@base-ui/react/field';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
-import Icon from './icons/icon.tsx';
+import Icon from '../icons/icon.tsx';
 
 // DS のチェックボックス（純粋 leaf UI）。claude design "INSESSION Design System" の Controls 仕様に準拠（#463）。
 // 振る舞いは Base UI の Checkbox へ委譲する（#22）。DS 側はトークンベースの見た目だけを持つ。

@@ -51,5 +51,5 @@
 
 /* ユーティリティ生成の走査対象。コンポーネント本体のみを見る。
  * stories/ は含めない（カタログ専用のクラスまで配布 CSS に混ざる）。 */
-@source "./*.tsx";
-@source "./icons/*.tsx";
+@source "../components/*.tsx";
+@source "../icons/*.tsx";

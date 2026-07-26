@@ -43,7 +43,7 @@ const config: StorybookConfig = {
       // ため、自己参照をソースの index.ts へ向ける（tsconfig.json の paths と対応）。
       resolve: {
         alias: {
-          '@insession/design-system': fileURLToPath(new URL('../index.ts', import.meta.url)),
+          '@insession/design-system': fileURLToPath(new URL('../src/index.ts', import.meta.url)),
         },
       },
       // デザイントークン(theme.css の @theme)を Storybook でも生成するため
