@@ -1,7 +1,16 @@
-import type { ReactNode, TextareaHTMLAttributes } from 'react';
-import { useId, useState } from 'react';
+import { Field } from '@base-ui/react/field';
+import type { FC, ReactElement, ReactNode, TextareaHTMLAttributes } from 'react';
+import { useState } from 'react';
+import {
+  FIELD_BOX_BASE,
+  FIELD_CONTROL,
+  FIELD_LABEL,
+  fieldBoxState,
+  fieldLabelColor,
+} from './input.tsx';
 
 // DS の複数行テキスト入力（純粋 leaf UI）。Input と同じ見た目・同じ状態遷移を持つ textarea 版。
+// label と control の紐付け・error の aria 連携は Base UI の Field へ委譲する（#22。Input と同じ）。
 //
 // ── なぜ必要か ────────────────────────────────────────
 // DS は Input（1行）と Composer（チャット送信欄。送信ボタンと添付を内包する専用部品）は持って
@@ -13,8 +22,8 @@ import { useId, useState } from 'react';
 //
 // ── Input との関係 ──────────────────────────────────
 // ラベル(mono caps) / field(surface-2 + 1.5px border + radius md) / 状態の優先度
-// (error > focused > default) と色は **Input と完全に同一**にしてある。並べて置いたときに
-// 揃うのが要件なので、値を変えるときは両方まとめて変えること。
+// (error > focused > default) と色は **Input と完全に同一**。定数と状態関数を input.tsx から
+// import して共有しているので、値を変えれば両方に効く（移行前は同じ文字列を二重に持っていた）。
 //
 // textarea 固有の差分は3点だけ:
 //   1. field を `items-center` ではなく `items-stretch` にする（複数行なので中央寄せは不要）
@@ -29,52 +38,48 @@ export type TextareaProps = {
   className?: string;
 } & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'>;
 
-const LABEL = 'font-mono text-xs font-semibold tracking-widest uppercase transition-colors';
-// field(ラッパー)。Input と同一。複数行なので items-stretch にする点だけ異なる。
-const FIELD =
-  'flex items-stretch w-full bg-surface-2 border-[1.5px] border-solid rounded-md px-3.5 py-3 transition-[border-color,box-shadow] duration-(--dur-fast)';
-const CONTROL =
-  'flex-1 min-w-0 border-none outline-none bg-transparent text-md text-text placeholder:text-text-faint';
 const RESIZE: Record<NonNullable<TextareaProps['resize']>, string> = {
   vertical: 'resize-y',
   none: 'resize-none',
 };
 
+// Base UI の Field.Control は型が `<input>` 固定で、`render` で `<textarea>` に差し替えても
+// props の型は追随しない（onFocus 等が HTMLInputElement のままになる）。Field との紐付け
+// （id の解決・aria-describedby・touched/dirty の追跡）は render 先の要素に正しく適用される
+// ので、ここでは型だけを textarea に合わせる。実体は Field.Control のまま。
+const TextareaControl = Field.Control as unknown as FC<
+  TextareaHTMLAttributes<HTMLTextAreaElement> & { render?: ReactElement; className?: string }
+>;
+
 export default function Textarea({
   label,
   error,
-  id,
   rows = 4,
   resize = 'vertical',
   onFocus,
   onBlur,
   className = '',
+  disabled,
   ...rest
 }: TextareaProps) {
-  const autoId = useId();
-  const textareaId = id ?? autoId;
   const invalid = error != null && error !== false;
   const [focused, setFocused] = useState(false);
-  // 状態の優先度: error > focused > default。Input と揃える。
-  const labelColor = invalid ? 'text-accent' : focused ? 'text-info' : 'text-text-dim';
-  const fieldState = invalid
-    ? 'border-accent'
-    : focused
-      ? 'border-info shadow-focus'
-      : 'border-border';
   return (
-    <div className={`flex flex-col gap-[7px] ${className}`.trim()}>
+    <Field.Root
+      disabled={disabled}
+      invalid={invalid}
+      className={`flex flex-col gap-[7px] ${className}`.trim()}
+    >
       {label != null && (
-        <label htmlFor={textareaId} className={`${LABEL} ${labelColor}`}>
+        <Field.Label className={`${FIELD_LABEL} ${fieldLabelColor(invalid, focused)}`}>
           {label}
-        </label>
+        </Field.Label>
       )}
-      <div className={`${FIELD} ${fieldState}`}>
-        <textarea
-          id={textareaId}
+      <div className={`${FIELD_BOX_BASE} items-stretch ${fieldBoxState(invalid, focused)}`}>
+        <TextareaControl
+          render={<textarea />}
           rows={rows}
-          aria-invalid={invalid || undefined}
-          className={`${CONTROL} ${RESIZE[resize]}`}
+          className={`${FIELD_CONTROL} ${RESIZE[resize]}`}
           onFocus={(e) => {
             setFocused(true);
             onFocus?.(e);
@@ -86,7 +91,13 @@ export default function Textarea({
           {...rest}
         />
       </div>
-      {invalid && <span className="text-xs text-accent">{error}</span>}
-    </div>
+      {/* match の明示が要る理由は input.tsx のコメント参照（既定はネイティブの
+          ValidityState を見るため、props 由来の error では aria-describedby が張られない）。 */}
+      {invalid && (
+        <Field.Error match className="text-xs text-accent">
+          {error}
+        </Field.Error>
+      )}
+    </Field.Root>
   );
 }
