@@ -6,6 +6,8 @@ import type { Preview } from '@storybook/react-vite';
 import { useEffect } from 'react';
 // 外枠と同じテーマ。Docs ページの地に使う（manager.ts と共有）。
 import { dsTheme } from './ds-theme';
+// Storybook 内部の衝突（Issue #19）への回避策。理由と外す条件はファイル冒頭に書いてある。
+import { guardFocusAccessor } from './patch-focus-accessor';
 
 // 旧モノレポでは MemoryRouter と I18nProvider の decorator で全 story を包んでいた。
 // これは insession アプリ固有の共有コンポーネント（SideNav 等）が react-router / i18n に
@@ -30,6 +32,14 @@ const preview: Preview = {
     },
   },
   initialGlobals: { theme: 'dark' },
+  // Storybook の csf addon が focus をアクセサへ差し替えるのは story の描画時なので、
+  // その後に走る loader でガードを掛ける（プロジェクトの loader はアドオンの loader より
+  // 後に走る）。掛かっていれば何もしない冪等な処理。詳細は patch-focus-accessor.ts。
+  loaders: [
+    () => {
+      guardFocusAccessor();
+    },
+  ],
   decorators: [
     (Story, context) => {
       const theme = context.globals.theme ?? 'dark';
