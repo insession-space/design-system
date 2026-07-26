@@ -1,14 +1,31 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { Drawer } from '@base-ui/react/drawer';
+import type { ReactNode } from 'react';
 
 // 汎用Bottom Sheet(純粋 leaf UI。#284)。モバイルのChat/Participants導線のために新設。
-// Modal(modal.tsx)と同じ「backdrop + 本体 + Esc/背景クリックで閉じる」の方針を
-// 踏襲しつつ、下からせり出す・ドラッグで高さを変えられる点が異なるため別コンポーネントにする。
-// 開いた直後は中途高さ(MID_RATIO)、上ドラッグでフルハイト(FULL_RATIO)まで拡張できる。
-// 下ドラッグで一定以下まで縮めると close する。i18n はこのパッケージに持たないため、
-// 閉じるラベル等は props で注入する(Modal と同じ方針)。
-const MID_RATIO = 0.68;
-const FULL_RATIO = 0.94;
-const CLOSE_RATIO = 0.32;
+// 振る舞いは Base UI の Drawer へ委譲する(#23)。DS 側は見た目(components.css の
+// .bottom-sheet* )と、呼び出し側の契約(open/onClose/ariaLabel/closeLabel/closeOnEsc)だけを持つ。
+//
+// ── 移行で捨てたもの ──────────────────────────────────
+// 自前で持っていた次を全部 Base UI に任せた。**props は移行前から変えていない**。
+//   - Pointer Events でのドラッグ実装(setPointerCapture / pointermove / スナップ計算。約60行)
+//     → Drawer の snapPoints。MID_RATIO 0.68 / FULL_RATIO 0.94 をそのまま渡す
+//   - window への keydown リスナーによる Esc close → Drawer 標準(closeOnEsc=false のときだけ
+//     eventDetails.cancel() で打ち消す。Popover/Modal と同じ書き方)
+//   - backdrop クリックで閉じる + 中身側での stopPropagation → Drawer.Backdrop 標準
+//   - `if (!open) return null` の手動アンマウント → Drawer.Portal
+// 併せて、移行前は無かった **フォーカストラップ・スクロールロック・閉じた後のフォーカス復帰**
+// が付いた(Modal を Base UI Dialog に載せたとき #6 と同じ効果)。
+//
+// ── 高さの扱い ────────────────────────────────────────
+// 移行前は mode('mid'|'full') を state で持ち、.bottom-sheet--mid / --full の height(68dvh /
+// 94dvh)を CSS で当てていた。Drawer は snapPoint を自分で管理して inline の transform で
+// 表現するため、**高さは常にフル(94dvh)にしておき、どこまでせり出すかを snapPoints に任せる**。
+// これで「開いた直後は中途、上に引くとフルハイト、下に引き切ると閉じる」という移行前の体験を
+// 維持したまま、スナップ計算を自前で持たずに済む。
+// CLOSE_RATIO(0.32) 相当の「一定以下まで縮めたら閉じる」は Drawer の dismiss 判定が担う
+// (Base UI は速度も見るので、ゆっくり下げたときの閾値は移行前と厳密には一致しない)。
+const MID_SNAP = 0.68;
+const FULL_SNAP = 0.94;
 
 export type BottomSheetProps = {
   open: boolean;
@@ -30,100 +47,57 @@ export default function BottomSheet({
   closeLabel,
   closeOnEsc = true,
 }: BottomSheetProps) {
-  const [mode, setMode] = useState<'mid' | 'full'>('mid');
-  const sheetRef = useRef<HTMLDivElement | null>(null);
-
-  // 開くたびに中途高さから始める(前回フルハイトのまま閉じても次回はリセットする)
-  useEffect(() => {
-    if (open) setMode('mid');
-  }, [open]);
-
-  useEffect(() => {
-    if (!open || !closeOnEsc) return undefined;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose, closeOnEsc]);
-
-  // ドラッグハンドルのPointer Events実装(use-queue-dnd.tsと同じ方針: 可変データはdragRefに
-  // 集約し、要素へ直接setPointerCaptureしてリスナーもその要素に張る)。ドラッグ中はCSS
-  // transitionを切ってinline heightで直接追従させ、離した時だけ2つの高さのどちらか(または
-  // close)にスナップする。
-  function onHandlePointerDown(e: any) {
-    const sheet = sheetRef.current;
-    if (!sheet) return;
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    const handle = e.currentTarget;
-    handle.setPointerCapture(e.pointerId);
-    const startHeight = sheet.getBoundingClientRect().height;
-    const vh = window.innerHeight;
-    const drag = { pointerId: e.pointerId, startY: e.clientY, startHeight, vh };
-    sheet.style.transition = 'none';
-
-    const onMove = (ev: PointerEvent) => {
-      if (ev.pointerId !== drag.pointerId) return;
-      const delta = drag.startY - ev.clientY;
-      const next = Math.min(
-        drag.vh * FULL_RATIO,
-        Math.max(drag.vh * 0.18, drag.startHeight + delta),
-      );
-      sheet.style.height = `${next}px`;
-    };
-    const onUp = (ev: PointerEvent) => {
-      if (ev.pointerId !== drag.pointerId) return;
-      handle.removeEventListener('pointermove', onMove);
-      handle.removeEventListener('pointerup', onUp);
-      handle.removeEventListener('pointercancel', onUp);
-      sheet.style.transition = '';
-      const finalHeight = sheet.getBoundingClientRect().height;
-      sheet.style.height = '';
-      if (finalHeight < drag.vh * CLOSE_RATIO) {
-        onClose();
-        return;
-      }
-      const midPx = drag.vh * MID_RATIO;
-      const fullPx = drag.vh * FULL_RATIO;
-      setMode(Math.abs(finalHeight - fullPx) < Math.abs(finalHeight - midPx) ? 'full' : 'mid');
-    };
-    handle.addEventListener('pointermove', onMove);
-    handle.addEventListener('pointerup', onUp);
-    handle.addEventListener('pointercancel', onUp);
-  }
-
-  if (!open) return null;
-
   return (
-    <div className="bottom-sheet-backdrop" onClick={onClose}>
-      <div
-        ref={sheetRef}
-        className={`bottom-sheet bottom-sheet--${mode}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={ariaLabel}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          className="bottom-sheet-handle-area"
-          onPointerDown={onHandlePointerDown}
-          aria-hidden="true"
+    <Drawer.Root
+      open={open}
+      swipeDirection="down"
+      // 開くたびに中途高さから始める(前回フルハイトのまま閉じても次回はリセットする)のは
+      // defaultSnapPoint が担う。Drawer は閉じるときに snapPoint を初期値へ戻す。
+      defaultSnapPoint={MID_SNAP}
+      snapPoints={[MID_SNAP, FULL_SNAP]}
+      onOpenChange={(nextOpen, eventDetails) => {
+        // closeOnEsc=false のときだけ Esc による close を打ち消す(Popover.Root と同じ方針)。
+        if (!nextOpen && !closeOnEsc && eventDetails.reason === 'escape-key') {
+          eventDetails.cancel();
+          return;
+        }
+        if (!nextOpen) onClose();
+      }}
+    >
+      <Drawer.Portal>
+        <Drawer.Backdrop className="bottom-sheet-backdrop" />
+        {/* Popup を下端に寄せる位置決めコンテナ。移行前は .bottom-sheet-backdrop 自身が
+            display:flex; align-items:flex-end でシート(子要素)を下端に置いていたが、Base UI
+            では Backdrop と Popup が **兄弟** になるためその役目は Drawer.Viewport が担う
+            （modal.tsx が Dialog.Viewport で中央寄せを再現しているのと同じ構造）。
+            z-index を明示しないと Backdrop 側の --z-modal が勝って Popup が背面に回る。 */}
+        <Drawer.Viewport
+          className="fixed inset-0 flex items-end"
+          style={{ zIndex: 'var(--z-modal)' }}
         >
-          <span className="bottom-sheet-handle" />
-        </div>
-        {closeLabel && (
-          <button
-            type="button"
-            className="bottom-sheet-close"
-            aria-label={closeLabel}
-            title={closeLabel}
-            onClick={onClose}
+          <Drawer.Popup
+            className="bottom-sheet bottom-sheet--full"
+            aria-label={ariaLabel}
+            aria-modal="true"
           >
-            ×
-          </button>
-        )}
-        <div className="bottom-sheet-body">{children}</div>
-      </div>
-    </div>
+            {/* ハンドル。移行前は自前の onPointerDown でドラッグを実装していたが、
+                Drawer.SwipeArea に置き換えた(スワイプの検出とスナップは Base UI 側)。 */}
+            <Drawer.SwipeArea className="bottom-sheet-handle-area">
+              <span className="bottom-sheet-handle" />
+            </Drawer.SwipeArea>
+            {closeLabel && (
+              <Drawer.Close
+                className="bottom-sheet-close"
+                aria-label={closeLabel}
+                title={closeLabel}
+              >
+                ×
+              </Drawer.Close>
+            )}
+            <div className="bottom-sheet-body">{children}</div>
+          </Drawer.Popup>
+        </Drawer.Viewport>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }
