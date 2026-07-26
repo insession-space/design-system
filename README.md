@@ -124,7 +124,7 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 | `Checkbox` / `Radio` / `Toggle` / `Input` / `Textarea` | v3 | label 紐付け・`aria-invalid` / `aria-describedby`・roving tabIndex |
 | `BottomSheet` / `Toast` | v3 | スナップ付きドラッグ・キュー管理・自動 dismiss・aria-live |
 | `Stepper` / `Avatar` / `SearchField` / `Button` / `IconButton` / `RingTimer` | v3 | 矢印キーでの数値増減・画像フォールバック・`focusableWhenDisabled`・`role="progressbar"` |
-| `Slider` / `SegmentedControl` / `ToggleGroup`（`ToolButton`） | v3.3 | 矢印 / Home / End / PageUp-Down・タッチとポインタの正規化・min/max/step の丸め・roving tabIndex・`aria-pressed` / `aria-checked` の管理 |
+| `Slider` / `SegmentedControl` / `ToggleGroup`（`ToolButton`） / `ColorSwatchGroup` | v3.3 | 矢印 / Home / End / PageUp-Down・タッチとポインタの正規化・min/max/step の丸め・roving tabIndex・`aria-pressed` / `aria-checked` の管理 |
 
 ### `SegmentedControl` はなぜ `ToggleGroup` ではなく `RadioGroup` に載っているか
 
@@ -138,7 +138,7 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 | `ToggleGroup` + `ToolButton` | ツールバーの道具選択。`multiple` で複数同時 on にもできる（太字 + 斜体など） |
 | `Tabs` | **表示するパネルを切り替える**とき（`SegmentedControl` はパネルを持たない値の選択） |
 
-`Badge` / `Chip` / `Lozenge` / `Spinner` / `EmptyNote` / `LogoMark` / `Icon` 系 / `Status` / `Link` / `Composer` は**振る舞いを持たない見た目部品**なので Base UI に載せていない（相当パートが無いか、載せても得るものが無い）。`StepFlow` は `<ol>`/`<li>` + `aria-current="step"` というネイティブのセマンティクスで表現している（`role="progressbar"` は中身が読み上げ対象から外れるため不適切）。`SplitModal` は `Modal` / `BottomSheet` 経由で間接的に載っている。
+`Badge` / `Chip` / `Lozenge` / `Spinner` / `EmptyNote` / `LogoMark` / `Icon` 系 / `Status` / `Link` / `Composer` / `ListRow` / `UploadTile` / `ColorInput` は**振る舞いを持たない見た目部品**なので Base UI に載せていない（相当パートが無いか、載せても得るものが無い）。`ListRow` は素の `<button onClick>` で足りる（開閉も選択状態もキーボードナビゲーションも持たない）。`UploadTile` / `ColorInput` はネイティブの `<input type="file">` / `<input type="color">` が機能を持っているので、DS が足すのは見た目とドラッグ&ドロップの状態管理だけ。`StepFlow` は `<ol>`/`<li>` + `aria-current="step"` というネイティブのセマンティクスで表現している（`role="progressbar"` は中身が読み上げ対象から外れるため不適切）。`SplitModal` は `Modal` / `BottomSheet` 経由で間接的に載っている。
 
 オーバーレイ系はパートを組み合わせる compound API。
 

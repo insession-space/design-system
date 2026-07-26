@@ -30,6 +30,13 @@ export {
 } from './components/button.tsx';
 export { type CheckboxProps, default as Checkbox } from './components/checkbox.tsx';
 export { type ChipAvatar, type ChipProps, default as Chip } from './components/chip.tsx';
+export {
+  ColorInput,
+  type ColorInputProps,
+  type ColorSwatch,
+  ColorSwatchGroup,
+  type ColorSwatchGroupProps,
+} from './components/color-input.tsx';
 export { type ComposerProps, default as Composer } from './components/composer.tsx';
 export {
   type ConfirmModalProps,
@@ -86,6 +93,7 @@ export {
   type LinkVariant,
   linkClass,
 } from './components/link.tsx';
+export { default as ListRow, type ListRowProps } from './components/list-row.tsx';
 export {
   default as LogoMark,
   type LogoMarkProps,
@@ -223,6 +231,8 @@ export {
   ToolButton,
   type ToolButtonProps,
 } from './components/toggle-group.tsx';
+export { default as UploadTile, type UploadTileProps } from './components/upload-tile.tsx';
+export { default as AppleIcon } from './icons/apple-icon.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
 export { default as PersonIcon } from './icons/person-icon.tsx';
