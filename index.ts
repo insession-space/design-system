@@ -141,4 +141,3 @@ export {
   type ToastViewportProps,
 } from './toast.tsx';
 export { default as Toggle, type ToggleProps } from './toggle.tsx';
-export { useDismiss } from './use-dismiss.ts';

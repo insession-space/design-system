@@ -75,7 +75,7 @@ export default function Textarea({
           {label}
         </Field.Label>
       )}
-      <div className={`${FIELD_BOX_BASE} items-stretch ${fieldBoxState(invalid, focused)}`}>
+      <div className={`${FIELD_BOX_BASE} items-stretch py-3 ${fieldBoxState(invalid, focused)}`}>
         <TextareaControl
           render={<textarea />}
           rows={rows}

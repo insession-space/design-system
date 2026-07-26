@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Button as BaseButton } from '@base-ui/react/button';
+import type { ReactNode } from 'react';
 import Icon, { type IconName } from './icons/icon.tsx';
 import Spinner from './spinner.tsx';
 
@@ -35,24 +36,36 @@ export type ButtonProps = {
   icon?: IconName | ReactNode;
   iconRight?: IconName | ReactNode;
   children: ReactNode;
-} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & { className?: string };
+} & Omit<React.ComponentProps<typeof BaseButton>, 'className' | 'render'> & {
+    className?: string;
+  };
 
 // border-2 を基底に置き、secondary(2px 枠)と他(透明枠)で外形を揃える(box-border)。
 // 角丸(rounded-md / rounded-pill)は同一ユーティリティの競合を避けるため BASE に含めず
 // radius として一方だけを組み立てて付与する(#517)。
+// ⚠ disabled 系は `disabled:` / `enabled:` ではなく **`data-disabled:` / `not-data-disabled:`**
+// で書く（#33）。Base UI の Button に `focusableWhenDisabled` を渡すと、`disabled` 属性を出さず
+// **`aria-disabled` に切り替わる**（disabled なボタンがキーボードナビから消える問題への対処。
+// utils/useFocusableWhenDisabled.js 参照）。そのとき CSS の `:disabled` / `:enabled` 疑似クラスは
+// マッチしなくなるため、`disabled:` のままだと **disabled が視覚的に無効化されず、しかも
+// hover が効いてしまう**。Base UI Button は state の disabled を常に `data-disabled` として
+// 出すので、そちらを見れば両方の経路（disabled 属性 / aria-disabled）を1つの書き方で拾える。
+// 値は移行前から変えていない。
 const BASE =
-  'inline-flex items-center justify-center gap-2 border-2 border-solid border-transparent box-border font-display cursor-pointer select-none transition-[transform,filter,background,color,box-shadow] duration-(--dur-fast) ease-spring enabled:active:scale-[0.97] disabled:bg-surface-3 disabled:text-text-dim disabled:border-transparent disabled:cursor-not-allowed disabled:shadow-none focus-visible:shadow-focus focus-visible:outline-none';
+  'inline-flex items-center justify-center gap-2 border-2 border-solid border-transparent box-border font-display cursor-pointer select-none transition-[transform,filter,background,color,box-shadow] duration-(--dur-fast) ease-spring not-data-disabled:active:scale-[0.97] data-disabled:bg-surface-3 data-disabled:text-text-dim data-disabled:border-transparent data-disabled:cursor-not-allowed data-disabled:shadow-none focus-visible:shadow-focus focus-visible:outline-none';
 
+// hover も `enabled:hover:` ではなく `hover:not-data-disabled:` で書く（理由は BASE のコメント）。
 const VARIANT: Record<ButtonVariant, string> = {
-  primary: 'bg-fill text-on-fill font-bold enabled:hover:brightness-[.93]',
-  accent: 'bg-accent text-on-accent font-bold enabled:hover:brightness-[.93]',
-  secondary: 'bg-transparent border-text text-text font-bold enabled:hover:bg-surface-hover',
-  ghost: 'bg-transparent text-info font-semibold enabled:hover:bg-surface-hover',
+  primary: 'bg-fill text-on-fill font-bold hover:not-data-disabled:brightness-[.93]',
+  accent: 'bg-accent text-on-accent font-bold hover:not-data-disabled:brightness-[.93]',
+  secondary:
+    'bg-transparent border-text text-text font-bold hover:not-data-disabled:bg-surface-hover',
+  ghost: 'bg-transparent text-info font-semibold hover:not-data-disabled:bg-surface-hover',
   danger:
-    'bg-danger-surface border-danger-border text-danger font-bold enabled:hover:brightness-[.93]',
-  live: 'bg-success text-white font-bold enabled:hover:brightness-[.93]',
+    'bg-danger-surface border-danger-border text-danger font-bold hover:not-data-disabled:brightness-[.93]',
+  live: 'bg-success text-white font-bold hover:not-data-disabled:brightness-[.93]',
   // 後方互換: join は live と同一。
-  join: 'bg-success text-white font-bold enabled:hover:brightness-[.93]',
+  join: 'bg-success text-white font-bold hover:not-data-disabled:brightness-[.93]',
 };
 
 // DS の padding。primary/accent/danger/live は 12/22。ghost は横を詰める(テキストボタン)。
@@ -96,7 +109,7 @@ export default function Button({
   const showDot = (dot || isLive) && !loading;
   const iconPx = ICON_SIZE[size];
   return (
-    <button
+    <BaseButton
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
@@ -108,6 +121,6 @@ export default function Button({
       {!loading && renderIcon(icon, iconPx)}
       {children}
       {!loading && renderIcon(iconRight, iconPx)}
-    </button>
+    </BaseButton>
   );
 }
