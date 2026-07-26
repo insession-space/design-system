@@ -1,7 +1,18 @@
+import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
 import type { CSSProperties, ReactNode } from 'react';
 
 // アバター（純粋 leaf UI）。DS(claude design "INSESSION Design System" #663)の Avatar 仕様へ寄せる。
 // 画像があれば <img>、無ければ名前先頭1文字（label 指定時はその文字列）の fallback 円を出す。
+//
+// ── DS 経路だけ Base UI へ委譲した（#33）──────────────
+// 移行前は `src` があれば**無条件で** <img> を描いていたため、**URL が壊れていても
+// fallback 円に切り替わらず、画像が割れたまま残った**。DS 経路（status / ring を使う新 API）は
+// Base UI の Avatar.Root / Image / Fallback に載せ替え、読み込み状態を見て切り替えるようにした。
+//
+// **legacy 経路（下記）は据え置く。** こちらは「status / ring を使わない呼び出しは従来どおり
+// 素の img/span を返す」という後方互換that消費側の .avatar / .auth-avatar が依存しており、
+// Avatar.Root でラップすると DOM 構造が1階層増えて既存の CSS セレクタが外れるため。
+// 同じ理由で、legacy 経路には fallback 切り替えも入らない（後方互換とのトレードオフ）。
 //
 // 後方互換: 既存消費側（presence バー・space-card・account 等）は className / fallbackClassName で
 // legacy の .avatar / .auth-avatar を注入して見た目・スタック重ね・アニメを得ているため、
@@ -65,30 +76,39 @@ export default function Avatar({
       width: dim,
       height: dim,
       fontSize: dim * 0.4,
-      ...(!src && bg ? { background: bg } : undefined),
+      // 移行前は `!src` のときだけ背景を付けていたが、画像の読み込みに失敗したときに
+      // fallback が地なしになるため、src の有無に関わらず付ける（Root のコメント参照）。
+      ...(bg ? { background: bg } : undefined),
     };
     return (
       <span
         className={`relative inline-flex shrink-0 ${className}`.trim()}
         style={{ width: dim, height: dim }}
       >
-        <span
+        {/* Root が円。Image が読み込めたときだけ Image が、失敗・未読み込みのときは
+            Fallback が描画される（この出し分けが移行の主目的）。
+            ⚠ 背景色は Root に常に置く。移行前は `src` があるとき bg-transparent にしていたが、
+            それだと画像の読み込みに失敗したときに fallback の文字が地なしで出てしまう。
+            画像が正常なら Image が object-cover で Root を覆うので背景は見えない
+            （透過 PNG のときだけ移行前と差が出るが、fallback が成立する方を優先した）。 */}
+        <BaseAvatar.Root
           className={`inline-flex items-center justify-center overflow-hidden rounded-pill font-bold text-white ${
-            src ? 'bg-transparent' : bg ? '' : 'bg-info'
+            bg ? '' : 'bg-info'
           } ${ring ? 'border-2 border-solid border-surface' : ''}`.trim()}
           style={circleStyle}
         >
-          {src ? (
-            <img
+          {src && (
+            <BaseAvatar.Image
               src={src}
               alt={alt || (typeof label === 'string' ? label : name || '')}
               referrerPolicy="no-referrer"
               className="h-full w-full object-cover"
             />
-          ) : (
-            content
           )}
-        </span>
+          <BaseAvatar.Fallback className="inline-flex items-center justify-center">
+            {content}
+          </BaseAvatar.Fallback>
+        </BaseAvatar.Root>
         {status != null && (
           <span
             aria-hidden="true"

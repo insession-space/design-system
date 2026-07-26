@@ -116,13 +116,16 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 
 ## Base UI ベースのプリミティブ
 
-**DS のプリミティブはすべて [Base UI](https://base-ui.com)（`@base-ui/react`）へ振る舞いを委譲している。** DS 側が持つのはトークンベースの見た目だけ。
+**振る舞いを持つプリミティブはすべて [Base UI](https://base-ui.com)（`@base-ui/react`）へ委譲している。** DS 側が持つのはトークンベースの見た目だけ。
 
 | | 移行 | 得たもの |
 | --- | --- | --- |
 | `Popover` / `Menu` / `Modal` / `ConfirmModal` / `Tabs` | v2 | 衝突回避・フォーカストラップ・スクロールロック・矢印キーナビ・typeahead |
 | `Checkbox` / `Radio` / `Toggle` / `Input` / `Textarea` | v3 | label 紐付け・`aria-invalid` / `aria-describedby`・roving tabIndex |
 | `BottomSheet` / `Toast` | v3 | スナップ付きドラッグ・キュー管理・自動 dismiss・aria-live |
+| `Stepper` / `Avatar` / `SearchField` / `Button` / `IconButton` / `RingTimer` | v3 | 矢印キーでの数値増減・画像フォールバック・`focusableWhenDisabled`・`role="progressbar"` |
+
+`Badge` / `Chip` / `Lozenge` / `Spinner` / `EmptyNote` / `LogoMark` / `Icon` 系 / `Status` / `Link` / `Composer` は**振る舞いを持たない見た目部品**なので Base UI に載せていない（相当パートが無いか、載せても得るものが無い）。`StepFlow` は `<ol>`/`<li>` + `aria-current="step"` というネイティブのセマンティクスで表現している（`role="progressbar"` は中身が読み上げ対象から外れるため不適切）。`SplitModal` は `Modal` / `BottomSheet` 経由で間接的に載っている。
 
 オーバーレイ系はパートを組み合わせる compound API。
 
@@ -185,6 +188,12 @@ v1 は `ownerDocument` から描画先を自動検出していたが、Base UI �
 `Input` / `Textarea` に `error` を渡すと `aria-invalid` と `aria-describedby` が張られ、支援技術からエラーが入力欄に紐付く（v2 までは素の `<span>` で紐付いていなかった）。
 
 > ⚠ **Base UI の Checkbox / Radio / Switch に `disabled:` ユーティリティは効かない。** これらが描画するのは `<span>`（`nativeButton` の既定が false）で、CSS の `:disabled` 疑似クラスはフォーム要素にしか適用されないため。**`data-disabled:` を使うこと。** 型検査もビルドも通ってしまい、disabled が視覚的に無効化されないまま出荷される（この移行でも一度踏んだ）。`Menu.Item` も同じ理由で `data-disabled:` を使っている。
+
+> ⚠ **`<button>` を描画する Base UI Button でも `disabled:` は避ける。** `focusableWhenDisabled` を渡すと `disabled` 属性を出さず **`aria-disabled` に切り替わる**ため（disabled なボタンがキーボードナビから消える問題への対処）、`:disabled` / `:enabled` がマッチしなくなる。`Button` / `IconButton` / `Stepper` は `data-disabled:` / `hover:not-data-disabled:` に統一してある。
+
+### ⚠ `FIELD_BOX_BASE` は縦 padding を持たない
+
+`Input` / `Textarea` / `SearchField` が共有する field の見た目定数（`FIELD_BOX_BASE`）は、**横 padding だけを持ち縦は持たない**。Input / Textarea は `py-3`、SearchField は `py-2.5` と一段浅く、共通側に `py-3` を置くと呼び出し側の `py-2.5` では**打ち消せない**（同一プロパティのユーティリティは配布 CSS の出力順で決まる。#21 と同じ構図）。この定数を使うときは**縦 padding を必ず自分で指定する**こと。
 
 ### Toast は Provider + キューになった（v3）
 

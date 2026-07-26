@@ -60,3 +60,31 @@ export const Status: Story = {
     </Section>
   ),
 };
+
+// 画像の読み込み失敗で fallback に切り替わることの回帰ネット（#33）。
+// 移行前は src があれば無条件で <img> を描いていたため、URL が壊れていても
+// 画像が割れたまま残り、頭文字の円に切り替わらなかった。
+export const BrokenImage: Story = {
+  render: () => (
+    <Section
+      title="画像の読み込み失敗"
+      note="左は正しい data URI の画像、右は存在しない URL。右が頭文字の fallback 円に切り替われば正しい（Base UI の Avatar.Image / Fallback が読み込み状態を見て出し分ける）。"
+    >
+      <div className="flex items-center gap-4">
+        <Avatar
+          name="Ok"
+          status="live"
+          ring
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%2312d8c9'/%3E%3C/svg%3E"
+        />
+        <Avatar
+          name="Broken"
+          color="hsl(20 65% 45%)"
+          status="offline"
+          ring
+          src="/__does-not-exist__.png"
+        />
+      </div>
+    </Section>
+  ),
+};
