@@ -2,7 +2,7 @@ import { Menu as BaseMenu } from '@base-ui/react/menu';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import Icon from './icons/icon.tsx';
-import { POPOVER_POPUP_BASE } from './popover.tsx';
+import { POPOVER_POPUP_BASE, POPOVER_POSITIONER_BASE } from './popover.tsx';
 
 // ポップオーバーの上に載せるメニュー。Base UI(floating-ui ベース)の Menu へ委譲する薄い
 // compound ラッパー(#6)。旧実装は role="menu" の <ul> + <button role="menuitem"> の行だけで、
@@ -35,8 +35,21 @@ export type MenuSubmenuRootProps = React.ComponentProps<typeof BaseMenu.SubmenuR
 
 export type MenuPositionerProps = React.ComponentProps<typeof BaseMenu.Positioner>;
 
-function MenuPositioner({ sideOffset = DEFAULT_SIDE_OFFSET, ...props }: MenuPositionerProps) {
-  return <BaseMenu.Positioner sideOffset={sideOffset} {...props} />;
+// z-index は Popover と同じく **Positioner 側**に置く(#14)。Base UI では Popup が
+// position:static なので、Popup に z-index を書いても効かない。詳細は popover.tsx の
+// POPOVER_POSITIONER_BASE のコメント参照。
+function MenuPositioner({
+  sideOffset = DEFAULT_SIDE_OFFSET,
+  className = '',
+  ...props
+}: MenuPositionerProps) {
+  return (
+    <BaseMenu.Positioner
+      sideOffset={sideOffset}
+      className={`${POPOVER_POSITIONER_BASE} ${className}`.trim()}
+      {...props}
+    />
+  );
 }
 
 // Popover.Popup と同じ面(surface/border/radius/shadow/p-3/max-h-80+scroll)を共有する

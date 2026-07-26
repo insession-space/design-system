@@ -19,15 +19,27 @@ import { createContext, useContext } from 'react';
 // 専用 props(panelPadding 等)は廃止したので、これらを外したい呼び出し側は className で
 // 打ち消す(例: `max-h-none overflow-visible`)。呼び出し側の className は後ろに置くこと
 // (className マージ規約: `${BASE} ${className}`.trim())。
-// z-index は旧実装で portal 有無により z-(--z-dropdown) / z-[var(--z-popover-portal,35)] を
-// 使い分けていたが、Base UI では Popup 自身は portal されたかどうかを知らない(Portal は
-// 呼び出し側が Positioner の外側に組む)。参加者一覧のような高い z-index の親に食い込まれる
-// 事故を避けるため、常に高い方の値(フォールバック付き任意値記法)へ統一する。theme.css を
-// import しない consumer(products/insession/apps/help 等)で --z-popover-portal が未定義でも
-// フォールバック 35 で z-index:auto に落ちないようにしてある(#885 由来)。
+// ⚠ z-index はここに置かない(#14)。Base UI では **Popup は position:static** で、位置決めを
+// しているのは親の Positioner。CSS 仕様上 position:static の要素に z-index は効かないため、
+// ここに書いても完全に無効になる。#6 の移行時、旧実装ではパネル自身が absolute/fixed
+// だったので効いていたという前提が崩れたのを見落としていた。実測(loophub-app / DS 2.0.0):
+// Popup は pos=static z=35、Positioner は pos=absolute z=auto となり、DOM 上で前にある
+// z-index:5 の要素にパネルが覆われた(elementFromPoint がその要素を返した)。
+// → z-index は POPOVER_POSITIONER_BASE 側(Positioner = positioned な要素)に置く。
 // Menu.Popup とも共有する(menu.tsx から import する)。
 export const POPOVER_POPUP_BASE =
-  'min-w-[220px] max-w-[calc(100vw-24px)] bg-surface border border-solid border-border-strong rounded-card z-[var(--z-popover-portal,35)] p-3 max-h-80 overflow-y-auto shadow-popover animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
+  'min-w-[220px] max-w-[calc(100vw-24px)] bg-surface border border-solid border-border-strong rounded-card p-3 max-h-80 overflow-y-auto shadow-popover animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
+
+// Positioner(position:absolute | fixed が当たる要素)に置く z-index。ここが実際に効く層。
+// 旧実装は portal 有無で z-(--z-dropdown) / z-[var(--z-popover-portal,35)] を使い分けていたが、
+// Base UI では Portal を呼び出し側が Positioner の外側に組むため Positioner 自身は portal
+// されたかを知らない。参加者一覧のような高い z-index の親に食い込まれる事故を避けるため、
+// 常に高い方の値へ統一する。theme.css を import しない consumer(products/insession/apps/help
+// 等)で --z-popover-portal が未定義でもフォールバック 35 で z-index:auto に落ちないよう、
+// フォールバック付きの任意値記法にしてある(#885 由来)。
+// 呼び出し側が Positioner の className で上書きできるよう、マージでは前に置く。
+// Menu.Positioner とも共有する(menu.tsx から import する)。
+export const POPOVER_POSITIONER_BASE = 'z-[var(--z-popover-portal,35)]';
 
 // 旧 PLACEMENT/PORTAL_OFFSET_PX(8px)と同じ間隔を Base UI の sideOffset で再現する既定値。
 const DEFAULT_SIDE_OFFSET = 8;
@@ -161,7 +173,7 @@ function PopoverPositioner({
         sideOffset={sideOffset}
         positionMethod={mobileSheet ? 'fixed' : positionMethod}
         collisionPadding={mobileSheet ? MOBILE_SHEET_COLLISION_PADDING : collisionPadding}
-        className={className}
+        className={`${POPOVER_POSITIONER_BASE} ${className}`.trim()}
         {...props}
       />
     </MobileSheetContext.Provider>
