@@ -58,14 +58,25 @@ const preview: Preview = {
     },
     options: {
       // 既定はアルファベット順で、Foundations が Components の後に来てしまう。
-      // カタログは「入口 → トークン → 部品」の順で読ませたいので明示的に並べる。
-      // Foundations の中も、色 → 書体 → その他トークンの順に固定する。
+      // カタログは「入口 → トークン → 骨格プリミティブ（Layout/Surface/Page） → 個別部品」の
+      // 順で読ませたいので明示的に並べる。骨格プリミティブは以前 Components/* に詰め込んで
+      // いたが、コンポーネント単位の story が増えて見づらくなったため、Components と並ぶ
+      // トップレベルの群（Layout / Surface / Page）に切り出した。
+      // Foundations の中は、色 → 書体 → その他トークン → elevation の順に固定する
+      // （elevation はトークンの話なので Foundations 側に置く）。
+      // Layout の中は Stack → Grid → 補助（Spacer/Divider/Center/Container）の順が読みやすい。
       // 列挙していないものは '*' の位置（= Components の後ろ）へアルファベット順で入る。
       storySort: {
         order: [
           'Introduction',
           'Foundations',
-          ['Colors', 'Typography', 'Tokens'],
+          ['Colors', 'Typography', 'Tokens', 'Elevation'],
+          'Layout',
+          ['Stack', 'Grid', 'Spacer', 'Divider', 'Center', 'Container'],
+          'Surface',
+          ['Surface', 'Paper', 'Card', 'Panel'],
+          'Page',
+          ['PageLayout', 'AppBar', 'Toolbar', 'PageHeader', 'Footer'],
           'Components',
           '*',
         ],
