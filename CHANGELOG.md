@@ -81,7 +81,7 @@
     <Popover.Trigger>開く</Popover.Trigger>
     <Popover.Portal>                             {/* portal={false} 相当なら Portal を挟まない */}
       <Popover.Positioner side="bottom" align="end" mobileSheet>
-        <Popover.Popup className="w-80 p-0">     {/* panelPadding={false} 相当は p-0 で打ち消す */}
+        <Popover.Popup className="w-80" padding={false}>  {/* ⚠ 下記の訂正を参照(2.1.0 で prop に戻した) */}
           {children}
         </Popover.Popup>
       </Popover.Positioner>
@@ -92,6 +92,8 @@
   `placement` の対応: `bottom-start` → `side="bottom" align="start"`（既定）/ `bottom-end` → `side="bottom" align="end"` / `top-start` → `side="top" align="start"` / `top-end` → `side="top" align="end"`。
 
   専用 props の `panelClassName` / `panelShadow` / `panelPadding` / `panelScroll` は廃止し、`Popover.Popup` の `className` に一本化した。既定は移行前と同じ（padding あり / `max-h-80` スクロールあり / DS の popover 影）で、打ち消したいときだけユーティリティを足す（`p-0` / `max-h-none overflow-visible`）。
+
+  > ⚠ **【2.1.0 で訂正】この「`className` で打ち消す」契約は成立していなかった（#21）。** 同一プロパティのユーティリティは配布 CSS の**出力順**で勝敗が決まり、クラス属性の並び順は無関係なため、`p-0` と `overflow-visible` は効かず `max-h-none` だけ偶然効く状態だった。2.1.0 で `padding` / `scroll` prop（いずれも既定 `true`）に戻している。**この節を移行手順として読む場合は、`p-0` ではなく `padding={false}`、`max-h-none overflow-visible` ではなく `scroll={false}` を使うこと。**
 
   ### Menu — 2 系統ある
 

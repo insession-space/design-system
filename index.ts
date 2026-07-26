@@ -79,6 +79,8 @@ export {
 } from './modal.tsx';
 export {
   POPOVER_POPUP_BASE,
+  POPOVER_POPUP_PADDING,
+  POPOVER_POPUP_SCROLL,
   POPOVER_POSITIONER_BASE,
   Popover,
   type PopoverArrowProps,
@@ -90,6 +92,8 @@ export {
   type PopoverRootProps,
   type PopoverTitleProps,
   type PopoverTriggerProps,
+  type PopupSurfaceProps,
+  popupSurfaceClassName,
 } from './popover.tsx';
 export { type OpenProfile, ProfileModalContext, useOpenProfile } from './profile-modal.tsx';
 export { default as Radio, type RadioProps } from './radio.tsx';

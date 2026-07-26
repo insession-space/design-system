@@ -131,7 +131,18 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 
 自前で持っていた配置計算・外側クリック・Esc・フォーカス管理をやめたことで、**衝突回避（フリップ/シフト）・フォーカストラップ・スクロールロック・矢印キーナビ・typeahead** が付いた。**見た目は移行前と同じ**（トークンのユーティリティは DS 側に残っている）。
 
-**v1 からの移行手順は `CHANGELOG.md` の 2.0.0 の項に props 単位の対応表がある。** 以下は移行時に踏みやすい2点だけ。
+**v1 からの移行手順は `CHANGELOG.md` の 2.0.0 の項に props 単位の対応表がある。** 以下は移行時に踏みやすい点。
+
+### パネルの padding / スクロールは `padding` / `scroll` prop で外す
+
+`Popover.Popup` / `Menu.Popup` は既定で内側 padding（`p-3`）と最大高さ + 内部スクロール（`max-h-80 overflow-y-auto`）を持つ（v1 の `panelPadding` / `panelScroll` が既定 `true` だったのと同じ）。外したいときは prop で指定する。
+
+```tsx
+{/* v1 の panelPadding={false} panelScroll={false} 相当 */}
+<Popover.Popup padding={false} scroll={false}>{children}</Popover.Popup>
+```
+
+> ⚠ **`className` に `p-0` / `max-h-none overflow-visible` を渡して打ち消す方式は効かない**（#21）。クラス属性の並び順は CSS の勝敗に無関係で、同一プロパティのユーティリティは**配布 CSS の出力順**で決まるため。2.0.0〜2.0.x はこの打ち消しを契約としていたが成立しておらず、`padding` は効かず `max-height` だけ偶然効く、という一貫性のない状態だった。2.1.0 で prop 方式に戻している。なお Tailwind v4 の important 接尾辞（`p-0!`）でなら打ち消せるが、**v3 の先頭 `!` 記法（`!p-0`）は v4 では無効でクラスごと生成されない**。
 
 ### ⚠ Base UI の Menu パートは `Popover.Popup` の中では使えない
 

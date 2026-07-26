@@ -265,3 +265,50 @@ export const MobileSheet: Story = {
     </Section>
   ),
 };
+
+// padding / scroll prop の回帰ネット(#21)。2.0 では「className で p-0 / max-h-none
+// overflow-visible を渡して打ち消す」契約だったが、同一プロパティのユーティリティは配布
+// CSS の出力順で勝敗が決まるため打ち消しが成立しなかった(padding と overflow は効かず
+// max-height だけ偶然効く)。prop で「そもそも出さない」方式に戻したので、算出スタイルが
+// padding:0px / max-height:none / overflow-y:visible になることをここで目視・実測できる。
+function PanelSurfaceDemo({ padding, scroll }: { padding: boolean; scroll: boolean }) {
+  return (
+    <Popover.Root>
+      <Popover.Trigger
+        data-testid={`trigger-p${padding ? 1 : 0}-s${scroll ? 1 : 0}`}
+        className="rounded-md border border-solid border-border-strong bg-surface px-3 py-2 text-text"
+      >
+        padding={String(padding)} / scroll={String(scroll)}
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner side="bottom" align="start">
+          <Popover.Popup padding={padding} scroll={scroll} aria-label="パネル面の検証">
+            <div className="flex flex-col gap-2">
+              {Array.from({ length: 14 }, (_, i) => (
+                <div key={i} className="text-smd text-text-dim">
+                  行 {i + 1}
+                </div>
+              ))}
+            </div>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+}
+
+export const PanelSurface: Story = {
+  render: () => (
+    <Section
+      title="padding / scroll prop"
+      note="既定(true/true)は p-3 + max-h-80 の内部スクロール。false にすると padding:0 / max-height:none / overflow-y:visible になる。className での打ち消し（p-0 等）は出力順の都合で効かないため prop を使う（#21）。"
+    >
+      <div className="flex flex-wrap gap-3">
+        <PanelSurfaceDemo padding scroll />
+        <PanelSurfaceDemo padding={false} scroll />
+        <PanelSurfaceDemo padding scroll={false} />
+        <PanelSurfaceDemo padding={false} scroll={false} />
+      </div>
+    </Section>
+  ),
+};

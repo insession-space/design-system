@@ -13,12 +13,19 @@ import { createContext, useContext } from 'react';
 // </Popover.Portal></Popover.Root>
 // Portal を挟まなければ従来の「非 portal(トリガーの兄弟として絶対配置)」相当になる。
 
-// パネル本体の見た目(面・境界・角丸・入場アニメ + 既定の内側 padding・最大高さスクロール・影)。
-// 旧 popover.tsx の PANEL_BASE と、既定 true だった panelPadding(p-3) / panelScroll
-// (max-h-80 overflow-y-auto) / panelShadow(shadow-popover) をひとつの定数に統合した。
-// 専用 props(panelPadding 等)は廃止したので、これらを外したい呼び出し側は className で
-// 打ち消す(例: `max-h-none overflow-visible`)。呼び出し側の className は後ろに置くこと
-// (className マージ規約: `${BASE} ${className}`.trim())。
+// パネル本体の見た目(面・境界・角丸・入場アニメ + 影)。旧 popover.tsx の PANEL_BASE 相当。
+// ⚠ padding(p-3)とスクロール(max-h-80 overflow-y-auto)はここに含めない(#21)。2.0 では
+// これらを常時出したうえで「外したい呼び出し側は className で p-0 / max-h-none
+// overflow-visible を渡して打ち消す」という契約にしていたが、**この打ち消しは成立しない**。
+// クラス属性の並び順は CSS の勝敗に無関係で、同一プロパティのユーティリティは配布 CSS の
+// 出力順で決まるため。実測(insession-app / apps/web の本番ビルド CSS, Tailwind 4.3.2)では
+// .p-0(idx 163644) < .p-3(idx 163880)、.overflow-visible(154257) < .overflow-y-auto(154325)
+// で base 側が勝ち、.max-h-none(147707) > .max-h-80(147416) だけ偶然打ち消せる、という
+// 一貫性のない状態だった(padding と overflow は効かず max-height だけ効く)。
+// data-* バリアント付きのクラスが base の後に出力されるのとは事情が異なる。
+// → 「打ち消す」のをやめ、padding / scroll prop で **そもそも出さない** 方式にした。
+// 出力順の勝負自体が発生しないので、消費側が Tailwind v4 の important 接尾辞(p-0!)を
+// 知っている必要もない(v3 の先頭 ! 記法 `!p-0` は v4 では無効でクラスごと生成されない)。
 // ⚠ z-index はここに置かない(#14)。Base UI では **Popup は position:static** で、位置決めを
 // しているのは親の Positioner。CSS 仕様上 position:static の要素に z-index は効かないため、
 // ここに書いても完全に無効になる。#6 の移行時、旧実装ではパネル自身が absolute/fixed
@@ -28,7 +35,30 @@ import { createContext, useContext } from 'react';
 // → z-index は POPOVER_POSITIONER_BASE 側(Positioner = positioned な要素)に置く。
 // Menu.Popup とも共有する(menu.tsx から import する)。
 export const POPOVER_POPUP_BASE =
-  'min-w-[220px] max-w-[calc(100vw-24px)] bg-surface border border-solid border-border-strong rounded-card p-3 max-h-80 overflow-y-auto shadow-popover animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
+  'min-w-[220px] max-w-[calc(100vw-24px)] bg-surface border border-solid border-border-strong rounded-card shadow-popover animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
+
+// padding / scroll prop が true(既定)のときだけ足すクラス。値は v1 の panelPadding /
+// panelScroll が既定 true で出していたものと同一なので、何も指定しなければ v1 と同じ見た目。
+// Popover.Popup / Menu.Popup で共有する。
+export const POPOVER_POPUP_PADDING = 'p-3';
+export const POPOVER_POPUP_SCROLL = 'max-h-80 overflow-y-auto';
+
+// Popup の padding / scroll を出し分ける共通ヘルパー。Popover.Popup と Menu.Popup が
+// 同じ契約(既定 true・false で出さない)になるよう1箇所に集約する。
+export function popupSurfaceClassName(padding: boolean, scroll: boolean) {
+  return `${POPOVER_POPUP_BASE}${padding ? ` ${POPOVER_POPUP_PADDING}` : ''}${
+    scroll ? ` ${POPOVER_POPUP_SCROLL}` : ''
+  }`;
+}
+
+// Popover.Popup / Menu.Popup が共有する padding / scroll の制御 prop。
+export type PopupSurfaceProps = {
+  // 内側の padding(p-3)。既定 true。false で padding を出さない(v1 の panelPadding={false} 相当)。
+  padding?: boolean;
+  // 最大高さ + 内部スクロール(max-h-80 overflow-y-auto)。既定 true。
+  // false で出さない(v1 の panelScroll={false} 相当)。
+  scroll?: boolean;
+};
 
 // Positioner(position:absolute | fixed が当たる要素)に置く z-index。ここが実際に効く層。
 // 旧実装は portal 有無で z-(--z-dropdown) / z-[var(--z-popover-portal,35)] を使い分けていたが、
@@ -180,13 +210,18 @@ function PopoverPositioner({
   );
 }
 
-export type PopoverPopupProps = React.ComponentProps<typeof BasePopover.Popup>;
+export type PopoverPopupProps = React.ComponentProps<typeof BasePopover.Popup> & PopupSurfaceProps;
 
-function PopoverPopup({ className = '', ...props }: PopoverPopupProps) {
+function PopoverPopup({
+  className = '',
+  padding = true,
+  scroll = true,
+  ...props
+}: PopoverPopupProps) {
   const mobileSheet = useContext(MobileSheetContext);
   return (
     <BasePopover.Popup
-      className={`${POPOVER_POPUP_BASE} ${mobileSheet ? MOBILE_SHEET_POPUP_CLASSNAME : ''} ${className}`.trim()}
+      className={`${popupSurfaceClassName(padding, scroll)} ${mobileSheet ? MOBILE_SHEET_POPUP_CLASSNAME : ''} ${className}`.trim()}
       {...props}
     />
   );
@@ -231,5 +266,8 @@ export const Popover = {
 //
 // role="menu" 前提だった箇所は Popover.Popup に role を明示するか、Menu(menu.tsx)の
 // Menu.Popup をそのまま使う形にする(role は Base UI Menu 側が自動で付与する)。
-// panelPadding=false / panelScroll=false 相当は Popup の className で
-// `p-0`（padding 打ち消し）/ `max-h-none overflow-visible`（スクロール打ち消し）を渡す。
+// panelPadding=false / panelScroll=false 相当は Popup の padding / scroll prop で指定する
+// (`<Popover.Popup padding={false} scroll={false}>`)。いずれも既定 true = v1 と同じ見た目。
+// ⚠ className で `p-0` / `max-h-none overflow-visible` を渡して打ち消す方式は **効かない**
+// (#21)。同一プロパティのユーティリティは配布 CSS の出力順で勝敗が決まり、クラス属性の
+// 並び順は無関係なため。2.0.0 〜 2.0.x のガイドはこの誤った打ち消し例を載せていた。
