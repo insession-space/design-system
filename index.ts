@@ -123,10 +123,12 @@ export {
 } from './tabs.tsx';
 export { default as Textarea, type TextareaProps } from './textarea.tsx';
 export {
-  default as Toast,
-  type ToastProps,
+  Toast,
+  type ToastData,
+  type ToastProviderProps,
   type ToastTone,
   type ToastVariant,
+  type ToastViewportProps,
 } from './toast.tsx';
 export { default as Toggle, type ToggleProps } from './toggle.tsx';
 export { useDismiss } from './use-dismiss.ts';

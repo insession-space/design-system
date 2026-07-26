@@ -114,9 +114,17 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 
 > 📌 1.4.x までは `theme.css` がダーク単一トーンで、ライトは**消費側が自前で持つ**契約だった。その結果、同じライト値が insession-app（`apps/web`）と loophub（`apps/web` / `apps/lp`）に重複していた。1.5.0 でここへ一本化した（移設前に3者の値を突き合わせ、**loophub の17トークンは insession-app の30トークンの部分集合で値も完全一致**であることを確認している）。
 
-## Base UI ベースのプリミティブ（v2 以降）
+## Base UI ベースのプリミティブ
 
-`Popover` / `Menu` / `Modal` / `ConfirmModal` / `Tabs` は **[Base UI](https://base-ui.com)（`@base-ui/react`）へ振る舞いを委譲した compound API**。パートを組み合わせて使う。
+**DS のプリミティブはすべて [Base UI](https://base-ui.com)（`@base-ui/react`）へ振る舞いを委譲している。** DS 側が持つのはトークンベースの見た目だけ。
+
+| | 移行 | 得たもの |
+| --- | --- | --- |
+| `Popover` / `Menu` / `Modal` / `ConfirmModal` / `Tabs` | v2 | 衝突回避・フォーカストラップ・スクロールロック・矢印キーナビ・typeahead |
+| `Checkbox` / `Radio` / `Toggle` / `Input` / `Textarea` | v3 | label 紐付け・`aria-invalid` / `aria-describedby`・roving tabIndex |
+| `BottomSheet` / `Toast` | v3 | スナップ付きドラッグ・キュー管理・自動 dismiss・aria-live |
+
+オーバーレイ系はパートを組み合わせる compound API。
 
 ```tsx
 <Popover.Root open={open} onOpenChange={(o) => !o && close()}>
@@ -145,6 +153,30 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 ### ⚠ Modal を別ドキュメント（PiP）へ出すなら `container` を明示する
 
 v1 は `ownerDocument` から描画先を自動検出していたが、Base UI の Portal は明示指定が必要。Document Picture-in-Picture へモーダルを出す場合は `<Modal.Portal container={pipDocument.body}>` を渡す。
+
+### Toast は Provider + キューになった（v3）
+
+**`<Toast title=… />` を自分で置く使い方は廃止した。** Base UI の Toast は「Provider が持つキューに add して Viewport が描画する」命令的 API で、見た目部品として単体では置けない。
+
+```tsx
+// アプリのルートに1度だけ
+<Toast.Provider>
+  <App />
+  <Toast.Viewport />
+</Toast.Provider>
+
+// 呼び出し側
+const toast = Toast.useToast();
+toast.add({ title: '保存しました', description: '…', data: { tone: 'success' } });
+```
+
+`tone` / `variant` / `icon` は `data` に載せる。これで**キュー管理・自動 dismiss・スワイプで閉じる・重ね表示・aria-live リージョンへの通知**が付いた。
+
+> ⚠ DS は本来「アプリ依存を持たない純粋 leaf UI」だが、**Toast だけは Provider を持つ**。キュー管理を伴う通知はアプリ全体で1つの出口を共有する必要があり、部品単体では成立しないため。方針からの意図的な逸脱。
+
+### ⚠ Drawer / BottomSheet は位置を CSS 変数で受け取る
+
+Base UI の Drawer は**位置を自分で当てず CSS 変数として出すだけ**。`components.css` の `.bottom-sheet` が `transform: translateY(calc(var(--drawer-snap-point-offset, 0px) + var(--drawer-swipe-movement-y, 0px)))` でそれを反映している。同様のことを自前でやる場合、この transform を書かないと**シートが常にフルハイトで表示される**（型検査もビルドも通る）。
 
 ## 開発
 
