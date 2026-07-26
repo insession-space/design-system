@@ -16,7 +16,11 @@ export {
   CountChip,
   type CountChipProps,
 } from './components/badge.tsx';
-export { type BottomSheetProps, default as BottomSheet } from './components/bottom-sheet.tsx';
+export {
+  type BottomSheetProps,
+  type BottomSheetSnapPoint,
+  default as BottomSheet,
+} from './components/bottom-sheet.tsx';
 export {
   type ButtonProps,
   type ButtonSize,
