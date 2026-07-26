@@ -259,6 +259,18 @@ Base UI の Drawer は**位置を自分で当てず CSS 変数として出すだ
 | 3 | `bg-surface` | `border-border-strong` | `shadow-elevation-3`（= 既存 `shadow-popover`） | Popover / Menu |
 | 4 | `bg-surface` | `border-border` | `shadow-elevation-4`（= 既存 `shadow-overlay`） | Modal |
 
+既存コンポーネントとの対応をもう少し細かく言うと:
+
+| 既存コンポーネント | 現在の面 | 対応する段 |
+| --- | --- | --- |
+| `Card` 相当の面 | `bg-surface` + `border-border` + `shadow-soft` | **2** |
+| `Popover` / `Menu` のポップアップ | `bg-surface` + `border-border-strong` + `shadow-popover` | **3** |
+| `Modal` のポップアップ | `bg-surface` + `border-border` + `shadow-overlay` | **4** |
+| `Toast`（snackbar 経路） | `bg-snackbar-surface` + `shadow-overlay` | **4**（面の色だけテーマに追従しない意図的な例外） |
+| `BottomSheet` | `bg-bg` + `border-border`（下辺なし）+ **上向きの専用影** `0 -16px 34px -18px` | **スケール外** |
+
+> ⚠ **`BottomSheet` は意図的にこのスケールに載っていない。** 画面下端から出る面なので影を上向きに落とす必要があり、下向き前提の `--elev-*` をそのまま使えない（`components.css` に専用の `box-shadow` を持つ）。`Surface` の `elevation` で BottomSheet の見た目を再現しようとしないこと。
+
 - **既存の `shadow-soft` / `shadow-popover` / `shadow-overlay` は廃止していない。** elevation スケールはその上に載る意味論の別名で、既存コンポーネントの見た目は一切変わっていない。
 - **ダーク（既定）では背景ランプの明度差が高さの主表現、ライトでは `--color-shadow` を青みグレーにした薄い影が主表現**になる。参照先の `--elev-*` が既にテーマ別の値を持っているため自動で切り替わり、**コンポーネント側は `elevation` prop の1軸しか見ていない**（テーマ分岐は持たない）。
 
