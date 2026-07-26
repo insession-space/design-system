@@ -124,6 +124,19 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 | `Checkbox` / `Radio` / `Toggle` / `Input` / `Textarea` | v3 | label 紐付け・`aria-invalid` / `aria-describedby`・roving tabIndex |
 | `BottomSheet` / `Toast` | v3 | スナップ付きドラッグ・キュー管理・自動 dismiss・aria-live |
 | `Stepper` / `Avatar` / `SearchField` / `Button` / `IconButton` / `RingTimer` | v3 | 矢印キーでの数値増減・画像フォールバック・`focusableWhenDisabled`・`role="progressbar"` |
+| `Slider` / `SegmentedControl` / `ToggleGroup`（`ToolButton`） | v3.3 | 矢印 / Home / End / PageUp-Down・タッチとポインタの正規化・min/max/step の丸め・roving tabIndex・`aria-pressed` / `aria-checked` の管理 |
+
+### `SegmentedControl` はなぜ `ToggleGroup` ではなく `RadioGroup` に載っているか
+
+セグメンテッドコントロールは**常にどれか1つが選択されている**（未選択状態が無い）。`ToggleGroup`（`aria-pressed`）は「押されていない状態」が正当なので、全部 off の状態を型でも a11y でも許してしまう。`RadioGroup` なら `value` が常に1つに定まり、読み上げも「n個中n番目」になる。
+
+用途で選ぶ:
+
+| 使うもの | いつ |
+| --- | --- |
+| `SegmentedControl` | 言語 / テーマ / 種別など、**1つが必ず選ばれている**切り替え |
+| `ToggleGroup` + `ToolButton` | ツールバーの道具選択。`multiple` で複数同時 on にもできる（太字 + 斜体など） |
+| `Tabs` | **表示するパネルを切り替える**とき（`SegmentedControl` はパネルを持たない値の選択） |
 
 `Badge` / `Chip` / `Lozenge` / `Spinner` / `EmptyNote` / `LogoMark` / `Icon` 系 / `Status` / `Link` / `Composer` は**振る舞いを持たない見た目部品**なので Base UI に載せていない（相当パートが無いか、載せても得るものが無い）。`StepFlow` は `<ol>`/`<li>` + `aria-current="step"` というネイティブのセマンティクスで表現している（`role="progressbar"` は中身が読み上げ対象から外れるため不適切）。`SplitModal` は `Modal` / `BottomSheet` 経由で間接的に載っている。
 

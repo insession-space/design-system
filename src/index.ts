@@ -162,6 +162,12 @@ export {
 export { Radio, type RadioGroupProps, type RadioItemProps } from './components/radio.tsx';
 export { default as RingTimer, type RingTimerProps } from './components/ring-timer.tsx';
 export { default as SearchField, type SearchFieldProps } from './components/search-field.tsx';
+export {
+  default as SegmentedControl,
+  type SegmentedControlItem,
+  type SegmentedControlProps,
+} from './components/segmented-control.tsx';
+export { default as Slider, type SliderProps } from './components/slider.tsx';
 export { default as Spinner, type SpinnerProps } from './components/spinner.tsx';
 export {
   default as SplitModal,
@@ -211,6 +217,12 @@ export {
   type ToastViewportProps,
 } from './components/toast.tsx';
 export { default as Toggle, type ToggleProps } from './components/toggle.tsx';
+export {
+  ToggleGroup,
+  type ToggleGroupProps,
+  ToolButton,
+  type ToolButtonProps,
+} from './components/toggle-group.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
 export { default as PersonIcon } from './icons/person-icon.tsx';
