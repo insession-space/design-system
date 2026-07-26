@@ -3,6 +3,12 @@
 
 export { MOBILE_LAYOUT_MQ } from './breakpoints.ts';
 export {
+  Accordion,
+  AccordionItem,
+  type AccordionItemProps,
+  type AccordionProps,
+} from './components/accordion.tsx';
+export {
   type AvatarProps,
   AvatarStack,
   type AvatarStackPerson,

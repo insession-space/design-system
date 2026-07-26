@@ -300,6 +300,59 @@
     }
   }
 
+  /* ---- Accordion の展開部 ----
+   * 高さのアニメーションは grid-template-rows 0fr → 1fr で行う。中身の高さを JS で実測しないので、
+   * 画像やフォントの遅延読み込みで中身の高さが後から変わってもズレない（max-height に大きい値を
+   * 置く手法のようにイージングが崩れることも無い）。0fr の行に入った子は高さ 0 になるだけで
+   * DOM からは消えないため、はみ出しは .accordion-panel-clip の overflow で切る。
+   *
+   * visibility も併せて遷移させるのが要点。visibility は離散的に補間される（開く方向は即座に
+   * visible、閉じる方向は duration の終わりに hidden へ落ちる）ので、閉じ切ってから支援技術と
+   * タブ順の両方から中身が外れる。閉じている間だけ非表示にするために [data-open] を使わず、
+   * 既定値を「閉じ」に置いている（属性が付くのは開いているときだけ）。 */
+  /* --ease-out は Tailwind 既定テーマのトークン（styles.src.css が読む tailwindcss/theme.css が
+     定義し、配布 CSS にもそのまま入る）。このパッケージ独自の --ease-spring と同じ扱いでよい。 */
+  .accordion-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition:
+      grid-template-rows var(--dur-fast) var(--ease-out),
+      visibility var(--dur-fast) var(--ease-out);
+  }
+
+  .accordion-panel[data-open] {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+
+  .accordion-panel-clip {
+    overflow: hidden;
+  }
+
+  /* 中身は器が開き切る手前で遅れて fade in させる。器と同時に出すと、まだ潰れている行の中で
+     テキストが縦に圧縮されて見えるため。
+     左の余白だけは leading の幅ぶん字下げしてヘッダ本文と左端を揃える。字下げ量は
+     AccordionItem が leading の実幅から算出して --accordion-indent で渡す（leading が無ければ
+     変数を渡さないので、他の辺と同じ 18px になる）。 */
+  .accordion-panel-content {
+    padding: 4px 18px 18px var(--accordion-indent, 18px);
+    opacity: 0;
+    transition: opacity var(--dur-fast) var(--ease-out);
+  }
+
+  /* 狭幅では字下げをやめて均等にする（字下げのぶん本文が細くなり、読みにくくなるため）。 */
+  @media (max-width: 480px) {
+    .accordion-panel-content {
+      padding: 4px 14px 14px;
+    }
+  }
+
+  .accordion-panel[data-open] .accordion-panel-content {
+    opacity: 1;
+    transition-delay: calc(var(--dur-fast) * 0.67);
+  }
+
   /* ---- モーションの抑制 ----
    * 移植元は `*, *::before, *::after` にグローバルな抑制をかけているが、ライブラリが消費側の
    * アニメーション全部を止めてよい理由は無いので、このパッケージが自分で動かすものだけを止める。
@@ -315,6 +368,15 @@
 
     .bottom-sheet {
       transition: none;
+    }
+
+    /* Accordion は開閉そのものを止めるのではなく、遷移を消して即座に切り替える。
+       transition-delay も 0 に戻さないと、中身の fade in が遅れたまま残る。 */
+    .accordion-panel,
+    .accordion-panel-content,
+    .accordion-panel[data-open] .accordion-panel-content {
+      transition: none;
+      transition-delay: 0s;
     }
   }
 }
