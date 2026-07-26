@@ -1,5 +1,30 @@
 # @insession/design-system
 
+## 3.3.0
+
+### Minor Changes
+
+- 8d2af69: `Slider` / `SegmentedControl` / `ToggleGroup`（`ToolButton`）を追加した（#53）
+
+  いずれも消費側（insession-app）が legacy CSS や `<input type="range">` で手組みしていたものを DS に上げたもの。振る舞いは Base UI へ委譲し、DS 側はトークンベースの見た目だけを持つ（#6 / #22 と同じ方針）。
+
+  - **`Slider`** — Base UI の `slider` へ委譲。`label` と `valueLabel`（整形済み文字列を受ける。単位付けは消費側の責務）を持つ。消費側は音量スライダー 3 種と whiteboard のペン太さ・不透明度で計 6 箇所を `<input type="range">` + `::-webkit-slider-thumb` / `::-moz-range-thumb` のブラウザ別記述で手組みしており、track の塗り分けも `linear-gradient` を自前で組み立てていた。
+  - **`SegmentedControl`** — Base UI の `radio-group` へ委譲。`items` を渡すだけで組める。**`ToggleGroup` ではなく `RadioGroup` に載せた**理由は README に書いた（セグメンテッドコントロールは常に 1 つが選択されている＝未選択状態が無いので、`aria-pressed` ベースの `ToggleGroup` では全部 off を型でも a11y でも許してしまう）。
+  - **`ToggleGroup` / `ToolButton`** — Base UI の `toggle-group` / `toggle` へ委譲。ツールバーの排他選択。`multiple` で複数選択にもできる。消費側は whiteboard（`whiteboard-chip`）と伝言ゲーム（`canvas-relay-draw-tool`）で**同じ構造の legacy CSS を 2 セット**持っていた。
+
+  ⚠ `Slider` の Indicator には position 系のクラスを置いていない。Base UI が Indicator へ `position: relative` を**inline style で**当てるため `absolute` を書いても無効になる（実測で確認）。効かないクラスを残すと「絶対配置で組んである」という誤読を招くため置かない。
+
+- a66ae80: `UploadTile` / `ColorSwatchGroup` / `ColorInput` / `ListRow` / `AppleIcon` を追加した（#53）
+
+  `Slider` / `SegmentedControl` / `ToggleGroup` に続く後半 4 種。いずれも消費側（insession-app）が legacy CSS や打ち消しユーティリティで手組みしていたものを DS に上げたもの。
+
+  - **`UploadTile`** — 破線タイル + 隠しファイル入力。消費側はこの構造を**8 箇所で手組み**しており（コミュニティのスタンプ追加 ×2 / カバー画像 / スタンプピッカー ×2 / 個人設定 ×3）、`min-h-35` と `min-h-[172px]` のように寸法だけが揺れていた。ドラッグ&ドロップにも対応する（`dragenter` / `dragleave` は子要素を跨ぐたびに発火するので深さを数える。数えないと子の上を通過した瞬間に枠がちらつく）。⚠ `<button>` の中に `<input>` を入れずに **`<label>` を面にした** — インタラクティブ要素の入れ子は HTML 仕様違反でクリックが二重発火する。label なら `input.click()` の呼び出しすら不要になる。
+  - **`ColorSwatchGroup` / `ColorInput`** — パレット選択（Base UI の `radio-group` 委譲）と任意色選択。消費側は `whiteboard-color-input` と `canvas-relay-draw-swatch` という**同じ構造の legacy CSS を 2 セット**持っていた。⚠ `<input type="color">` はブラウザ既定の枠・余白をベンダー別疑似要素でしか消せないため、**input を親より一段大きく広げ、親の `overflow-hidden` で既定の枠を切り落とす**実装にした（配布 CSS にベンダー疑似要素のルールを足さずに済む）。
+  - **`ListRow`** — 画面内に置くクリックできる行。`MenuPlainItem` とは別部品にした。`MenuPlainItem` は `role="menu"` の中の `role="menuitem"` として振る舞う前提で、**メニュー外に置くとセマンティクスが嘘になる**（メニューでないものを menu として読み上げる）。消費側は同じ形を `bg-transparent border-none shadow-none p-0` のような**打ち消しユーティリティの列**で毎回書いていた（打ち消しが必要なのは legacy の素の `button {}` が塗りと padding を与えているため）。
+  - **`AppleIcon`** — `GoogleIcon` と対になる部品。DS に Google だけがあり Apple が無かったため、消費側が `user-signin-apple-btn` として手組みしていた。⚠ 色は `currentColor` に従わせる（Apple の HIG が「黒地には白、白地には黒」を要求するため。GoogleIcon がブランド多色で固定なのとは事情が違う）。
+
+  なお `pnpm check:styles`（DOM に出るクラスに対応する CSS があるかの検査）が `AppleIcon` の `.apple-icon` を「対応ルール無し」で捕まえた。`GoogleIcon` の `.google-icon` は中身が `flex-shrink: 0` の 1 行だけなので、`AppleIcon` は部品 CSS を増やさず `shrink-0` ユーティリティで書いた。
+
 ## 3.2.0
 
 ### Minor Changes
