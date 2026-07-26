@@ -219,6 +219,63 @@ toast.add({ title: '保存しました', description: '…', data: { tone: 'succ
 
 Base UI の Drawer は**位置を自分で当てず CSS 変数として出すだけ**。`components.css` の `.bottom-sheet` が `transform: translateY(calc(var(--drawer-snap-point-offset, 0px) + var(--drawer-swipe-movement-y, 0px)))` でそれを反映している。同様のことを自前でやる場合、この transform を書かないと**シートが常にフルハイトで表示される**（型検査もビルドも通る）。
 
+## レイアウト / Surface / Page プリミティブ
+
+**並び・面・画面骨格を担う3グループのプリミティブ。** いずれも見た目のトークン（色/影/角丸）と並びのロジック（flex/grid）を分けて持ち、Page 系は前の2グループを組み合わせて作られている（DOM を深くしすぎない範囲で、独自の flex/面ロジックは再実装しない）。
+
+| グループ | コンポーネント | 用途 |
+| --- | --- | --- |
+| レイアウト | `Stack` / `VStack` / `HStack` | flex コンテナの基底 / 縦積み・横並びの固定ラッパー |
+| | `Grid` | `columns` / `gap` をブレークポイント別に指定できるレスポンシブグリッド |
+| | `Spacer` | flex 中で余白を食う不可視の伸縮要素（左右分離など） |
+| | `Divider` | 水平/垂直の区切り線 |
+| | `Center` | 子要素を縦横中央に置く器 |
+| | `Container` | 最大幅 + 中央寄せ + 左右パディング |
+| Surface | `Surface` | 面の基底（`elevation` 1軸で背景/境界/影が決まる） |
+| | `Paper` | elevation=1 固定。境界のみの控えめな面 |
+| | `Card` | elevation 既定2。padding/radius がカードらしい既定値 |
+| | `Panel` | elevation=1 固定。サイドバー/セクション囲み用に radius だけ変える |
+| Page | `AppBar` | 画面上端のバー。left/center/right の3スロット、center が伸びる |
+| | `Toolbar` | バー内外で使える水平ツール列（`role="toolbar"`） |
+| | `PageHeader` | 見出しブロック（title 必須、description/actions は任意） |
+| | `PageLayout` | 画面骨格。appBar/sidebar/footer のスロット + メイン。`scroll` でスクロールの主体を選ぶ |
+| | `Footer` | 画面下端の領域。上端の境界 + `Gap` 語彙の padding |
+
+> ⚠ **`PageLayout` の `scroll` は「どこがスクロールするか」を決める。既定は `'page'`。**
+> - `scroll="page"` — ページ全体が内容ぶん伸び、**ブラウザ側**がスクロールする（LP / ドキュメント型）。外枠は `min-h-dvh` で「最低でも画面いっぱい」を保証するだけで、メインに高さ制約を付けない。AppBar を画面に残したいときは `AppBar` 側の `sticky`（既定 true）が担う。
+> - `scroll="body"` — 外枠を `h-dvh` で画面高さに固定し、**本文だけ**がスクロールする（アプリシェル型）。AppBar / Footer は動かない。
+>
+> この2つを取り違えると「スクロールしない」「AppBar の sticky が効かない」という形で崩れる。`scroll="body"` はメイン側に `min-h-0` が必須で（これが無いと flex item が子の内容ぶん伸びて `h-dvh` を突き破り、`overflow-y-auto` に有効な高さ制約が生まれない）、逆に `scroll="page"` でメインに `overflow-y-auto` を付けると `position: sticky` の追従先がメインになって AppBar が固定されなくなる。`PageLayout` はこの組み合わせを prop 1つに閉じ込めているので、**`className` で高さや overflow を上書きしないこと**。
+
+### elevation スケールの対応表
+
+`Surface` の `elevation` は 0〜4 の1軸で「背景 + 境界 + 影」の組を決める。`theme.css` に追加した `--shadow-elevation-0`〜`4` は**既存の `--shadow-soft` / `-popover` / `-overlay` を参照するだけの別名トークン**で、新しい影の実値は増やしていない。
+
+| elevation | 背景 | 境界 | 影 | 既存の対応 |
+| --- | --- | --- | --- | --- |
+| 0 | なし | なし | なし | 素の器 |
+| 1 | `bg-bg-elevated` | `border-border` | なし | Paper / Panel |
+| 2 | `bg-surface` | `border-border` | `shadow-elevation-2`（= 既存 `shadow-soft`） | Card |
+| 3 | `bg-surface` | `border-border-strong` | `shadow-elevation-3`（= 既存 `shadow-popover`） | Popover / Menu |
+| 4 | `bg-surface` | `border-border` | `shadow-elevation-4`（= 既存 `shadow-overlay`） | Modal |
+
+- **既存の `shadow-soft` / `shadow-popover` / `shadow-overlay` は廃止していない。** elevation スケールはその上に載る意味論の別名で、既存コンポーネントの見た目は一切変わっていない。
+- **ダーク（既定）では背景ランプの明度差が高さの主表現、ライトでは `--color-shadow` を青みグレーにした薄い影が主表現**になる。参照先の `--elev-*` が既にテーマ別の値を持っているため自動で切り替わり、**コンポーネント側は `elevation` prop の1軸しか見ていない**（テーマ分岐は持たない）。
+
+### 移行ガイド（Tailwind 直書き → プリミティブ）
+
+消費側（insession-app / loophub-app）で繰り返し書かれている Tailwind 直書きパターンは、以下のプリミティブに置き換えられる。
+
+| これまで | これから |
+| --- | --- |
+| `<div className="flex flex-col gap-3">` | `<VStack gap="md">` |
+| `<div className="flex items-center gap-2">` | `<HStack gap="sm" align="center">` |
+| `<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">` | `<Grid columns={{ base: 1, md: 2, lg: 3 }} gap="md">` |
+| `<div className="rounded-card border border-border bg-surface p-4 shadow-soft">` | `<Card padding="lg">` |
+| `<div className="mx-auto w-full max-w-[1024px] px-4">` | `<Container size="lg">` |
+
+⚠ **`className` は逃げ道として残っているが、props を正とする。** 生の Tailwind ユーティリティに直接戻すと、DS 側でトークン（gap の刻み・elevation の組・コンテナ幅など）を変更しても消費側へ伝播しなくなる。
+
 ## 開発
 
 ```bash

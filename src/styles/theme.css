@@ -249,6 +249,24 @@
   --shadow-popover: var(--elev-popover);
   --shadow-overlay: var(--elev-overlay);
 
+  /* エレベーションスケール(#42): 「背景 + 境界 + 影」の3点セットで1段を成す意味論を
+     0〜4 の5段に名前を付けたもの。既存の --shadow-soft/-popover/-overlay を消さず、
+     その上に載る別名として追加する(#867 と同じ理由でここも var() 参照のみ。実値は
+     既存 --elev-* をそのまま使う。新しい影の実値はここでは作らない)。
+     背景/境界は Surface コンポーネント側の静的クラスマップが担当するので、ここは影だけ。
+       elevation-0: なし(素の器。背景/境界も無し)
+       elevation-1: なし(bg-bg-elevated + border-border。Paper / Panel)
+       elevation-2: shadow-soft   と同値(bg-surface + border-border。Card)
+       elevation-3: shadow-popover と同値(bg-surface + border-border-strong。既存 Popover / Menu)
+       elevation-4: shadow-overlay と同値(bg-surface + border-border。既存 Modal)
+     ダーク/ライトの表現差は参照先の --elev-* が既に持っている(ダークは背景ランプの明度差、
+     ライトは --color-shadow を青みグレーにした薄い影)ので、ここにテーマ分岐は要らない。 */
+  --shadow-elevation-0: none;
+  --shadow-elevation-1: none;
+  --shadow-elevation-2: var(--elev-soft);
+  --shadow-elevation-3: var(--elev-popover);
+  --shadow-elevation-4: var(--elev-overlay);
+
   /* フォーカスリング: キーボードフォーカスの発光(シアンの薄いリング + 柔らかいグロー)。
      input:focus 等で生値だったものをトークン化(#445)。新規部品は focus-visible:shadow-focus で使う。
      アウトライン色/幅/offset は @theme static 側(--color-focus-ring / --focus-ring-*)。 */

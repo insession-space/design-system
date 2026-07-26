@@ -47,6 +47,35 @@ export {
   type InputProps,
 } from './components/input.tsx';
 export {
+  type Align,
+  type Breakpoint,
+  Center,
+  type CenterProps,
+  COLUMNS_CLASS,
+  type Columns,
+  Container,
+  type ContainerProps,
+  type ContainerSize,
+  Divider,
+  type DividerOrientation,
+  type DividerProps,
+  GAP_CLASS,
+  type Gap,
+  Grid,
+  type GridProps,
+  HStack,
+  type HStackProps,
+  type Justify,
+  type Responsive,
+  Spacer,
+  type SpacerProps,
+  Stack,
+  type StackDirection,
+  type StackProps,
+  VStack,
+  type VStackProps,
+} from './components/layout.tsx';
+export {
   default as Link,
   type LinkProps,
   type LinkVariant,
@@ -92,6 +121,19 @@ export {
   type ModalVariant,
 } from './components/modal.tsx';
 export {
+  AppBar,
+  type AppBarProps,
+  Footer,
+  type FooterProps,
+  PageHeader,
+  type PageHeaderProps,
+  PageLayout,
+  type PageLayoutProps,
+  type PageScroll,
+  Toolbar,
+  type ToolbarProps,
+} from './components/page.tsx';
+export {
   POPOVER_POPUP_BASE,
   POPOVER_POPUP_PADDING,
   POPOVER_POPUP_SCROLL,
@@ -134,6 +176,19 @@ export {
   type StepFlowStep,
 } from './components/step-flow.tsx';
 export { default as Stepper, type StepperProps } from './components/stepper.tsx';
+export {
+  Card,
+  type CardProps,
+  type Elevation,
+  Panel,
+  type PanelProps,
+  Paper,
+  type PaperProps,
+  Surface,
+  type SurfacePadding,
+  type SurfaceProps,
+  type SurfaceRadius,
+} from './components/surface.tsx';
 export {
   Tabs,
   type TabsListProps,
