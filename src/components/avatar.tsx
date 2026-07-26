@@ -45,6 +45,11 @@ export type AvatarProps = {
   // fallback 円だけに足すクラス（例 'auth-avatar-fallback' で既定背景を供給）。
   fallbackClassName?: string;
   alt?: string;
+  // 内部/公開フラグ: status/ring を指定しなくても DS 経路（Base UI の Avatar.Root/Image/
+  // Fallback）を強制する（#62）。UserLabel のような複合コンポーネントは status 指定の
+  // 有無で見た目・fallback 挙動がぶれると困るため、常にこれを立てて DS 経路に固定する。
+  // 既存の呼び出し（未指定 = false 相当）の挙動は変えない後方互換フラグ（legacy 経路のコメント参照）。
+  ds?: boolean;
 };
 
 function initialOf(name?: string | null, fallback?: string | null): string {
@@ -64,13 +69,14 @@ export default function Avatar({
   className = '',
   fallbackClassName = '',
   alt = '',
+  ds: forceDs,
 }: AvatarProps) {
   const bg = color ?? bgColor;
   const content = label != null ? label : initialOf(name, fallback);
-  const ds = status != null || ring === true;
+  const useDsPath = status != null || ring === true || forceDs === true;
 
   // DS 経路: token/props ベースの自己完結した円（新 API 専用。legacy CSS に依存しない）。
-  if (ds) {
+  if (useDsPath) {
     const dim = size ?? 40;
     const circleStyle: CSSProperties = {
       width: dim,

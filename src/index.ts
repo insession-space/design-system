@@ -242,3 +242,8 @@ export {
   type FeedItemAttachmentProps,
   type FeedItemProps,
 } from './ui-kit/feed-item.tsx';
+export {
+  default as UserLabel,
+  type UserLabelProps,
+  type UserLabelSize,
+} from './ui-kit/user-label.tsx';
