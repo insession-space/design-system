@@ -144,11 +144,25 @@
     border-bottom: none;
     border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
     box-shadow: 0 -16px 34px -18px color-mix(in srgb, var(--color-shadow) 80%, transparent);
-    transition: height 0.28s var(--ease-spring);
+
+    /* Drawer(Base UI)の snapPoint とスワイプ追従(#23)。
+       ⚠ Base UI は位置を自分で当てず、**CSS 変数として出すだけ**なので、ここで translateY に
+       反映する必要がある（変数が無い環境＝移行前の DOM では 0px にフォールバックする）。
+         --drawer-snap-point-offset : 現在の snapPoint まで下げる量（フルハイトとの差分）
+         --drawer-swipe-movement-y  : スワイプ中の指の移動量
+       高さは常にフル（.bottom-sheet--full = 94dvh）にしておき、「どこまでせり出すか」は
+       transform が決める。移行前は mode('mid'|'full') を state で持って height を
+       68dvh / 94dvh に切り替えていたが、その役目は Drawer の snapPoints に移った。 */
+    transform: translateY(
+      calc(var(--drawer-snap-point-offset, 0px) + var(--drawer-swipe-movement-y, 0px))
+    );
+    transition: transform 0.28s var(--ease-spring);
   }
 
-  .bottom-sheet--mid {
-    height: 68dvh;
+  /* スワイプ中は指に1:1で追従させたいので transition を切る（移行前も、ドラッグ中は
+     inline style で transition:none にして高さを直接書き換えていた）。 */
+  .bottom-sheet[data-swiping] {
+    transition: none;
   }
 
   .bottom-sheet--full {
