@@ -1,11 +1,16 @@
-import { Button, Icon, Modal } from '@insession/design-system';
+import { Button, Icon, Input, Modal } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';
 
-// 汎用モーダルの外殻。Base UI Dialog に委譲した compound API(#6)。2つの体裁を持つ:
-// title/footer 相当のパートを使わない既定(legacy .modal 経路)と、Modal.Title/Body/Footer を
-// 並べる DS 構造(variant='ds'。border-bottom の見出し行 + body + surface-2 の footer 行)。
+// 汎用モーダルの外殻。Base UI Dialog に委譲した compound API(#6)。
+// Modal.Popup に variant='ds' を渡し、Modal.Title / Modal.Body / Modal.Footer を並べる DS 構造で
+// 使う(border-bottom の見出し行 + body + surface-2 の footer 行)。
+//
+// ⚠ variant を渡さない既定は legacy の .modal / .modal-close をそのまま使う後方互換の経路で、
+// 中身に raw な <button> / <input> を置くことを前提にしている（塗りはホストアプリの
+// グローバル `button {}` 頼み。components.css の .modal button[type="submit"] の注記を参照）。
+// 新規の実装では使わないため、カタログにも載せない。
 const meta: Meta = {
   title: 'Components/Modal',
   parameters: { layout: 'padded' },
@@ -13,26 +18,6 @@ const meta: Meta = {
 export default meta;
 
 type Story = StoryObj;
-
-function DefaultDemo() {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button onClick={() => setOpen(true)}>モーダルを開く</Button>
-      <Modal.Root open={open} onOpenChange={setOpen}>
-        <Modal.Portal>
-          <Modal.Backdrop />
-          <Modal.Popup aria-label="スペースを作成">
-            <Modal.Close aria-label="閉じる" title="閉じる" />
-            <h2>スペースを作成</h2>
-            <input type="text" placeholder="スペース名" />
-            <button type="submit">作成する</button>
-          </Modal.Popup>
-        </Modal.Portal>
-      </Modal.Root>
-    </>
-  );
-}
 
 function DsDemo({ width }: { width?: string }) {
   const [open, setOpen] = useState(false);
@@ -102,12 +87,7 @@ function FormDemo() {
               </Modal.Close>
             </div>
             <Modal.Body>
-              <input
-                name="space-name"
-                type="text"
-                placeholder="スペース名"
-                className="w-full rounded-md border border-solid border-border bg-surface px-3 py-2 text-text"
-              />
+              <Input name="space-name" type="text" placeholder="スペース名" />
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={() => setOpen(false)}>
@@ -132,9 +112,9 @@ function FocusTrapDemo() {
   return (
     <div>
       <Button onClick={() => setOpen(true)}>フォーカストラップを確認</Button>
-      <button type="button" className="ml-2 underline">
+      <Button variant="ghost" className="ml-2">
         モーダル外の focusable な要素
-      </button>
+      </Button>
       <Modal.Root open={open} onOpenChange={setOpen}>
         <Modal.Portal>
           <Modal.Backdrop />
@@ -150,16 +130,10 @@ function FocusTrapDemo() {
                 Tab キーでフォーカスがモーダル内を循環すること(外の「モーダル外の focusable
                 な要素」に 抜けないこと)を確認する。
               </p>
-              <input
-                type="text"
-                placeholder="1つ目のフィールド"
-                className="mb-2 w-full rounded-md border border-solid border-border bg-surface px-3 py-2 text-text"
-              />
-              <input
-                type="text"
-                placeholder="2つ目のフィールド"
-                className="w-full rounded-md border border-solid border-border bg-surface px-3 py-2 text-text"
-              />
+              <div className="flex flex-col gap-2">
+                <Input type="text" placeholder="1つ目のフィールド" />
+                <Input type="text" placeholder="2つ目のフィールド" />
+              </div>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="primary" onClick={() => setOpen(false)}>
@@ -180,17 +154,6 @@ function FocusTrapDemo() {
     </div>
   );
 }
-
-export const Default: Story = {
-  render: () => (
-    <Section
-      title="既定(legacy 経路)"
-      note="Modal.Title/Body/Footer を使わないと legacy の .modal / .modal-close をそのまま使う従来経路。"
-    >
-      <DefaultDemo />
-    </Section>
-  ),
-};
 
 export const DsStructure: Story = {
   render: () => (
