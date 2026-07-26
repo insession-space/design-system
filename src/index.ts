@@ -1,4 +1,5 @@
-// @insession/design-system — 純粋 leaf UI の公開窓口。外部はここ経由で import する。
+// @insession/design-system — UI の公開窓口。外部はここ経由で import する。
+// components/ と icons/ が純粋 leaf のプリミティブ、ui-kit/ がそれらを束ねた複合コンポーネント。
 
 export { MOBILE_LAYOUT_MQ } from './breakpoints.ts';
 export {
@@ -213,3 +214,9 @@ export { default as Toggle, type ToggleProps } from './components/toggle.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
 export { default as PersonIcon } from './icons/person-icon.tsx';
+export {
+  FeedItem,
+  FeedItemAttachment,
+  type FeedItemAttachmentProps,
+  type FeedItemProps,
+} from './ui-kit/feed-item.tsx';
