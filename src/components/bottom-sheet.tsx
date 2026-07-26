@@ -27,6 +27,10 @@ import type { ReactNode } from 'react';
 const MID_SNAP = 0.68;
 const FULL_SNAP = 0.94;
 
+const SNAP_RATIO = { mid: MID_SNAP, full: FULL_SNAP } as const;
+
+export type BottomSheetSnapPoint = keyof typeof SNAP_RATIO;
+
 export type BottomSheetProps = {
   open: boolean;
   onClose: () => void;
@@ -37,6 +41,16 @@ export type BottomSheetProps = {
   closeLabel?: string;
   // Esc キーで閉じる。既定 true。
   closeOnEsc?: boolean;
+  // 開いた直後の高さ。既定 'mid'(中途)。スナップ先は 'mid' / 'full' の2点で変わらない。
+  //
+  // ⚠ **中身の下端に固定された操作要素(入力欄・送信ボタン等)があるなら 'full' を渡すこと。**
+  // 上の「高さの扱い」節のとおり Popup の高さは常にフル(94dvh)で、snapPoint までの差分は
+  // transform: translateY() で押し下げて表現している。つまり 'mid' では **Popup の下端
+  // 26dvh 分がビューポートの外に出る**。中身が「上から順に読むリスト」なら見えている範囲で
+  // 用が足りるが、下端固定の入力欄は画面外に落ち、ユーザーが一度シートを上へスワイプする
+  // までは触れない。insession-app のモバイルチャットで実際に踏んだ(ビューポート 844px に
+  // 対し入力欄が 955..1063px = 完全に画面外。'full' なら 736..844px で収まる)。
+  defaultSnapPoint?: BottomSheetSnapPoint;
 };
 
 export default function BottomSheet({
@@ -46,14 +60,15 @@ export default function BottomSheet({
   ariaLabel,
   closeLabel,
   closeOnEsc = true,
+  defaultSnapPoint = 'mid',
 }: BottomSheetProps) {
   return (
     <Drawer.Root
       open={open}
       swipeDirection="down"
-      // 開くたびに中途高さから始める(前回フルハイトのまま閉じても次回はリセットする)のは
-      // defaultSnapPoint が担う。Drawer は閉じるときに snapPoint を初期値へ戻す。
-      defaultSnapPoint={MID_SNAP}
+      // 開くたびに既定の高さから始める(前回フルハイトのまま閉じても次回はリセットする)のは
+      // Drawer の defaultSnapPoint が担う。Drawer は閉じるときに snapPoint を初期値へ戻す。
+      defaultSnapPoint={SNAP_RATIO[defaultSnapPoint]}
       snapPoints={[MID_SNAP, FULL_SNAP]}
       onOpenChange={(nextOpen, eventDetails) => {
         // closeOnEsc=false のときだけ Esc による close を打ち消す(Popover.Root と同じ方針)。
