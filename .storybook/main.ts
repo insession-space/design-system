@@ -9,6 +9,10 @@ import { mergeConfig } from 'vite';
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.@(ts|tsx)', '../stories/**/*.mdx'],
   addons: ['@storybook/addon-docs'],
+  // public/ を成果物へそのままコピーする。ここに置いた CNAME が
+  // storybook-static/CNAME として出て、GitHub Pages のカスタムドメイン
+  // (design-system.insession.space) を宣言する（README「カタログの公開」参照）。
+  staticDirs: ['./public'],
   framework: {
     name: '@storybook/react-vite',
     options: {},

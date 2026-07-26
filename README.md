@@ -5,7 +5,7 @@ InSession と loophub が共有するデザインシステム。**純粋 leaf UI
 アプリ固有のロジックには依存しない（i18n の `t`・ルーター・認証などは全て props で注入する）。依存は `react` / `react-dom` の peer だけ。
 
 - npm: [`@insession/design-system`](https://www.npmjs.com/package/@insession/design-system)
-- **カタログ（Storybook）: https://insession-space.github.io/design-system/**
+- **カタログ（Storybook）: https://design-system.insession.space/**
 - 消費側: `insession-space/insession-app`（InSession 本体・admin・lp・help）、`insession-space/loophub-app`（web・lp）
 
 ## セットアップ（消費側アプリ）
@@ -187,6 +187,28 @@ pnpm build
 
 `tsup.config.ts` は `minify: false`、`build:css` も minify しない。従来方式（`@source` で `dist` を走査してユーティリティを生成する）の消費側がまだ居るため、**クラス名の文字列リテラルが壊れると上記の「スタイルが静かに消える」障害を引き起こす**。配布 CSS は gzip で約 9KB に落ちるので、minify の実利はほとんど無い。
 
+## カタログの公開（GitHub Pages + カスタムドメイン）
+
+カタログは `main` への push で `.github/workflows/storybook.yml` が `pnpm build-storybook` → GitHub Pages（Actions ビルド方式）へデプロイし、**https://design-system.insession.space/** で公開される。
+
+**このリポジトリでホストしている理由**: カタログは元々 insession-app（モノレポ）で公開していたが、org 移管で private リポジトリの GitHub Pages が使えなくなった（Free プランは private Pages 非対応で deploy が 422 になる）。design-system は public なので Pages が使え、リポジトリ分割でストーリーもここへ移設済みなので、本来ここが正しい置き場所。
+
+### ドメインの構成（3箇所が揃って初めて動く）
+
+| 場所 | 設定 |
+| --- | --- |
+| `.storybook/public/CNAME` | `design-system.insession.space`。`staticDirs: ['./public']` で `storybook-static/CNAME` として成果物に入る |
+| GitHub Pages 設定 | Settings → Pages → Custom domain（＝`gh api -X PUT repos/insession-space/design-system/pages -f cname=design-system.insession.space`）+ Enforce HTTPS |
+| Cloudflare DNS（`insession.space` ゾーン） | `design-system` を **CNAME → `insession-space.github.io`**、**Proxy status = DNS only（プロキシ無効）** |
+
+> ⚠ **Cloudflare のプロキシ（オレンジの雲）は無効にする。** GitHub は Let's Encrypt 証明書の発行にドメインが GitHub Pages のサーバへ直接解決できることを要求するため、プロキシ有効だと証明書が発行されず Enforce HTTPS が有効化できない。
+
+> ⚠ **設定の順序**: GitHub は custom domain を設定する時点でドメインの解決を検証する。**DNS レコードを先に入れる**こと（先に Pages 側を設定すると `Domain does not resolve to the GitHub Pages server` で 422 になる）。証明書の発行には数分〜十数分かかり、それまで Enforce HTTPS は有効化できない。
+
+Actions ビルド方式では実際に効いているのは GitHub Pages 側の設定で、成果物の `CNAME` は参照されない。それでもリポジトリに置いてあるのは、**どのドメインで出しているかをコードに記録し、Pages 設定が失われたときの復元源にするため**。
+
+旧 URL（`https://insession-space.github.io/design-system/`）は GitHub がカスタムドメインへリダイレクトするので、既存のリンクは壊れない。消費側リポジトリ（insession-app / loophub-app）のドキュメントに残る旧 URL も、必要になった時点でそれぞれのリポジトリで差し替える（リポジトリを跨いだ変更は別 PR）。
+
 ## リリース
 
 Changesets でバージョンを採番し、`main` への push で npm へ publish する。
@@ -272,6 +294,7 @@ styles.src.css        配布 CSS のビルド入力（publish しない）
 icons/                アイコン（icon.tsx の PATHS が単一ソース）
 stories/              Storybook のカタログ
 .storybook/           Storybook 設定（preview.css が消費側と同じ経路の再現）
+.storybook/public/    成果物へそのままコピーされる静的ファイル（CNAME = 公開ドメイン）
 scripts/              check-styles.mjs（配布 CSS の欠損検査）
 .design-sync/         DesignSync（claude.ai/design 連携）の設定
 tsup.config.ts        配布物（js + d.ts）のビルド

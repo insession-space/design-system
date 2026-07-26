@@ -1,6 +1,13 @@
 name: Storybook
 
 # DS プリミティブのカタログを GitHub Pages で公開する。
+# 公開先は https://design-system.insession.space/（カスタムドメイン）。
+#
+# ドメインは3箇所が揃って初めて成立する（詳細は README「カタログの公開」）:
+#   1. .storybook/public/CNAME  → staticDirs で storybook-static/CNAME として出る
+#   2. GitHub Pages の Custom domain 設定（Actions ビルド方式では実際に効くのはこちら）
+#   3. Cloudflare DNS（insession.space ゾーン）の design-system CNAME → insession-space.github.io
+#      ※ Proxy は無効（DNS only）。プロキシ有効だと GitHub が証明書を発行できない
 #
 # なぜこのリポジトリでホストするのか:
 #   カタログは元々 insession-app（モノレポ）で公開していたが、org 移管で
