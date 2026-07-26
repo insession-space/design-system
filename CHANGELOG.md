@@ -1,5 +1,94 @@
 # @insession/design-system
 
+## 2.1.0
+
+### Minor Changes
+
+- 18abd6b: `Popover.Popup` / `Menu.Popup` に `padding` / `scroll` props を足した（#21）
+
+  2.0.0 で `panelPadding` / `panelScroll` の専用 props を廃止し「外したい呼び出し側は `className` で `p-0` / `max-h-none overflow-visible` を渡して打ち消す」契約にしたが、**この打ち消しは効かなかった。**
+
+  **クラス属性の並び順は CSS の勝敗に無関係で、同一プロパティのユーティリティは配布 CSS の出力順で決まる。** 実測（insession-app の本番ビルド CSS / Tailwind 4.3.2）:
+
+  | クラス              | 出力位置   | 勝敗                 |
+  | ------------------- | ---------- | -------------------- |
+  | `.p-0`              | idx 163644 | 負ける               |
+  | `.p-3`              | idx 163880 | **これが適用される** |
+  | `.overflow-visible` | idx 154257 | 負ける               |
+  | `.overflow-y-auto`  | idx 154325 | **これが適用される** |
+  | `.max-h-none`       | idx 147707 | たまたま勝つ         |
+
+  つまり `max-height` だけ偶然効いて padding と overflow は効かない、という一貫性のない状態だった。実害として消費側（insession-app の通知センター / MiniProfile）に **v1 に無かった 12px の padding と内部スクロール**が付いていた。
+
+  **「打ち消す」のをやめ、そもそも出さない方式へ戻した。** v1 が `panelPadding` / `panelScroll` という props を持っていたのは正しかった。
+
+  ```tsx
+  <Popover.Popup
+    padding={false}
+    scroll={false}
+    className="flex max-h-[220px] flex-col overflow-hidden"
+  >
+    <div className="shrink-0 border-b border-solid border-border px-4 py-3">
+      固定ヘッダー
+    </div>
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">{items}</div>
+  </Popover.Popup>
+  ```
+
+  - `padding` / `scroll` はどちらも**既定 true**（v1 の `panelPadding` / `panelScroll` と同じ既定）。**既定の見た目は 2.0 から変わらない**ので、既存の呼び出し側は無変更で動く
+  - `POPOVER_POPUP_BASE` から padding とスクロールを外し、`POPOVER_POPUP_PADDING`（`p-3`）と `POPOVER_POPUP_SCROLL`（`max-h-80 overflow-y-auto`）として分離・export した
+  - `Popover.Popup` と `Menu.Popup` で組み立てを共有する（`popupBase` / `mergePopupClassName`）
+  - **Base UI の `className` は `string | ((state) => string)` の union を受ける**ので、関数形をそのまま文字列連結して関数の実装がクラス名に埋め込まれないよう、形ごとに分けて合成している
+  - `README.md` に「`className` では打ち消せない」理由を実測つきで明記し、`padding` / `scroll` の使い方を追記した
+  - Storybook に `Popover / Panel Options` story を追加（既定 / `padding={false}` / `padding={false} scroll={false}` を並べて比較できる）
+
+  修正後の実測（Storybook / 算出スタイル）:
+
+  | story                            | padding | max-height            | overflow-y |
+  | -------------------------------- | ------- | --------------------- | ---------- |
+  | 既定                             | 12px    | 320px                 | auto       |
+  | `padding={false}`                | **0px** | 320px                 | auto       |
+  | `padding={false} scroll={false}` | **0px** | **220px**（独自指定） | **hidden** |
+
+  これにより消費側は Tailwind v4 の important 接尾辞（`p-0!`）に頼らなくてよくなる（insession-app は現在その回避策を使っている。insession-space/insession-app#1107）。
+
+### Patch Changes
+
+- bc0d4e4: メニューの `active` 行の green tint が表示されていなかったのを直した（#17）
+
+  `Menu.Item` / `RadioItem` / `CheckboxItem` / `PlainItem` に `active` を渡したとき、テキスト色（green）は出るのに**背景の tint（`--color-success` 10%）が出ていなかった**。
+
+  **これは 2.x の回帰ではなく 1.x から続いていた不具合。** #9 の移行作業中に実測で気づいたが、当時は「振る舞いの委譲のみで見た目は変えない」方針だったため changeset に記録だけ残していた。
+
+  ## 原因
+
+  行の基底クラス（`MENU_ROW_BASE`）に `bg-transparent` があり、`active` 分岐の tint と**同じクラス属性に両方が並んでいた**。どちらもクラス 1 つで特異度が同じなので、勝敗は**配布 CSS の出力順**で決まる。
+
+  ```
+  color-mix(in srgb,var(--color-success) 10%,transparent)  idx=20987   ← 負ける
+  .bg-transparent                                          idx=22906   ← 後勝ち
+  ```
+
+  結果、**「静止時は tint なし、hover / キーボードハイライト時だけ tint が出る」**という中途半端な状態になっていた（`hover:` / `data-highlighted:` のバリアント付きルールは出力順が後なので勝つ）。
+
+  ## 直し方
+
+  **`MENU_ROW_BASE` から `bg-transparent` を外し、`toneClassName` / `plainToneClassName` が背景を排他的に出す**形にした（`active` なら tint、それ以外なら `bg-transparent`）。
+
+  `bg-transparent` を単に落とすだけにしないのは、DS が preflight を配っていないため `PlainItem`（`<button>`）に UA 既定の `buttonface` 背景が残るから。排他で出せば両方満たせる。
+
+  ## 修正後の実測（Storybook / 算出スタイル）
+
+  | 行                                       | 描画要素   | 背景                                      |
+  | ---------------------------------------- | ---------- | ----------------------------------------- |
+  | `active` な `Menu.Item`                  | `<div>`    | **`color(srgb 0.192 0.769 0.494 / 0.1)`** |
+  | `active` な `RadioItem` / `CheckboxItem` | `<div>`    | **同上**                                  |
+  | `active` な `PlainItem`                  | `<button>` | **同上**                                  |
+  | 非 `active` の行                         | 両方       | `rgba(0, 0, 0, 0)`                        |
+  | `danger` 行                              | 両方       | 透明・文字色 `rgb(255, 107, 107)` を維持  |
+
+  hover / キーボードハイライト時の 20% tint も引き続き出るので、**静止 10% → ハイライト 20%** で区別が付く状態は保たれている。
+
 ## 2.0.1
 
 ### Patch Changes
