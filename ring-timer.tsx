@@ -1,3 +1,4 @@
+import { Progress } from '@base-ui/react/progress';
 import type { CSSProperties } from 'react';
 
 // 円形カウントダウンタイマー(純粋 leaf UI)。時間計算はしない — 呼び出し側が
@@ -44,8 +45,26 @@ export default function RingTimer({
     .filter(Boolean)
     .join(' ');
 
+  // Progress.Root をラッパーに使う（#33）。描画は従来どおり conic-gradient + mask で、
+  // Base UI からは **a11y だけ** を受け取る（role="progressbar" と aria-valuenow/min/max）。
+  // 移行前はただの <div> で、支援技術には「残り時間が進行している」ことが一切伝わらなかった。
+  // Track / Indicator パートは使わない（リングの描画を Base UI の DOM に載せ替えると
+  // conic-gradient の構造が変わってしまうため）。
+  // value は「残り秒」。カウントダウンなので値は減っていくが、aria-valuetext を添えて
+  // 「何の値なのか」を明示する（caption があればそれを使う）。
   return (
-    <div className={wrapperClass} style={{ width: size, height: size }}>
+    <Progress.Root
+      value={Math.max(0, Math.round(secondsLeft))}
+      min={0}
+      max={Math.max(0, Math.round(totalSeconds))}
+      aria-valuetext={
+        caption
+          ? `${Math.max(0, Math.round(secondsLeft))} ${caption}`
+          : `残り ${Math.max(0, Math.round(secondsLeft))} 秒`
+      }
+      className={wrapperClass}
+      style={{ width: size, height: size }}
+    >
       <div className="absolute inset-0 rounded-pill" style={maskStyle} aria-hidden="true" />
       <div className="relative flex flex-col items-center justify-center">
         <span
@@ -56,6 +75,6 @@ export default function RingTimer({
         </span>
         {caption && <span className="mt-1 text-2xs text-text-dim">{caption}</span>}
       </div>
-    </div>
+    </Progress.Root>
   );
 }

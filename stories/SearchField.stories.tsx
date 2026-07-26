@@ -52,3 +52,18 @@ export const CustomPlaceholder: Story = {
     </Section>
   ),
 };
+
+// label を渡したときの回帰ネット（#33）。Field.Label が control に自動で紐付く
+// （label をクリックすると入力欄にフォーカスが移る）。
+// label が無いときは Field.Root を挟まず移行前と同じ DOM を返す契約なので、
+// className の載る要素が label の有無で変わる点もここで確認できる。
+export const WithLabel: Story = {
+  render: () => (
+    <Section
+      title="label つき"
+      note="label をクリックすると入力欄にフォーカスが移る（Field.Label が control の id を自動解決する）。label が無い場合は Field.Root を挟まないので、className は検索ボックス本体に載る。"
+    >
+      <SearchField label="スペースを検索" placeholder="名前で検索" className="max-w-sm" />
+    </Section>
+  ),
+};
