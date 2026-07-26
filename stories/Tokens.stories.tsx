@@ -1,3 +1,4 @@
+import { Button, Input } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BoxSwatch, Section, TokenTable } from './tokens';
 
@@ -77,10 +78,8 @@ export const FocusAndDisabled: Story = {
         note="キーボードフォーカスの表現(#445)。アウトライン(色/幅/offset) + 発光(shadow-focus)。下の入力を Tab でフォーカスすると確認できる。"
       >
         <div className="flex flex-wrap items-center gap-6">
-          <input type="text" placeholder="Tab でフォーカス" />
-          <button type="button" className="focus-visible:shadow-focus">
-            フォーカスで発光
-          </button>
+          <Input type="text" placeholder="Tab でフォーカス" className="max-w-3xs" />
+          <Button variant="secondary">フォーカスで発光</Button>
         </div>
         <div className="mt-4">
           <TokenTable
@@ -97,10 +96,8 @@ export const FocusAndDisabled: Story = {
         note="DS 標準の一組: opacity-(--disabled-opacity) + cursor-not-allowed。"
       >
         <div className="flex flex-wrap items-center gap-6">
-          <button type="button">通常</button>
-          <button type="button" disabled>
-            無効
-          </button>
+          <Button>通常</Button>
+          <Button disabled>無効</Button>
         </div>
         <div className="mt-4">
           <TokenTable rows={[{ varName: '--disabled-opacity', label: 'disabled 不透明度' }]} />
@@ -144,13 +141,13 @@ export const Motion: Story = {
             { label: 'slower (.5s)', varName: '--dur-slower', dur: 'var(--dur-slower)' },
           ].map((d) => (
             <div key={d.varName} className="flex flex-col items-center gap-2">
-              <button
-                type="button"
+              <Button
+                variant="secondary"
                 className="hover:-translate-y-1 hover:shadow-glow ease-spring"
                 style={{ transitionDuration: d.dur, transitionProperty: 'transform, box-shadow' }}
               >
                 hover me
-              </button>
+              </Button>
               <code className="text-2xs text-text-faint">{d.varName}</code>
               <span className="text-2xs text-text-dim">{d.label}</span>
             </div>

@@ -1,4 +1,4 @@
-import { Icon, Toast } from '@insession/design-system';
+import { Button, Icon, Toast } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 
@@ -31,9 +31,8 @@ function AddButton({
 }) {
   const toast = Toast.useToast();
   return (
-    <button
-      type="button"
-      className="rounded-md border border-solid border-border-strong bg-surface px-3 py-2 text-text"
+    <Button
+      variant="secondary"
       onClick={() =>
         toast.add({
           title,
@@ -45,7 +44,7 @@ function AddButton({
       }
     >
       {label}
-    </button>
+    </Button>
   );
 }
 
