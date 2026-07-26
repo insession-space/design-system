@@ -1,19 +1,146 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { chrome } from '../.storybook/ds-theme';
+
+{/* 表紙。ページ組みは Tailwind ユーティリティではなく inline style で書く —
+    preview.css の @source は ../stories を走査するが、.mdx のクラス名まで拾えるかは
+    保証がなく、拾えなければ「クラスは DOM に出るのに CSS が無い」で静かに崩れる。
+
+    色は `var(--color-*)` ではなく ds-theme.ts の chrome（固定値）を使う。トークンは
+    ツールバーの Theme トグルに追従するが、Docs ページの地は固定ダークなので、ライトに
+    切り替えた状態でこのページを開くと「ライトのトークン × 暗い地」で文字が沈む。 */}
 
 <Meta title="Introduction" />
 
-# InSession デザインカタログ
+<div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '.75rem' }}>
+  <svg width="26" height="26" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+    <circle cx="24" cy="24" r="13" stroke="currentColor" strokeWidth="4" fill="none" />
+    <circle cx="24" cy="11" r="6.5" fill="#FF5A36" />
+    <circle cx="35.3" cy="30.5" r="6.5" fill="#F5A524" />
+    <circle cx="12.7" cy="30.5" r="6.5" fill="#3B6FE0" />
+  </svg>
+  <code style={{ fontSize: '.95rem' }}>@insession/design-system</code>
+</div>
 
-友達と同期して YouTube を観る Watch Party アプリ **InSession** のデザインシステム・カタログです。
+# デザインカタログ
 
-- **Foundations** — デザイントークン（カラー / タイポグラフィ / 半径 / グロー / z-index / モーション）。
-  トークンの単一ソースは `client/src/style.css` の `@theme`（CSS 変数として出力）。
-- **Components** — 共通コンポーネントとプリミティブ（Toggle / ボタン / 入力 / カード / バッジ / モーダル / スナックバー）。
+**InSession** と **loophub** が共有するデザインシステムのカタログです。提供するのは
+**純粋 leaf UI プリミティブ + デザイントークン**で、アプリ固有のロジックには依存しません
+（i18n の `t`・ルーター・認証などは全て props で注入する）。依存は `react` / `react-dom` の peer だけ。
 
-## 原則（トンマナ）
+<div style={{
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+  gap: '.75rem',
+  margin: '1.75rem 0',
+}}>
+  <div style={{
+    background: chrome.surface,
+    border: `1px solid ${chrome.border}`,
+    borderRadius: chrome.radiusMd,
+    padding: '.9rem 1rem',
+  }}>
+    <div style={{ fontWeight: 700, marginBottom: '.3rem' }}>Foundations</div>
+    <div style={{ color: chrome.textDim, fontSize: '.85rem' }}>
+      デザイントークン。カラー / タイポグラフィ / 半径 / z-index / モーション。
+    </div>
+  </div>
+  <div style={{
+    background: chrome.surface,
+    border: `1px solid ${chrome.border}`,
+    borderRadius: chrome.radiusMd,
+    padding: '.9rem 1rem',
+  }}>
+    <div style={{ fontWeight: 700, marginBottom: '.3rem' }}>Components</div>
+    <div style={{ color: chrome.textDim, fontSize: '.85rem' }}>
+      UI プリミティブ。Button / Input / Modal / Popover / Menu / Tabs / Toast など。
+    </div>
+  </div>
+</div>
 
-- パレットはロゴ由来（ミント / シアン / バイオレット）。柔らかい発光、**控えめ・洗練**を優先。
-- 面は **tinted surface + 細ボーダー**を基本形にする。派手なグラデ/グローは使わない。
-- 生値（マジックナンバー）や生 `#hex` / `rgba()` を書かない。足りなければ `@theme` にトークンを足す。
+各部品のページには **Docs**（全バリアント + props テーブル）と個別の story が並びます。
 
-詳細な実装語彙・移行パターン・落とし穴は `client/src/STYLE_GUIDE.md` が正です。
+## トークンの単一ソースは `theme.css`
+
+トークンはこのリポジトリの `theme.css` の `@theme` が単一ソースで、CSS 変数として出力されます。
+消費側は `@insession/design-system/styles.css` を1枚読むだけで、Tailwind は要りません。
+
+生値（マジックナンバー）や生 `#hex` / `rgba()` は書かず、足りなければ `theme.css` にトークンを足します。
+
+### ⚠ トークン名と実際の色がずれているものがある
+
+パレット刷新の際、**トークン名は互換のため据え置いたまま値だけ振り替えた**ものがあります。
+名前から色を推測しないでください。
+
+{/* MDX は GFM のパイプ表を解釈しないので（書くと生テキストのまま出る）、表は JSX で組む。 */}
+<table style={{ borderCollapse: 'collapse', width: '100%', margin: '1rem 0' }}>
+  <thead>
+    <tr>
+      {['トークン', '実際の色（ダーク）', '位置づけ'].map((h) => (
+        <th key={h} style={{
+          textAlign: 'left',
+          padding: '.5rem .7rem',
+          borderBottom: `1px solid ${chrome.borderStrong}`,
+          color: chrome.textDim,
+          fontSize: '.8rem',
+        }}>{h}</th>
+      ))}
+    </tr>
+  </thead>
+  <tbody>
+    {[
+      ['--color-mint', 'コーラル #ff6a47', '#ff6a47', '主アクセント'],
+      ['--color-cyan', 'ブルー #5b8bf0', '#5b8bf0', '副アクセント'],
+      ['--color-violet', 'グリーン #31c47e', '#31c47e', '装飾のみ'],
+    ].map(([token, label, swatch, role]) => (
+      <tr key={token}>
+        <td style={{ padding: '.5rem .7rem', borderBottom: `1px solid ${chrome.border}` }}>
+          <code>{token}</code>
+        </td>
+        <td style={{ padding: '.5rem .7rem', borderBottom: `1px solid ${chrome.border}` }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem' }}>
+            <span style={{
+              width: 12,
+              height: 12,
+              borderRadius: 3,
+              background: swatch,
+              border: `1px solid ${chrome.borderStrong}`,
+            }} />
+            {label}
+          </span>
+        </td>
+        <td style={{
+          padding: '.5rem .7rem',
+          borderBottom: `1px solid ${chrome.border}`,
+          color: chrome.textDim,
+        }}>{role}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+## ライト / ダーク
+
+`theme.css` が**両方のトーンを持ちます**（1.5.0 で消費側に重複していたライト値をここへ一本化）。
+ダークが既定で、ライトは `<html data-theme="light">` のときだけ効きます。
+
+このカタログでは**ツールバーの Theme トグル**で切り替えて見比べられます（消費側と同じやり方で
+`html` の `data-theme` を書き換えている）。なお外枠（サイドバー / ツールバー）は DS のダークトーンに
+固定してあるので、トグルで変わるのはストーリーの描画領域だけです。
+
+## v2 以降は Base UI ベース
+
+Popover / Menu / Modal / ConfirmModal / Tabs は [Base UI](https://base-ui.com/) ベースの
+compound API（`Popover.Root` / `Trigger` / `Portal` / `Positioner` / `Popup` …）です。
+落とし穴（Menu パートを `Popover.Popup` の中に置けない、PiP へ出すなら `container` を明示する等）は
+リポジトリの `README.md` に集約しています。
+
+---
+
+{/* 各項目を改行で分けると MDX が別段落に割るので、区切りごと1行に収める。 */}
+<div style={{ color: chrome.textDim, fontSize: '.85rem', display: 'flex', flexWrap: 'wrap', gap: '.6rem' }}>
+  <span>npm: <a href="https://www.npmjs.com/package/@insession/design-system">@insession/design-system</a></span>
+  <span aria-hidden="true">·</span>
+  <span>リポジトリ: <a href="https://github.com/insession-space/design-system">insession-space/design-system</a></span>
+  <span aria-hidden="true">·</span>
+  <span>カタログ: <a href="https://design-system.insession.space/">design-system.insession.space</a></span>
+</div>

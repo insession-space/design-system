@@ -4,6 +4,8 @@ import '@fontsource/jetbrains-mono/700.css';
 import './preview.css';
 import type { Preview } from '@storybook/react-vite';
 import { useEffect } from 'react';
+// 外枠と同じテーマ。Docs ページの地に使う（manager.ts と共有）。
+import { dsTheme } from './ds-theme';
 
 // 旧モノレポでは MemoryRouter と I18nProvider の decorator で全 story を包んでいた。
 // これは insession アプリ固有の共有コンポーネント（SideNav 等）が react-router / i18n に
@@ -44,7 +46,36 @@ const preview: Preview = {
     controls: {
       matchers: { color: /(background|color)$/i, date: /Date$/i },
     },
+    options: {
+      // 既定はアルファベット順で、Foundations が Components の後に来てしまう。
+      // カタログは「入口 → トークン → 部品」の順で読ませたいので明示的に並べる。
+      // Foundations の中も、色 → 書体 → その他トークンの順に固定する。
+      // 列挙していないものは '*' の位置（= Components の後ろ）へアルファベット順で入る。
+      storySort: {
+        order: [
+          'Introduction',
+          'Foundations',
+          ['Colors', 'Typography', 'Tokens'],
+          'Components',
+          '*',
+        ],
+      },
+    },
+    docs: {
+      // Docs コンテナの地。これを渡さないとライト既定のままで、白い面に暗テーマ由来の
+      // クリーム色の文字が載って読めなくなる（.sbdocs-wrapper の背景が #fff になる）。
+      // manager と同じテーマを共有して二重管理を避ける。
+      theme: dsTheme,
+      // props テーブルが長い部品（Button / Modal 等）で目次を出す。
+      // headingSelector を明示しないと h3 しか拾わず、h2 の節が目次に出ない。
+      toc: { headingSelector: 'h2, h3' },
+    },
   },
+  // 全 story に autodocs を付ける（= 部品ごとに Docs ページが生える）。
+  // 個別の meta に tags を書かなくて済むよう、ここで一括で有効にする。
+  // Controls パネルに出ている props テーブルが Docs ページ側にも並ぶので、
+  // 「その部品の全バリアント + props」を1ページで読めるようになる。
+  tags: ['autodocs'],
 };
 
 export default preview;

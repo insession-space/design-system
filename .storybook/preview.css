@@ -35,3 +35,21 @@ body {
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Docs ページの story プレビュー枠だけ、地を DS トークンに追従させる。
+ *
+ * なぜ必要か: プレビュー枠の背景は Storybook のテーマ（ds-theme.ts の appPreviewBg）で
+ * 塗られる = 固定ダーク。一方その中の部品はツールバーの Theme トグルに従うので、
+ * ライトにすると「暗い枠の上に暗い文字の部品」になって読めなくなる（見出しや
+ * secondary ボタンが消える）。枠の地をトークンにすると、部品と枠が必ず同じトーンになる。
+ *
+ * Docs の文章部分（.sbdocs-wrapper）はダーク固定のままにしてある。こちらはクリーム色の
+ * 文字が暗地に載るのでトグルに関係なく読め、追従させるには Storybook が emotion で
+ * 個別に色を当てている見出し・表・コードを全部上書きすることになり割に合わない。
+ *
+ * セレクタを 2 クラス（.sbdocs + .sbdocs-preview）にしているのは特異性のため —
+ * emotion が実行時に注入する 1 クラスのルール（.css-xxxx）に後から負けないようにする。
+ * !important は使わない。 */
+.sbdocs.sbdocs-preview {
+  background: var(--color-bg);
+}
