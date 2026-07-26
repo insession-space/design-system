@@ -131,7 +131,20 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 
 自前で持っていた配置計算・外側クリック・Esc・フォーカス管理をやめたことで、**衝突回避（フリップ/シフト）・フォーカストラップ・スクロールロック・矢印キーナビ・typeahead** が付いた。**見た目は移行前と同じ**（トークンのユーティリティは DS 側に残っている）。
 
-**v1 からの移行手順は `CHANGELOG.md` の 2.0.0 の項に props 単位の対応表がある。** 以下は移行時に踏みやすい2点だけ。
+**v1 からの移行手順は `CHANGELOG.md` の 2.0.0 の項に props 単位の対応表がある。** 以下は移行時に踏みやすい点。
+
+### パネルの padding / 内部スクロールを切る
+
+`Popover.Popup` と `Menu.Popup` は既定で内側 padding（`p-3`）と最大高さ + 内部スクロール（`max-h-80 overflow-y-auto`）を持つ。ヘッダー固定 + リストだけスクロールのように独自の高さを組みたいときは **props で切る**（v1 の `panelPadding` / `panelScroll` と同じ既定・同じ意味）。
+
+```tsx
+<Popover.Popup padding={false} scroll={false} className="flex max-h-[220px] flex-col overflow-hidden">
+  <div className="shrink-0 border-b border-solid border-border px-4 py-3">固定ヘッダー</div>
+  <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">{items}</div>
+</Popover.Popup>
+```
+
+> ⚠ **`className` で `p-0` / `overflow-visible` を渡して打ち消すことはできない**（2.0.0 ではそう案内していたが誤りだった。#21）。**クラス属性の並び順は CSS の勝敗に無関係**で、同一プロパティのユーティリティは配布 CSS の**出力順**で決まる。実測では `.p-3` が `.p-0` より後ろに出力されるため打ち消せなかった。`className` での上書きが成立するのは、`data-*` バリアントのようにバリアント付きが base より後に出力されるケースだけ。
 
 ### ⚠ Base UI の Menu パートは `Popover.Popup` の中では使えない
 

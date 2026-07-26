@@ -265,3 +265,93 @@ export const MobileSheet: Story = {
     </Section>
   ),
 };
+
+// 行ラベルは配列で持つ(key に配列 index を使わない)。
+const DEFAULT_ROWS = Array.from({ length: 12 }, (_, i) => `行 ${i + 1}`);
+const SCROLL_ROWS = Array.from({ length: 20 }, (_, i) => `項目 ${i + 1}`);
+
+// padding / scroll props(#21)。v1 の panelPadding / panelScroll と同じ既定(どちらも true)で、
+// false にすると「打ち消す」のではなく **そもそもクラスを出さない**。ヘッダー固定 + リストだけ
+// スクロールのように独自の高さ/スクロール領域を組むパネルはこれを切る。
+function PanelOptionsDemo() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      <Popover.Root>
+        <Popover.Trigger className="rounded-md border border-solid border-border-strong bg-surface px-3 py-2 text-text">
+          既定（padding + scroll）
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Positioner side="bottom" align="start">
+            <Popover.Popup aria-label="既定" className="w-64">
+              <p className="text-smd text-text-dim">
+                p-3 の内側 padding と max-h-80 + 内部スクロールが付く。下に長い中身を置くと
+                パネル自身がスクロールする。
+              </p>
+              {DEFAULT_ROWS.map((row) => (
+                <p key={row} className="text-smd text-text-faint">
+                  {row}
+                </p>
+              ))}
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+
+      <Popover.Root>
+        <Popover.Trigger className="rounded-md border border-solid border-border-strong bg-surface px-3 py-2 text-text">
+          padding=false
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Positioner side="bottom" align="start">
+            <Popover.Popup aria-label="padding なし" padding={false} className="w-64">
+              <div className="border-b border-solid border-border px-4 py-3 font-bold text-text">
+                固定ヘッダー
+              </div>
+              <p className="px-4 py-3 text-smd text-text-dim">
+                パネル自身の padding が無いので、ヘッダーの下線を端まで引ける。
+              </p>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+
+      <Popover.Root>
+        <Popover.Trigger className="rounded-md border border-solid border-border-strong bg-surface px-3 py-2 text-text">
+          padding=false scroll=false
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Positioner side="bottom" align="start">
+            <Popover.Popup
+              aria-label="独自スクロール"
+              padding={false}
+              scroll={false}
+              className="flex w-64 max-h-[220px] flex-col overflow-hidden"
+            >
+              <div className="shrink-0 border-b border-solid border-border px-4 py-3 font-bold text-text">
+                固定ヘッダー
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+                {SCROLL_ROWS.map((row) => (
+                  <p key={row} className="text-smd text-text-faint">
+                    {row}
+                  </p>
+                ))}
+              </div>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+    </div>
+  );
+}
+
+export const PanelOptions: Story = {
+  render: () => (
+    <Section
+      title="padding / scroll"
+      note="どちらも既定 true（v1 の panelPadding / panelScroll と同じ）。false にするとクラスを出さないので、className での打ち消しに頼らずヘッダー固定＋リストだけスクロールのパネルが組める。"
+    >
+      <PanelOptionsDemo />
+    </Section>
+  ),
+};

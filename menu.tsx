@@ -2,7 +2,7 @@ import { Menu as BaseMenu } from '@base-ui/react/menu';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import Icon from './icons/icon.tsx';
-import { POPOVER_POPUP_BASE, POPOVER_POSITIONER_BASE } from './popover.tsx';
+import { mergePopupClassName, POPOVER_POSITIONER_BASE, popupBase } from './popover.tsx';
 
 // ポップオーバーの上に載せるメニュー。Base UI(floating-ui ベース)の Menu へ委譲する薄い
 // compound ラッパー(#6)。旧実装は role="menu" の <ul> + <button role="menuitem"> の行だけで、
@@ -55,10 +55,23 @@ function MenuPositioner({
 // Popover.Popup と同じ面(surface/border/radius/shadow/p-3/max-h-80+scroll)を共有する
 // (popover.tsx から export された定数を流用。#6 で Menu を Popover に依存せず単独開閉可能に
 // したため、Popover の中に無い Menu 単体でも同じ「浮く面」の見た目を出す必要がある)。
-export type MenuPopupProps = React.ComponentProps<typeof BaseMenu.Popup>;
+export type MenuPopupProps = React.ComponentProps<typeof BaseMenu.Popup> & {
+  // 既定の内側 padding(p-3)を出すか。既定 true。
+  padding?: boolean;
+  // 既定の最大高さ + 内部スクロール(max-h-80 overflow-y-auto)を出すか。既定 true。
+  scroll?: boolean;
+};
 
-function MenuPopup({ className = '', ...props }: MenuPopupProps) {
-  return <BaseMenu.Popup className={`${POPOVER_POPUP_BASE} ${className}`.trim()} {...props} />;
+// Popover.Popup と同じ組み立てを共有する(#21。className での打ち消しは効かないので
+// prop で出す・出さないを選ぶ。理由は popover.tsx の POPOVER_POPUP_BASE のコメント参照)。
+// mobileSheet は Menu には無い概念なので常に false。
+function MenuPopup({ padding = true, scroll = true, className, ...props }: MenuPopupProps) {
+  return (
+    <BaseMenu.Popup
+      className={mergePopupClassName(popupBase({ padding, scroll, mobileSheet: false }), className)}
+      {...props}
+    />
+  );
 }
 
 // 新 DS(#463) Menu 行: radius-md / gap 13 / padding 11x13 / font 15。hover は surface-hover、

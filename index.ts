@@ -79,6 +79,8 @@ export {
 } from './modal.tsx';
 export {
   POPOVER_POPUP_BASE,
+  POPOVER_POPUP_PADDING,
+  POPOVER_POPUP_SCROLL,
   POPOVER_POSITIONER_BASE,
   Popover,
   type PopoverArrowProps,

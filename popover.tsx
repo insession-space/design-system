@@ -13,12 +13,22 @@ import { createContext, useContext } from 'react';
 // </Popover.Portal></Popover.Root>
 // Portal を挟まなければ従来の「非 portal(トリガーの兄弟として絶対配置)」相当になる。
 
-// パネル本体の見た目(面・境界・角丸・入場アニメ + 既定の内側 padding・最大高さスクロール・影)。
-// 旧 popover.tsx の PANEL_BASE と、既定 true だった panelPadding(p-3) / panelScroll
-// (max-h-80 overflow-y-auto) / panelShadow(shadow-popover) をひとつの定数に統合した。
-// 専用 props(panelPadding 等)は廃止したので、これらを外したい呼び出し側は className で
-// 打ち消す(例: `max-h-none overflow-visible`)。呼び出し側の className は後ろに置くこと
-// (className マージ規約: `${BASE} ${className}`.trim())。
+// パネル本体の見た目(面・境界・角丸・影・入場アニメ)。padding と最大高さスクロールは
+// **ここに含めない** — 下記 POPOVER_POPUP_PADDING / POPOVER_POPUP_SCROLL として分離し、
+// Popup の padding / scroll props(既定 true)で出す・出さないを選ばせる。
+//
+// ⚠ 2.0 では padding/scroll をこの定数に混ぜて「外したい呼び出し側は className で
+// `p-0` / `max-h-none overflow-visible` を渡して打ち消す」契約にしていたが、**この打ち消しは
+// 効かなかった(#21)**。クラス属性の並び順は CSS の勝敗に無関係で、同一プロパティの
+// ユーティリティは**配布 CSS の出力順**で決まる。実測(insession-app の本番ビルド CSS /
+// Tailwind 4.3.2): `.p-0` は idx 163644、`.p-3` は idx 163880 で後ろの `.p-3` が勝ち、
+// `.overflow-y-auto`(154325) も `.overflow-visible`(154257) より後ろ。`.max-h-none` だけ
+// たまたま後ろにあって効くという一貫性のない状態だった。
+// → 「打ち消す」のをやめ、**そもそも出さない**(prop で分岐する)方式へ戻した。v1 が
+// panelPadding / panelScroll という props を持っていたのは正しかった。
+// className マージ規約(`${BASE} ${className}`.trim())は、`data-*` バリアントのように
+// バリアント付きが base より後に出力されるケースでのみ上書きが成立する。素の同一
+// プロパティ同士では成立しないので、className での打ち消しを前提にした設計をしない。
 // ⚠ z-index はここに置かない(#14)。Base UI では **Popup は position:static** で、位置決めを
 // しているのは親の Positioner。CSS 仕様上 position:static の要素に z-index は効かないため、
 // ここに書いても完全に無効になる。#6 の移行時、旧実装ではパネル自身が absolute/fixed
@@ -28,7 +38,15 @@ import { createContext, useContext } from 'react';
 // → z-index は POPOVER_POSITIONER_BASE 側(Positioner = positioned な要素)に置く。
 // Menu.Popup とも共有する(menu.tsx から import する)。
 export const POPOVER_POPUP_BASE =
-  'min-w-[220px] max-w-[calc(100vw-24px)] bg-surface border border-solid border-border-strong rounded-card p-3 max-h-80 overflow-y-auto shadow-popover animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
+  'min-w-[220px] max-w-[calc(100vw-24px)] bg-surface border border-solid border-border-strong rounded-card shadow-popover animate-[card-in_var(--dur-base)_var(--ease-spring)_both]';
+
+// Popup の既定の内側 padding。`padding={false}` で出さない(v1 の panelPadding={false} 相当)。
+export const POPOVER_POPUP_PADDING = 'p-3';
+
+// Popup の既定の最大高さ + 内部スクロール。`scroll={false}` で出さない
+// (v1 の panelScroll={false} 相当)。ヘッダー固定 + リストだけスクロールのように、
+// 呼び出し側が独自の高さ/スクロール領域を組むパネルはこれを切る。
+export const POPOVER_POPUP_SCROLL = 'max-h-80 overflow-y-auto';
 
 // Positioner(position:absolute | fixed が当たる要素)に置く z-index。ここが実際に効く層。
 // 旧実装は portal 有無で z-(--z-dropdown) / z-[var(--z-popover-portal,35)] を使い分けていたが、
@@ -180,16 +198,59 @@ function PopoverPositioner({
   );
 }
 
-export type PopoverPopupProps = React.ComponentProps<typeof BasePopover.Popup>;
+export type PopoverPopupProps = React.ComponentProps<typeof BasePopover.Popup> & {
+  // 既定の内側 padding(p-3)を出すか。既定 true(v1 の panelPadding と同じ既定)。
+  padding?: boolean;
+  // 既定の最大高さ + 内部スクロール(max-h-80 overflow-y-auto)を出すか。既定 true
+  // (v1 の panelScroll と同じ既定)。
+  scroll?: boolean;
+};
 
-function PopoverPopup({ className = '', ...props }: PopoverPopupProps) {
+// padding / scroll は className で打ち消すのではなく **出す・出さないを prop で選ぶ**(#21)。
+// 理由は POPOVER_POPUP_BASE のコメント参照(同一プロパティのユーティリティは配布 CSS の
+// 出力順で決まるため、className を後ろに置いても打ち消せない)。
+function PopoverPopup({ padding = true, scroll = true, className, ...props }: PopoverPopupProps) {
   const mobileSheet = useContext(MobileSheetContext);
   return (
     <BasePopover.Popup
-      className={`${POPOVER_POPUP_BASE} ${mobileSheet ? MOBILE_SHEET_POPUP_CLASSNAME : ''} ${className}`.trim()}
+      className={mergePopupClassName(popupBase({ padding, scroll, mobileSheet }), className)}
       {...props}
     />
   );
+}
+
+// Popover.Popup と Menu.Popup で同じ組み立てを共有する(menu.tsx から import する)。
+export function popupBase({
+  padding,
+  scroll,
+  mobileSheet,
+}: {
+  padding: boolean;
+  scroll: boolean;
+  mobileSheet: boolean;
+}) {
+  return [
+    POPOVER_POPUP_BASE,
+    padding ? POPOVER_POPUP_PADDING : '',
+    scroll ? POPOVER_POPUP_SCROLL : '',
+    mobileSheet ? MOBILE_SHEET_POPUP_CLASSNAME : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+// Base UI の className は `string | ((state) => string | undefined)` の union を受ける
+// (状態に応じてクラスを変えられる)。関数形をそのまま文字列連結すると関数の実装が
+// クラス名として埋め込まれてしまうので、形ごとに分けて合成する。
+// 呼び出し側の className は必ず後ろに置く(className マージ規約)。
+export function mergePopupClassName<S>(
+  base: string,
+  className: string | ((state: S) => string | undefined) | undefined,
+): string | ((state: S) => string) {
+  if (typeof className === 'function') {
+    return (state: S) => `${base} ${className(state) ?? ''}`.trim();
+  }
+  return `${base} ${className ?? ''}`.trim();
 }
 
 export const Popover = {
