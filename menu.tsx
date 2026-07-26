@@ -78,8 +78,20 @@ function MenuPopup({ padding = true, scroll = true, className, ...props }: MenuP
 // 選択中は live(green) の tint 面 + green テキスト。旧 menu.tsx の ROW 定数から一切変えていない。
 // disabled/hover の表現だけ描画要素によって異なるため、共通部分(MENU_ROW_BASE)を1つ持ち、
 // disabled 系のセレクタだけ描画先の要素に合わせて出し分ける(二重管理を避ける)。
+// ⚠ bg-transparent はここに置かない(#17)。行の背景色は toneClassName /
+// plainToneClassName 側が **排他的に** 出す(active なら tint、それ以外なら bg-transparent)。
+// base に bg-transparent を置くと、active の green tint と同じクラス属性に両方が並び、
+// 配布 CSS の出力順(.bg-transparent idx=22906 > tint の color-mix ルール idx=20987)で
+// bg-transparent が後勝ちして tint が消える。どちらもクラス1つで特異度が同じなので、
+// 並び順ではなく出力順で決まる(#21 と同じ構図)。この不具合は 1.x から続いており
+// (#9 の移行時に実測で気づいたが「見た目は変えない」方針だったため changeset に記録だけ
+// 残していた)、「静止時は tint なし・hover / キーボードハイライト時だけ tint が出る」という
+// 中途半端な状態になっていた(data-highlighted: / hover: のバリアント付きルールは出力順が
+// 後なので勝つため)。
+// bg-transparent を単に落とさないのは、DS が preflight を配っていないため
+// PlainItem(<button>)に UA 既定の buttonface 背景が残るから。排他で出せば両方満たせる。
 const MENU_ROW_BASE =
-  'flex w-full items-center gap-[13px] rounded-md border-none bg-transparent px-[13px] py-[11px] text-left text-[15px] shadow-none transition-colors duration-(--dur-fast) cursor-pointer';
+  'flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-[15px] shadow-none transition-colors duration-(--dur-fast) cursor-pointer';
 
 // Base UI の Item/RadioItem/CheckboxItem は <div> を描画するため、disabled は data-disabled
 // 属性で表現される(:disabled は button 等のフォーム要素にしか適用されないため効かない)。
@@ -123,23 +135,29 @@ const PLAIN_ROW = `${MENU_ROW_BASE} disabled:opacity-(--disabled-opacity) disabl
 // 現在位置を見失う実害があるため、hover/highlight 時だけ tint を 10% → 20% に濃くして区別する
 // (テキスト色 green は維持したまま、選択中である情報を失わない)。ハイライト状態自体は
 // 移行前に存在しなかった概念なので、この追加は「見た目を変えない」制約に抵触しない。
+//
+// 静止時の背景は各分岐が排他的に出す(#17)。active だけ tint、それ以外は bg-transparent。
+// MENU_ROW_BASE 側に bg-transparent を持たせると出力順で tint が打ち消されるため
+// (詳細は MENU_ROW_BASE のコメント)、ここで出し分ける。
 function toneClassName(active: boolean, danger: boolean) {
   if (danger) {
-    return 'text-danger hover:not-data-disabled:bg-danger-surface data-highlighted:not-data-disabled:bg-danger-surface';
+    return 'text-danger bg-transparent hover:not-data-disabled:bg-danger-surface data-highlighted:not-data-disabled:bg-danger-surface';
   }
   if (active) {
     return 'text-success bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] hover:not-data-disabled:bg-[color-mix(in_srgb,var(--color-success)_20%,transparent)] data-highlighted:not-data-disabled:bg-[color-mix(in_srgb,var(--color-success)_20%,transparent)]';
   }
-  return 'text-text hover:not-data-disabled:bg-surface-hover data-highlighted:not-data-disabled:bg-surface-hover';
+  return 'text-text bg-transparent hover:not-data-disabled:bg-surface-hover data-highlighted:not-data-disabled:bg-surface-hover';
 }
 
 // PlainItem(<button>)用の tone 表現。移行前と同じく enabled:hover:(ネイティブ疑似クラス)で
 // hover を表現する。toneClassName([[<div>用]])とロジックは同じだが、セレクタが異なるため
 // 関数を分けている(<button> と <div> の打ち消しクラスを一つの文字列に混ぜないため)。
+// toneClassName と同じく静止時の背景を排他的に出す(#17)。<button> は preflight を
+// 配っていない環境では UA 既定の背景を持つため、非 active 分岐の bg-transparent は必須。
 function plainToneClassName(active: boolean, danger: boolean) {
-  if (danger) return 'text-danger enabled:hover:bg-danger-surface';
+  if (danger) return 'text-danger bg-transparent enabled:hover:bg-danger-surface';
   if (active) return 'text-success bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]';
-  return 'text-text enabled:hover:bg-surface-hover';
+  return 'text-text bg-transparent enabled:hover:bg-surface-hover';
 }
 
 type ItemContentProps = {
