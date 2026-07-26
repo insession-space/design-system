@@ -238,8 +238,14 @@ Base UI の Drawer は**位置を自分で当てず CSS 変数として出すだ
 | Page | `AppBar` | 画面上端のバー。left/center/right の3スロット、center が伸びる |
 | | `Toolbar` | バー内外で使える水平ツール列（`role="toolbar"`） |
 | | `PageHeader` | 見出しブロック（title 必須、description/actions は任意） |
-| | `PageLayout` | 画面骨格。appBar/sidebar/footer のスロット + メイン |
+| | `PageLayout` | 画面骨格。appBar/sidebar/footer のスロット + メイン。`scroll` でスクロールの主体を選ぶ |
 | | `Footer` | 画面下端の領域。上端の境界 + `Gap` 語彙の padding |
+
+> ⚠ **`PageLayout` の `scroll` は「どこがスクロールするか」を決める。既定は `'page'`。**
+> - `scroll="page"` — ページ全体が内容ぶん伸び、**ブラウザ側**がスクロールする（LP / ドキュメント型）。外枠は `min-h-dvh` で「最低でも画面いっぱい」を保証するだけで、メインに高さ制約を付けない。AppBar を画面に残したいときは `AppBar` 側の `sticky`（既定 true）が担う。
+> - `scroll="body"` — 外枠を `h-dvh` で画面高さに固定し、**本文だけ**がスクロールする（アプリシェル型）。AppBar / Footer は動かない。
+>
+> この2つを取り違えると「スクロールしない」「AppBar の sticky が効かない」という形で崩れる。`scroll="body"` はメイン側に `min-h-0` が必須で（これが無いと flex item が子の内容ぶん伸びて `h-dvh` を突き破り、`overflow-y-auto` に有効な高さ制約が生まれない）、逆に `scroll="page"` でメインに `overflow-y-auto` を付けると `position: sticky` の追従先がメインになって AppBar が固定されなくなる。`PageLayout` はこの組み合わせを prop 1つに閉じ込めているので、**`className` で高さや overflow を上書きしないこと**。
 
 ### elevation スケールの対応表
 

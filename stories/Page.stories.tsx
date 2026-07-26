@@ -71,9 +71,13 @@ export const PageHeaderDemo: Story = {
   ),
 };
 
+// scroll="body"(アプリシェル型)の骨格。外枠が h-dvh で画面高さに固定され、AppBar / Footer は
+// 動かず本文だけがスクロールする。既定の scroll="page" はページ全体が伸びてブラウザがスクロールする
+// (LP / ドキュメント型)ので、AppBar を画面に残したい場合は AppBar 側の sticky が担う。
 export const PageLayoutDemo: Story = {
   render: () => (
     <PageLayout
+      scroll="body"
       appBar={
         <AppBar
           left={<span className="text-md font-semibold text-text">InSession</span>}
@@ -110,7 +114,9 @@ export const PageLayoutDemo: Story = {
         />
         <div className="mt-6 flex flex-col gap-4">
           <Card padding="lg">
-            <p className="text-smd text-text">本文領域は min-h-0 + overflow-y-auto。</p>
+            <p className="text-smd text-text">
+              scroll="body" では外枠が h-dvh、本文が min-h-0 + overflow-y-auto になる。
+            </p>
           </Card>
           <Card padding="lg">
             <p className="text-smd text-text">

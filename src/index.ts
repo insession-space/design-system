@@ -129,6 +129,7 @@ export {
   type PageHeaderProps,
   PageLayout,
   type PageLayoutProps,
+  type PageScroll,
   Toolbar,
   type ToolbarProps,
 } from './components/page.tsx';
