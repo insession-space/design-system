@@ -13,7 +13,7 @@
 
     // import/export を持たないファイルも常にモジュール扱いにする。
     "moduleDetection": "force",
-    // index.ts が './avatar.tsx' のように拡張子付きで import するため必須（noEmit 前提）。
+    // src/index.ts が './components/avatar.tsx' のように拡張子付きで import するため必須（noEmit 前提）。
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -33,7 +33,7 @@
     // stories/ は消費側と同じ書き方（パッケージ名 import）を保つため自己参照を許可する。
     "baseUrl": ".",
     "paths": {
-      "@insession/design-system": ["./index.ts"]
+      "@insession/design-system": ["./src/index.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

@@ -53,9 +53,9 @@ jobs:
               "dist/index.js",
               "dist/index.d.ts",
               "dist/styles.css",
-              "theme.css",
-              "base.css",
-              "components.css",
+              "src/styles/theme.css",
+              "src/styles/base.css",
+              "src/styles/components.css",
               "package.json",
               // 公開パッケージなのでライセンス本文の同梱は必須。
               "LICENSE",

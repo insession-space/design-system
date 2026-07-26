@@ -1,6 +1,6 @@
 import { Field } from '@base-ui/react/field';
 import type { InputHTMLAttributes, ReactNode } from 'react';
-import Icon from './icons/icon.tsx';
+import Icon from '../icons/icon.tsx';
 import { FIELD_BOX_BASE, FIELD_CONTROL, FIELD_LABEL, fieldLabelColor } from './input.tsx';
 
 // 検索入力（純粋 leaf UI）。claude design "INSESSION Design System" 準拠（loophub #682）。

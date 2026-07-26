@@ -1,6 +1,6 @@
 import type { FormEvent, KeyboardEvent, MutableRefObject, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
-import Icon from './icons/icon.tsx';
+import Icon from '../icons/icon.tsx';
 
 // メッセージ入力フォーム(純粋 leaf UI)。space のチャット入力とコミュニティの投稿入力の共通化
 // (#1027)。textarea + 下段アクション行(左: actions props / 右: 送信アイコンボタン)の構成で、

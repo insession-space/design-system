@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup';
 // 配布物のビルド。旧モノレポでは .ts ソースをそのまま Vite に解決させていたが、
 // 外部 npm パッケージになったため js + d.ts を生成して配る（#repo-split）。
 export default defineConfig({
-  entry: ['index.ts'],
+  entry: ['src/index.ts'],
   // 消費側は全て Vite（insession web/admin/lp/help, loophub web/lp）なので ESM のみ。
   // Node から require される予定が無いため CJS は出さない。
   format: ['esm'],

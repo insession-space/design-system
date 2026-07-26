@@ -1,5 +1,6 @@
 // @insession/design-system — 純粋 leaf UI の公開窓口。外部はここ経由で import する。
 
+export { MOBILE_LAYOUT_MQ } from './breakpoints.ts';
 export {
   type AvatarProps,
   AvatarStack,
@@ -7,39 +8,35 @@ export {
   type AvatarStackProps,
   type AvatarStatus,
   default as Avatar,
-} from './avatar.tsx';
+} from './components/avatar.tsx';
 export {
   Badge,
   type BadgeProps,
   type BadgeTone,
   CountChip,
   type CountChipProps,
-} from './badge.tsx';
-export { type BottomSheetProps, default as BottomSheet } from './bottom-sheet.tsx';
-export { MOBILE_LAYOUT_MQ } from './breakpoints.ts';
+} from './components/badge.tsx';
+export { type BottomSheetProps, default as BottomSheet } from './components/bottom-sheet.tsx';
 export {
   type ButtonProps,
   type ButtonSize,
   type ButtonVariant,
   default as Button,
-} from './button.tsx';
-export { type CheckboxProps, default as Checkbox } from './checkbox.tsx';
-export { type ChipAvatar, type ChipProps, default as Chip } from './chip.tsx';
-export { type ComposerProps, default as Composer } from './composer.tsx';
+} from './components/button.tsx';
+export { type CheckboxProps, default as Checkbox } from './components/checkbox.tsx';
+export { type ChipAvatar, type ChipProps, default as Chip } from './components/chip.tsx';
+export { type ComposerProps, default as Composer } from './components/composer.tsx';
 export {
   type ConfirmModalProps,
   type ConfirmTone,
   default as ConfirmModal,
-} from './confirm-modal.tsx';
-export { default as EmptyNote, type EmptyNoteProps } from './empty-note.tsx';
+} from './components/confirm-modal.tsx';
+export { default as EmptyNote, type EmptyNoteProps } from './components/empty-note.tsx';
 export {
   default as IconButton,
   type IconButtonProps,
   type IconButtonVariant,
-} from './icon-button.tsx';
-export { default as GoogleIcon } from './icons/google-icon.tsx';
-export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
-export { default as PersonIcon } from './icons/person-icon.tsx';
+} from './components/icon-button.tsx';
 export {
   default as Input,
   FIELD_BOX_BASE,
@@ -48,10 +45,19 @@ export {
   fieldBoxState,
   fieldLabelColor,
   type InputProps,
-} from './input.tsx';
-export { default as Link, type LinkProps, type LinkVariant, linkClass } from './link.tsx';
-export { default as LogoMark, type LogoMarkProps, type LogoMarkVariant } from './logo-mark.tsx';
-export { default as Lozenge, type LozengeProps, type LozengeTone } from './lozenge.tsx';
+} from './components/input.tsx';
+export {
+  default as Link,
+  type LinkProps,
+  type LinkVariant,
+  linkClass,
+} from './components/link.tsx';
+export {
+  default as LogoMark,
+  type LogoMarkProps,
+  type LogoMarkVariant,
+} from './components/logo-mark.tsx';
+export { default as Lozenge, type LozengeProps, type LozengeTone } from './components/lozenge.tsx';
 export {
   Menu,
   type MenuCheckboxItemProps,
@@ -70,7 +76,7 @@ export {
   type MenuSubmenuRootProps,
   type MenuSubmenuTriggerProps,
   type MenuTriggerProps,
-} from './menu.tsx';
+} from './components/menu.tsx';
 export {
   Modal,
   type ModalBackdropProps,
@@ -84,7 +90,7 @@ export {
   type ModalTitleProps,
   type ModalTriggerProps,
   type ModalVariant,
-} from './modal.tsx';
+} from './components/modal.tsx';
 export {
   POPOVER_POPUP_BASE,
   POPOVER_POPUP_PADDING,
@@ -100,38 +106,42 @@ export {
   type PopoverRootProps,
   type PopoverTitleProps,
   type PopoverTriggerProps,
-} from './popover.tsx';
-export { type OpenProfile, ProfileModalContext, useOpenProfile } from './profile-modal.tsx';
-export { Radio, type RadioGroupProps, type RadioItemProps } from './radio.tsx';
-export { default as RingTimer, type RingTimerProps } from './ring-timer.tsx';
-export { default as SearchField, type SearchFieldProps } from './search-field.tsx';
-export { default as Spinner, type SpinnerProps } from './spinner.tsx';
+} from './components/popover.tsx';
+export {
+  type OpenProfile,
+  ProfileModalContext,
+  useOpenProfile,
+} from './components/profile-modal.tsx';
+export { Radio, type RadioGroupProps, type RadioItemProps } from './components/radio.tsx';
+export { default as RingTimer, type RingTimerProps } from './components/ring-timer.tsx';
+export { default as SearchField, type SearchFieldProps } from './components/search-field.tsx';
+export { default as Spinner, type SpinnerProps } from './components/spinner.tsx';
 export {
   default as SplitModal,
   type SplitModalItem,
   type SplitModalProps,
-} from './split-modal.tsx';
+} from './components/split-modal.tsx';
 export {
   StatusBadge,
   type StatusBadgeProps,
   StatusDot,
   type StatusDotProps,
   type StatusTone,
-} from './status.tsx';
+} from './components/status.tsx';
 export {
   default as StepFlow,
   type StepFlowProps,
   type StepFlowStep,
-} from './step-flow.tsx';
-export { default as Stepper, type StepperProps } from './stepper.tsx';
+} from './components/step-flow.tsx';
+export { default as Stepper, type StepperProps } from './components/stepper.tsx';
 export {
   Tabs,
   type TabsListProps,
   type TabsPanelProps,
   type TabsRootProps,
   type TabsTabProps,
-} from './tabs.tsx';
-export { default as Textarea, type TextareaProps } from './textarea.tsx';
+} from './components/tabs.tsx';
+export { default as Textarea, type TextareaProps } from './components/textarea.tsx';
 export {
   Toast,
   type ToastData,
@@ -139,5 +149,8 @@ export {
   type ToastTone,
   type ToastVariant,
   type ToastViewportProps,
-} from './toast.tsx';
-export { default as Toggle, type ToggleProps } from './toggle.tsx';
+} from './components/toast.tsx';
+export { default as Toggle, type ToggleProps } from './components/toggle.tsx';
+export { default as GoogleIcon } from './icons/google-icon.tsx';
+export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
+export { default as PersonIcon } from './icons/person-icon.tsx';

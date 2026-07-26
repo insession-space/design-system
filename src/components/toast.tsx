@@ -6,7 +6,7 @@ import type { ToastObject } from '@base-ui/react/toast';
 import { Toast as BaseToast } from '@base-ui/react/toast';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
-import Icon from './icons/icon.tsx';
+import Icon from '../icons/icon.tsx';
 
 const useToastManager = BaseToast.useToastManager;
 

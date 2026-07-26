@@ -1,6 +1,6 @@
 import { Button as BaseButton } from '@base-ui/react/button';
 import type { ReactNode } from 'react';
-import Icon, { type IconName } from './icons/icon.tsx';
+import Icon, { type IconName } from '../icons/icon.tsx';
 import Spinner from './spinner.tsx';
 
 // DS のボタン（純粋 leaf UI）。claude design "INSESSION Design System" のボタン仕様に準拠（#463 / #663）。

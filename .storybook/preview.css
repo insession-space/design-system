@@ -24,7 +24,7 @@
 /* 2) stories/ が使うユーティリティのみを追加生成する。theme.css はトークン定義を
       Tailwind に教えるために読む（:root への出力は 1) と重複するが無害）。 */
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
-@import "../theme.css";
+@import "../src/styles/theme.css";
 @source "../stories";
 
 /* theme.css はトークン契約のみでリセットを持たないため、カタログ表示用の最小限を足す。
