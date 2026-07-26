@@ -66,12 +66,17 @@ export function Toolbar({ gap = 'sm', align, className = '', ...rest }: ToolbarP
   return <HStack role="toolbar" gap={gap} align={align} className={className} {...rest} />;
 }
 
+// ⚠ `title` を Omit しないと、HTML の title 属性(string)と交差して `ReactNode & string` に
+// 潰れ、**文字列以外を渡せなくなる**(型エラーになる)。見出しにアイコンやブランドドットを
+// 混ぜた ReactNode を渡す使い方が塞がれるので、同名の HTML 属性は必ず Omit する。
+// 他のプリミティブの props(gap / align / padding / elevation / size / wrap …)は div の
+// HTMLAttributes に同名が無いため衝突しない。
 export type PageHeaderProps = {
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
   className?: string;
-} & Omit<ComponentProps<'div'>, 'className'>;
+} & Omit<ComponentProps<'div'>, 'className' | 'title'>;
 
 // PageHeader: 画面見出しブロック。title/description は theme.css のセマンティック
 // タイポグラフィトークン(text-h1 = 見出し階層のうち画面タイトル相当、text-text-dim = 補足文の
