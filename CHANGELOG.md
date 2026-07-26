@@ -1,5 +1,26 @@
 # @insession/design-system
 
+## 3.1.0
+
+### Minor Changes
+
+- c85149c: BottomSheet に `defaultSnapPoint` を追加する
+
+  開いた直後の高さを `'mid'`(既定・従来どおり) / `'full'` から選べるようにした。
+
+  Popup の高さは常にフル(94dvh)で、snapPoint までの差分は `translateY()` で押し下げて表現している。
+  そのため `'mid'` では **Popup の下端 26dvh 分がビューポートの外に出る**。中身が「上から順に読む
+  リスト」なら問題にならないが、**下端に固定された入力欄や送信ボタンは画面外に落ちて、ユーザーが
+  一度シートを上へスワイプするまで触れない**。insession-app のモバイルチャットで実際にこれを踏んで
+  いた（ビューポート 844px に対し入力欄が 955..1063px = 完全に画面外。`'full'` なら 736..844px）。
+
+  スナップ先自体は `'mid'` / `'full'` の 2 点で従来と変わらず、既定値も `'mid'` なので既存の
+  消費側の挙動は変わらない。
+
+- f1a14b6: 画面骨格プリミティブ(`AppBar` / `Toolbar` / `PageHeader` / `PageLayout` / `Footer`)を追加した。既存のレイアウト(`Stack` 系)/ Surface プリミティブを組み合わせて作っており、新しい並び・面のロジックは持たない。あわせて README に新プリミティブ一覧・elevation スケールの対応表・Tailwind 直書きからの移行ガイドを追記した。
+- f1a14b6: 面プリミティブ(`Surface` / `Paper` / `Card` / `Panel`)と、`theme.css` に elevation スケール(`--shadow-elevation-0`〜`4`。既存の `--shadow-soft` / `-popover` / `-overlay` を参照する別名トークンで、新しい影の実値は追加していない)を追加した。`elevation` プロパティ 1 つで背景/境界/影の 3 点セットが決まり、既存の Card(2) / Popover・Menu(3) / Modal(4) と同じ組に対応する。
+- f1a14b6: レイアウトプリミティブ（`Stack` / `VStack` / `HStack` / `Grid` / `Spacer` / `Divider` / `Center` / `Container`）を追加した。`gap`（Stack / Grid）と `columns`（Grid）はブレークポイント別に指定できるレスポンシブ値（`Responsive<T>`）を受け付ける。
+
 ## 3.0.1
 
 ### Patch Changes
