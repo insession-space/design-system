@@ -48,37 +48,40 @@ export default function MessageItemSkeleton({
   className = '',
 }: MessageItemSkeletonProps) {
   return (
-    <VStack gap="xs" className={`min-w-0 ${className}`.trim()}>
-      {/* ヘッダー行。message-item.tsx と同じ二重の HStack(外側 justify="between" / 内側
-          align="baseline")+ UserLabel 相当の内側 HStack(align="center")構造にする。
-          actions は出さないため外側 HStack には子が1つしか無いが、justify="between" 自体は
+    // ルートの w-full min-w-0 は message-item.tsx と同じ理由(#97)。行方向 flex の子として
+    // 置かれても与えられた幅を使い切る。
+    <VStack gap="xs" className={`w-full min-w-0 ${className}`.trim()}>
+      {/* ヘッダー行。message-item.tsx と同じく外側 HStack(justify="between")の直下に
+          UserLabel 相当の HStack(align="center")を置く構造にする(#97 で時刻を UserLabel
+          の trailing 内へ移したため、時刻用の外側ラッパー HStack は無くなった)。actions は
+          出さないため外側 HStack には子が1つしか無いが、justify="between" 自体は
           message-item.tsx と揃えておく(actions が現れても崩れない)。 */}
       <HStack gap="sm" align="center" justify="between">
-        <HStack gap="sm" align="baseline" className="min-w-0">
-          <HStack gap="sm" align="center" className="min-w-0">
-            {/* UserLabel のアバター div(aria-hidden shrink-0。文字サイズクラスを持たない)と
-                同じ入れ物にする。この div はテキストクラスを持たないぶん基準フォント
-                (ページ既定サイズ)の strut を生み、実物のヘッダー行の高さはアバター24pxでは
-                なくこの strut(UserLabel 側の実測どおり)で決まっている。同じ入れ物構造に
-                しないとここだけ 24px 側に寄ってズレる。 */}
-            {avatar && (
-              <div aria-hidden="true" className="shrink-0">
-                <Skeleton circle size={AVATAR_SIZE} />
-              </div>
-            )}
-            {/* UserLabel の名前 div(min-w-0 flex-1)+ span(font-body font-bold text-small)と
-                同じ入れ物・テキストクラス。strut が UserLabel の実際の行の高さを再現する。 */}
-            <div className="min-w-0 flex-1">
+        <HStack gap="sm" align="center" className="min-w-0">
+          {/* UserLabel のアバター div(aria-hidden shrink-0。文字サイズクラスを持たない)と
+              同じ入れ物にする。この div はテキストクラスを持たないぶん基準フォント
+              (ページ既定サイズ)の strut を生み、実物のヘッダー行の高さはアバター24pxでは
+              なくこの strut(UserLabel 側の実測どおり)で決まっている。同じ入れ物構造に
+              しないとここだけ 24px 側に寄ってズレる。 */}
+          {avatar && (
+            <div aria-hidden="true" className="shrink-0">
+              <Skeleton circle size={AVATAR_SIZE} />
+            </div>
+          )}
+          {/* UserLabel の名前の行(trailing 有りのときの HStack align="baseline")と同じ
+              入れ物・テキストクラス。名前 span(font-body font-bold text-small)+
+              trailing(message-item.tsx のタイムスタンプ span と同じ font-body text-xs)を
+              同じ行に並べる。strut が UserLabel の実際の行の高さを再現する。 */}
+          <div className="min-w-0 flex-1">
+            <HStack gap="xs" align="baseline" className="min-w-0">
               <span className="font-body font-bold text-small">
                 <Skeleton width={NAME_WIDTH} height="0.7em" />
               </span>
-            </div>
-          </HStack>
-          {/* message-item.tsx のタイムスタンプ span(font-body text-xs text-text-dim)と
-              同じテキストクラス。 */}
-          <span className="shrink-0 font-body text-xs">
-            <Skeleton width={TIMESTAMP_WIDTH} height="0.7em" />
-          </span>
+              <span className="shrink-0 font-body text-xs">
+                <Skeleton width={TIMESTAMP_WIDTH} height="0.7em" />
+              </span>
+            </HStack>
+          </div>
         </HStack>
       </HStack>
       {/* 本文。message-item.tsx の本文 div(font-body text-small)と同じテキストクラスを

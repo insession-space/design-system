@@ -1,6 +1,7 @@
 import type { MouseEvent, ReactNode } from 'react';
 import Avatar, { type AvatarStatus } from '../components/avatar.tsx';
 import { type Gap, HStack, VStack } from '../components/layout.tsx';
+import { hasSlotContent } from './slot.ts';
 
 // アバター + ユーザー名の複合コンポーネント(#62)。src/components/ のプリミティブ(Avatar /
 // HStack / VStack)を束ねるので src/ui-kit/ に置く。
@@ -22,6 +23,23 @@ import { type Gap, HStack, VStack } from '../components/layout.tsx';
 // 旧 ListRow を廃止してここへ集約した。ListRow は icon/label/description を別々に受ける形で、
 // 人の行に使うと「アバター寸法と文字サイズを連動させる」という UserLabel の保証が効かず、
 // label を <span> で包む実装のため UserLabel を入れると不正なネストになっていた。
+//
+// ── trailing: 名前と同じベースラインに置く小さな要素(#97) ─────
+// 名前の右に、名前と同じベースラインで置きたい要素(時刻・バッジ等)向けの差し込み口。
+// 名前の"下"に置く subtitle と対になる(subtitle = 縦、trailing = 横)。
+// 名前のテキスト列(名前の <span> を含む行)の中に、名前と trailing を
+// `HStack align="baseline"` で並べて描く。これにより名前と trailing は同じ flex 行の
+// テキスト同士になり、ベースラインが機械的に一致する。
+// ⚠ 消費側が MessageItem のヘッダーでやっていたように「UserLabel の外側(兄弟)」に時刻を
+// 置くと、外側の align="baseline" は UserLabel の HStack の first baseline(= アバター div。
+// テキストを持たないため下端が基準になる)を拾ってしまい、名前のベースラインとは揃わない
+// (アバターの有無や href/onClick による要素分岐(<div>/<a>/<button>)に関係なくズレる)。
+// trailing はこの問題を UserLabel の内側で解消する。旧コメントにあった「subtitle は名前の
+// "下"にしか出せないため、名前の"横"に置く用途には使えない」という制約はこの trailing で
+// 解消された。
+// ⚠ href/onClick を渡して行全体が <a>/<button> になっているときは、trailing もその操作領域の
+// 内側に入る。時刻のように押させたくないものを置く場合は消費側が考慮すること
+// (例: pointer-events を切る、あるいは時刻を押しても問題ない設計にする)。
 //
 // ⚠ Avatar は status / ring を指定しないと legacy 経路(素の img/span。見た目を消費側 CSS に
 // 依存)を返す(avatar.tsx 参照)。UserLabel は status 指定の有無で見た目・fallback 挙動が
@@ -62,6 +80,9 @@ export type UserLabelProps = {
   src?: string | null;
   // 名前の下に出す補助テキスト(役割・肩書きなど)。省略時は1行表示になる。
   subtitle?: ReactNode;
+  // 名前の右に、名前と同じベースラインで置く小さな要素(時刻・バッジ等)。subtitle(名前の
+  // "下")と対になる差し込み口。省略時は DOM も見た目も従来と完全に一致する。
+  trailing?: ReactNode;
   size?: UserLabelSize;
   // true でアバターを描画しない(コンパクト表示)。既定 false(常時表示)は変えない —
   // 既存呼び出し側の見た目を変えないための後方互換の既定値。
@@ -100,6 +121,7 @@ export default function UserLabel({
   name,
   src,
   subtitle,
+  trailing,
   size = 'md',
   hideAvatar = false,
   status,
@@ -145,20 +167,34 @@ export default function UserLabel({
       {/* min-w-0 が無いと flex の既定(min-width: auto)により子の truncate が効かない
           (feed-item.tsx の FeedItemAttachment と同じ理由)。 */}
       <div className="min-w-0 flex-1">
-        {subtitle != null ? (
-          <VStack gap={spec.stackGap} className="min-w-0">
+        {(() => {
+          // 名前の行。trailing が無いときは従来どおり単独の <span> のまま描く(DOM を
+          // 増やさない)。trailing があるときだけ HStack align="baseline" で名前と
+          // trailing を並べ、同じ行のテキスト同士としてベースラインを揃える。
+          const nameRow = hasSlotContent(trailing) ? (
+            <HStack gap="xs" align="baseline" className="min-w-0">
+              <span className={`min-w-0 truncate font-body font-bold text-text ${spec.name}`}>
+                {name}
+              </span>
+              <span className="shrink-0">{trailing}</span>
+            </HStack>
+          ) : (
             <span className={`block truncate font-body font-bold text-text ${spec.name}`}>
               {name}
             </span>
-            <span className={`block truncate font-body text-text-dim ${spec.subtitle}`}>
-              {subtitle}
-            </span>
-          </VStack>
-        ) : (
-          <span className={`block truncate font-body font-bold text-text ${spec.name}`}>
-            {name}
-          </span>
-        )}
+          );
+
+          return subtitle != null ? (
+            <VStack gap={spec.stackGap} className="min-w-0">
+              {nameRow}
+              <span className={`block truncate font-body text-text-dim ${spec.subtitle}`}>
+                {subtitle}
+              </span>
+            </VStack>
+          ) : (
+            nameRow
+          );
+        })()}
       </div>
     </HStack>
   );

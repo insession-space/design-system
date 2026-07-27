@@ -137,6 +137,29 @@ export const HideAvatar: Story = {
   ),
 };
 
+export const WithTrailing: Story = {
+  render: () => (
+    <Section
+      title="trailing(#97)"
+      note="名前の右に、名前と同じベースラインで小さな要素(時刻など)を置く差し込み口。subtitle(名前の下)と対になる。MessageItem はこれを使って時刻のベースラインを名前に揃えている。"
+    >
+      <div className="flex flex-col items-start gap-4">
+        <UserLabel
+          name="Seiya"
+          src={AVATAR_SRC}
+          trailing={<span className="font-body text-text-dim text-xs">01:03</span>}
+        />
+        <UserLabel
+          name="subtitle と併用"
+          src={AVATAR_SRC}
+          subtitle="Host"
+          trailing={<span className="font-body text-text-dim text-xs">01:03</span>}
+        />
+      </div>
+    </Section>
+  ),
+};
+
 export const LongName: Story = {
   render: () => (
     <Section title="長い名前の truncate" note="コンテナ幅を超える名前/subtitle は1行で省略する。">
