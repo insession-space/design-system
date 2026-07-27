@@ -1,6 +1,6 @@
 {
   "name": "@insession/design-system",
-  "version": "4.3.1",
+  "version": "4.3.2",
   "description": "InSession / loophub 共通のデザインシステム。純粋 leaf UI プリミティブ + デザイントークン（アプリ依存なし。i18n 等は props で注入する）",
   "license": "MIT",
   "type": "module",
