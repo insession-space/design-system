@@ -1,4 +1,5 @@
-import type { ComponentProps } from 'react';
+import { useRender } from '@base-ui/react/use-render';
+import type * as React from 'react';
 
 // 面プリミティブ(Surface / Paper / Card / Panel。純粋 leaf UI)。
 // layout.tsx が「並び・余白・揃え」だけを扱い色/面/角丸を持たないのに対し、こちらは逆に
@@ -50,15 +51,36 @@ export const ELEVATION_SHADOW: Record<Elevation, string> = {
   4: 'shadow-elevation-4',
 };
 
-// Surface 自身(4辺に境界を引く汎用の面)が使う合成形。上の3マップから組み立てるので、
-// 段の定義を足す/変えるときに直すのは上の3つだけで済む。
-const ELEVATION_CLASS: Record<Elevation, string> = {
-  0: '',
-  1: `${ELEVATION_BG[1]} border border-solid ${ELEVATION_BORDER_COLOR[1]}`,
-  2: `${ELEVATION_BG[2]} border border-solid ${ELEVATION_BORDER_COLOR[2]} ${ELEVATION_SHADOW[2]}`,
-  3: `${ELEVATION_BG[3]} border border-solid ${ELEVATION_BORDER_COLOR[3]} ${ELEVATION_SHADOW[3]}`,
-  4: `${ELEVATION_BG[4]} border border-solid ${ELEVATION_BORDER_COLOR[4]} ${ELEVATION_SHADOW[4]}`,
+// elevation に対して**直交する**2つの軸(#57)。段を増やすのではなく軸を分けるのは、
+// elevation の意味(1〜4 = Paper / Card / Popover / Modal)を1つも動かさずに、消費側が
+// className で1プロパティだけ上書きしていた2パターンを props で表現するため。
+//
+//   tone   — 面の「色」だけを切る。'tint' は地の色をわずかに持ち上げただけの面
+//            (--color-tint-5)。境界と影は elevation のまま。ホームのマイスペースタイルが
+//            `<Surface elevation={1} className="bg-tint-5">` と書いていたもの。
+//   shadow — 影だけを落とす。'none' は「背景と境界は欲しいが浮かせたくない」面。
+//            リストの中に並ぶ行(プレイリスト行 / 伝言ゲームの履歴行)が
+//            `<Surface elevation={2} className="shadow-none">` と書いていたもの。
+//
+// どちらも**新しい影の実値やトークンを増やしていない**(tint-* は theme.css の既存トークン、
+// shadow は既存の組から引くだけ)。
+export type SurfaceTone = 'default' | 'tint';
+export type SurfaceShadow = 'auto' | 'none';
+
+const TONE_BG: Record<Exclude<SurfaceTone, 'default'>, string> = {
+  tint: 'bg-tint-5',
 };
+
+// Surface 自身(4辺に境界を引く汎用の面)が使う合成形。上の3マップから組み立てるので、
+// 段の定義を足す/変えるときに直すのは上の3つだけで済む。tone/shadow は組み立ての
+// 途中で「背景」「影」だけを差し替える(境界は常に elevation が決める)。
+function surfaceClass(elevation: Elevation, tone: SurfaceTone, shadow: SurfaceShadow): string {
+  const bg = tone === 'default' ? ELEVATION_BG[elevation] : TONE_BG[tone];
+  const borderColor = ELEVATION_BORDER_COLOR[elevation];
+  const border = borderColor ? `border border-solid ${borderColor}` : '';
+  const shadowClass = shadow === 'none' ? '' : ELEVATION_SHADOW[elevation];
+  return [bg, border, shadowClass].filter(Boolean).join(' ');
+}
 
 export type SurfaceRadius = 'none' | 'chip' | 'md' | 'card' | 'panel' | 'pill';
 
@@ -75,13 +97,15 @@ const RADIUS_CLASS: Record<SurfaceRadius, string> = {
 // layout.tsx の Gap と同じ語彙・同じ刻み(none/xs/sm/md/lg/xl/2xl → p-0/1/2/3/4/6/8)。
 // GAP_CLASS(gap-*)と刻みを揃えることで、Stack の gap と Surface の padding を並べて
 // 使ったときに余白の見た目が一致する。
-export type SurfacePadding = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type SurfacePadding = 'none' | 'xs' | 'xs.5' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 // page.tsx の Footer 等、Surface を包めない(セマンティック要素側に padding を持たせたい)
 // 箇所からも参照するので export する。
 export const SURFACE_PADDING_CLASS: Record<SurfacePadding, string> = {
   none: 'p-0',
   xs: 'p-1',
+  // `xs.5` = xs と sm の中間(6px)。layout.tsx の Gap と同じ理由で足した段(#57)。
+  'xs.5': 'p-1.5',
   sm: 'p-2',
   md: 'p-3',
   lg: 'p-4',
@@ -96,31 +120,65 @@ export const SURFACE_PADDING_CLASS: Record<SurfacePadding, string> = {
 const INTERACTIVE_CLASS =
   'cursor-pointer transition-[transform,background,box-shadow] duration-(--dur-fast) hover:-translate-y-0.5 hover:bg-surface-hover focus-visible:shadow-focus focus-visible:outline-none';
 
-export type SurfaceProps = {
+// render で要素の実体を差し替えたときにだけ足す打ち消し(#56)。既定の <div> には当てない
+// —— `m-0` / `text-left` は同じプロパティのユーティリティ(`mt-4` / `text-center`)と強さが
+// 並ぶので、常時付けると消費側の className が勝てるかどうかが Tailwind の出力順に依存して
+// しまう。render を渡したときだけに限れば「UA 既定を消す」という目的に対して過不足がない。
+//
+// 何を消しているか:
+//   appearance-none — <button> の OS ボタン外観
+//   m-0             — <button> / <fieldset> 等が持つ UA マージン
+//   text-left       — <button> の text-align:center(面の中身は左揃えが正)
+//   active:scale-100— 消費側(insession-app)の legacy CSS が `button:active` に持つ縮小。
+//                     DS は preflight を配らないので、消費側の button 既定が露出する
+//                     (side-nav.tsx の ITEM と同じ手当て)
+// 面そのもの(背景 / 境界 / 影 / padding)は elevation 側のクラスが当てるので、消費側は
+// `border-none bg-transparent p-0 shadow-none` を書かなくてよい。
+const RENDER_RESET_CLASS = 'appearance-none m-0 text-left active:scale-100';
+
+export type SurfaceProps = useRender.ComponentProps<'div'> & {
   elevation?: Elevation;
   radius?: SurfaceRadius;
   padding?: SurfacePadding;
+  // 面の色だけを切る直交軸(#57)。既定は elevation が決める背景。
+  tone?: SurfaceTone;
+  // 影だけを落とす直交軸(#57)。既定は elevation が決める影。
+  shadow?: SurfaceShadow;
   interactive?: boolean;
-  className?: string;
-} & Omit<ComponentProps<'div'>, 'className'>;
+};
 
 // Surface: 面の基底プリミティブ。Paper/Card/Panel はこれの elevation 固定(または既定値違い)
 // ラッパーで、面のロジックは重複させずここへ委譲する。
+//
+// `render` は Base UI の useRender に委譲する(side-nav.tsx と同じ流儀)。クリックできるカードを
+// 「リセットした <button> > Surface」の入れ子ではなく1要素で描くための口で、
+// <button> の中に <div> を置く content model 違反も同時に解消する:
+//   <Card render={<button type="button" />} onClick={…} interactive>…</Card>
+//
+// 戻り値の型を明示する理由は side-nav.tsx と同じ(useRender の返り値が null を含みうる型に
+// 推論され、dist/index.d.ts に出てしまう)。
 export function Surface({
   elevation = 1,
   radius = 'card',
   padding = 'none',
+  tone = 'default',
+  shadow = 'auto',
   interactive = false,
   className = '',
+  render,
   ...rest
-}: SurfaceProps) {
+}: SurfaceProps): React.ReactElement {
   const interactiveClass = interactive ? ` ${INTERACTIVE_CLASS}` : '';
-  return (
-    <div
-      className={`${ELEVATION_CLASS[elevation]} ${RADIUS_CLASS[radius]} ${SURFACE_PADDING_CLASS[padding]}${interactiveClass} ${className}`.trim()}
-      {...rest}
-    />
-  );
+  const resetClass = render ? ` ${RENDER_RESET_CLASS}` : '';
+  return useRender({
+    render,
+    defaultTagName: 'div',
+    props: {
+      ...rest,
+      className:
+        `${surfaceClass(elevation, tone, shadow)} ${RADIUS_CLASS[radius]} ${SURFACE_PADDING_CLASS[padding]}${interactiveClass}${resetClass} ${className}`.trim(),
+    },
+  });
 }
 
 export type PaperProps = Omit<SurfaceProps, 'elevation'>;

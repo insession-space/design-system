@@ -83,3 +83,25 @@ export const StackAlignJustify: Story = {
     </Section>
   ),
 };
+
+export const GapScale: Story = {
+  render: () => (
+    <Section
+      title="gap スケール"
+      note="none(0) / xs(4px) / xs.5(6px) / sm(8px) / md(12px) / lg(16px) / xl(24px) / 2xl(32px)。xs.5 は #57 で足した半刻み — カード内の詰まった縦積み(アバター + 名前)で自然に出る 6px を Stack に載せられるようにするため。"
+    >
+      <div className="flex flex-col gap-4">
+        {(['none', 'xs', 'xs.5', 'sm', 'md', 'lg', 'xl', '2xl'] as const).map((gap) => (
+          <div key={gap} className="flex items-center gap-4">
+            <span className="w-16 shrink-0 text-2xs text-text-faint">gap=&quot;{gap}&quot;</span>
+            <HStack gap={gap} align="center" data-testid={`gap-${gap}`}>
+              <Box>1</Box>
+              <Box>2</Box>
+              <Box>3</Box>
+            </HStack>
+          </div>
+        ))}
+      </div>
+    </Section>
+  ),
+};

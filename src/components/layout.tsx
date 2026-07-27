@@ -10,7 +10,12 @@ export type Breakpoint = 'sm' | 'md' | 'lg' | 'xl';
 // 上書きする（Tailwind の既定スケール = sm:640px / md:768px / lg:1024px / xl:1280px に準拠）。
 export type Responsive<T> = T | { base?: T; sm?: T; md?: T; lg?: T; xl?: T };
 
-export type Gap = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+// `xs.5` は xs(4px) と sm(8px) の中間の 6px(#57)。消費側(insession-app の live-friend.tsx)が
+// `gap-1.5` を使っており Stack に載せられなかったため足した段。**`2xs` とは呼ばない** ——
+// t シャツスケールでは `2xs` は「xs より小さい」を意味するのに、実際は xs より大きいので
+// 逆の印象を与える。Tailwind 自身の半刻み(`gap-1.5`)に合わせた `xs.5` なら、xs と sm の間に
+// あることが名前だけで分かる。
+export type Gap = 'none' | 'xs' | 'xs.5' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 // ⚠ ここに書いたクラス名の文字列リテラルが、そのまま styles.src.css の @source 走査に
 // 引っかかって配布 CSS へ出力される（README「pnpm check:styles が守っているもの」参照）。
@@ -22,6 +27,7 @@ export const GAP_CLASS: Record<'base' | Breakpoint, Record<Gap, string>> = {
   base: {
     none: 'gap-0',
     xs: 'gap-1',
+    'xs.5': 'gap-1.5',
     sm: 'gap-2',
     md: 'gap-3',
     lg: 'gap-4',
@@ -31,6 +37,7 @@ export const GAP_CLASS: Record<'base' | Breakpoint, Record<Gap, string>> = {
   sm: {
     none: 'sm:gap-0',
     xs: 'sm:gap-1',
+    'xs.5': 'sm:gap-1.5',
     sm: 'sm:gap-2',
     md: 'sm:gap-3',
     lg: 'sm:gap-4',
@@ -40,6 +47,7 @@ export const GAP_CLASS: Record<'base' | Breakpoint, Record<Gap, string>> = {
   md: {
     none: 'md:gap-0',
     xs: 'md:gap-1',
+    'xs.5': 'md:gap-1.5',
     sm: 'md:gap-2',
     md: 'md:gap-3',
     lg: 'md:gap-4',
@@ -49,6 +57,7 @@ export const GAP_CLASS: Record<'base' | Breakpoint, Record<Gap, string>> = {
   lg: {
     none: 'lg:gap-0',
     xs: 'lg:gap-1',
+    'xs.5': 'lg:gap-1.5',
     sm: 'lg:gap-2',
     md: 'lg:gap-3',
     lg: 'lg:gap-4',
@@ -58,6 +67,7 @@ export const GAP_CLASS: Record<'base' | Breakpoint, Record<Gap, string>> = {
   xl: {
     none: 'xl:gap-0',
     xs: 'xl:gap-1',
+    'xs.5': 'xl:gap-1.5',
     sm: 'xl:gap-2',
     md: 'xl:gap-3',
     lg: 'xl:gap-4',
