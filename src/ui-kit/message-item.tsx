@@ -4,6 +4,7 @@ import IconButton from '../components/icon-button.tsx';
 import { HStack, VStack } from '../components/layout.tsx';
 import LinkPreview, { type LinkPreviewMeta } from '../components/link-preview.tsx';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { hasSlotContent } from './slot.ts';
 import UserLabel from './user-label.tsx';
 
 // 「誰かの投稿1件」を表す複合コンポーネント(#83)。UserLabel / Chip / IconButton を束ねるので
@@ -36,6 +37,29 @@ import UserLabel from './user-label.tsx';
 // tab 移動自体は止めない実装なので、これが無いとフォーカスは移るのに見えない状態が起きる)。
 // レイアウトが飛ばないよう absolute にはせず、ヘッダー行の中に領域を確保したまま
 // opacity だけを切り替える(表示/非表示で他要素の位置が動かない)。
+// この opacity 制御は actions(IconButton 群)にだけ当て、actionsSlot には当てない
+// (下記 actionsSlot の説明を参照)。
+//
+// ── タイムスタンプは UserLabel の trailing に渡す(#97) ────────
+// 以前は外側の HStack align="baseline" で名前とタイムスタンプを兄弟として並べていたが、
+// UserLabel 自身の内側は HStack align="center" のフレックスで、その最初の要素はテキストを
+// 持たないアバターの <div>。フレックスの first baseline はこのアバター div から合成される
+// ため、外側の align="baseline" は「名前のベースライン」ではなくアバターの下端を基準にして
+// しまい、実測(ヘッドレス Chromium)でアバター有りのとき時刻が 1.84px ずれていた。
+// trailing は名前と同じ flex 行のテキスト同士として描かれるため、アバターの有無や
+// href/onClick による要素分岐に関係なくベースラインが一致する(user-label.tsx のコメント参照)。
+//
+// ── actionsSlot: ヘッダー右に任意のノードを置ける口(#97) ────
+// actions は `{icon,label,onClick}` の配列しか表現できず、Popover を伴うアクション
+// (絵文字ピッカー等)を表現できない。消費側(insession-app)はこれを MessageItem の
+// "兄弟"として行方向 flex の中に横並びで置かざるを得なかったが、アクション UI は非表示
+// (opacity-0)でも in-flow のため常時レイアウト幅を占有し、本文の折り返し幅を奪っていた
+// (実測で本文が約100px 分狭くなり早期折り返しが起きていた)。actionsSlot はヘッダー行の
+// 中(actions と同じ領域、actions の後ろ)に任意のノードを描画できる差し込み口を用意し、
+// 消費側が兄弟として置く必要をなくす。表示/非表示の制御(ホバー時のみ見せる、タッチ端末で
+// data-actions-open を使う等)は消費側が独自に持っているため、DS 側の ACTIONS_VISIBILITY を
+// 被せると衝突する。そのため actionsSlot には opacity 制御を当てず、shrink-0 のコンテナに
+// 入れるだけにする。
 //
 // ── OGP リンクプレビュー(#93): fetcher 注入で network を持ち込まない ─────
 // 本文に貼られた URL のリンク先を `LinkPreview`(src/components/link-preview.tsx)カードで
@@ -94,6 +118,10 @@ export type MessageItemProps = {
   reactions?: MessageItemReaction[];
   // ホバー/フォーカス時に出るアクションアイコン群。省略/空配列なら領域自体を出さない。
   actions?: MessageItemAction[];
+  // ヘッダー右側(actions の後ろ)に置く任意のノード。Popover を伴うアクション
+  // (絵文字ピッカー等)のように actions では表現できない UI 向け。actions と併存できる。
+  // opacity による表示/非表示の制御は当てない(表示/非表示は消費側の責務。上記コメント参照)。
+  actionsSlot?: ReactNode;
   // OGP メタデータの取得を呼び出し側へ委ねる口。`signal` は abort 用(unmount / 対象 URL
   // 変化時に MessageItem が abort する)。メタデータが無い/取得失敗のときは null を返す
   // (reject してもよいが、その場合カードを出さず黙って握り潰す)。省略時は本機能自体が
@@ -140,6 +168,28 @@ function resolveTargetUrls(urls: string[], max: number): string[] {
 const ACTIONS_VISIBILITY =
   'opacity-0 transition-opacity duration-(--dur-fast) group-hover:opacity-100 group-focus-within:opacity-100';
 
+// 投稿者名を押せるようにしている(href / onClick)ときだけ、その内側に載る時刻を「押せない飾り」に
+// 落とすためのハンドラ。preventDefault が <a href> の遷移を、stopPropagation が <button> の
+// onClick への伝播を止める。
+// ⚠ 残る経路: <a href> を右クリックしてコンテキストメニューから「新しいタブで開く」を選ぶ操作は
+// DOM イベントでは止められない。<a> の中に入れた子要素である以上これは避けられないので、時刻を
+// 完全に不活性にしたい消費側は authorHref ではなく authorOnClick(=<button>。中クリック/
+// コンテキストメニューで遷移しない)を使う。
+function swallowActivation(e: MouseEvent<HTMLElement>) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+// 中クリックは mousedown の時点で「新しいタブで開く」の対象が決まるブラウザがあるため、
+// 中ボタン(button === 1)のときだけ mousedown も止める。左クリックは止めない — 止めると
+// 投稿者名側のフォーカス移動やテキスト選択まで壊れるため。
+function swallowMiddleMouseDown(e: MouseEvent<HTMLElement>) {
+  if (e.button === 1) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}
+
 export default function MessageItem({
   authorName,
   authorHref,
@@ -149,6 +199,7 @@ export default function MessageItem({
   children,
   reactions,
   actions,
+  actionsSlot,
   fetchLinkPreview,
   previewUrls,
   maxLinkPreviews = 1,
@@ -231,35 +282,67 @@ export default function MessageItem({
   // 生まれてしまう**(「カードもエラーも出さず本文だけが残る」約束が崩れる)。
   const visiblePreviewUrls = targetUrls.filter((url) => previews[url] !== null);
 
+  const hasHeaderTrailing = (actions != null && actions.length > 0) || hasSlotContent(actionsSlot);
+  // 投稿者名を押せるようにしているか(href / onClick)。UserLabel は操作可能なとき行全体を
+  // <a>/<button> にするので、trailing に載せた時刻もその操作領域の"内側"に入る。時刻は
+  // 押しても何も起きない飾りなので、操作可能なときだけ次の2点で無害化する(#97):
+  //   - ポインタ: 時刻のクリック/中クリックを止める(押してもプロフィールへ遷移しない)。
+  //   - 読み上げ: 時刻を aria-hidden にし、代わりに UserLabel へ ariaLabel(表示名のみ)を
+  //     渡してリンク名が「表示名 + 時刻」に汚れないようにする。そのままだと時刻が支援技術から
+  //     消えてしまうので、操作領域の"外側"に sr-only の時刻を1つ置いて読み上げを維持する。
+  // 押せないとき(既定)は素の <div> なのでこの手当ては不要 — DOM を増やさない。
+  const authorInteractive = authorHref != null || authorOnClick != null;
+  const hasInertTimestamp = authorInteractive && timestamp != null;
+
   return (
-    // group はアクション群のホバー/フォーカス表示の起点になる。
-    <VStack gap="xs" className={`group min-w-0 ${className}`.trim()}>
+    // group はアクション群のホバー/フォーカス表示の起点になる。w-full は min-w-0 が
+    // 「縮むことを許可」するだけで幅を取り切る指定ではないための併記(#97)。行方向 flex
+    // の子として置かれたとき(消費側が MessageActionBar 等と横並びにする場合)、与えられた
+    // 幅を使い切って本文の折り返し幅を最大化する。
+    <VStack gap="xs" className={`group w-full min-w-0 ${className}`.trim()}>
       <HStack gap="sm" align="center" justify="between">
-        <HStack gap="sm" align="baseline" className="min-w-0">
-          <UserLabel
-            name={authorName}
-            href={authorHref}
-            onClick={authorOnClick}
-            src={avatarSrc}
-            hideAvatar={avatarSrc == null}
-            size="sm"
-          />
-          {timestamp != null && (
-            <span className="shrink-0 font-body text-xs text-text-dim">{timestamp}</span>
-          )}
-        </HStack>
-        {actions != null && actions.length > 0 && (
-          <HStack gap="xs" className={`shrink-0 ${ACTIONS_VISIBILITY}`}>
-            {actions.map((action) => (
-              <IconButton
-                key={action.label}
-                label={action.label}
-                icon={<Icon name={action.icon} size={16} />}
-                variant="ghost"
-                size={28}
-                onClick={action.onClick}
-              />
-            ))}
+        <UserLabel
+          name={authorName}
+          href={authorHref}
+          onClick={authorOnClick}
+          src={avatarSrc}
+          hideAvatar={avatarSrc == null}
+          size="sm"
+          ariaLabel={hasInertTimestamp ? authorName : undefined}
+          trailing={
+            timestamp != null ? (
+              <span
+                className="font-body text-xs text-text-dim"
+                aria-hidden={hasInertTimestamp || undefined}
+                onClick={hasInertTimestamp ? swallowActivation : undefined}
+                // 中クリック(新しいタブで開く)は click ではなく auxclick / mousedown の経路を
+                // 通るので、onClick だけでは <a> の既定動作を止められない。両方を塞ぐ。
+                onAuxClick={hasInertTimestamp ? swallowActivation : undefined}
+                onMouseDown={hasInertTimestamp ? swallowMiddleMouseDown : undefined}
+              >
+                {timestamp}
+              </span>
+            ) : undefined
+          }
+        />
+        {hasInertTimestamp && <span className="sr-only">{timestamp}</span>}
+        {hasHeaderTrailing && (
+          <HStack gap="xs" className="shrink-0">
+            {actions != null && actions.length > 0 && (
+              <HStack gap="xs" className={ACTIONS_VISIBILITY}>
+                {actions.map((action) => (
+                  <IconButton
+                    key={action.label}
+                    label={action.label}
+                    icon={<Icon name={action.icon} size={16} />}
+                    variant="ghost"
+                    size={28}
+                    onClick={action.onClick}
+                  />
+                ))}
+              </HStack>
+            )}
+            {actionsSlot}
           </HStack>
         )}
       </HStack>

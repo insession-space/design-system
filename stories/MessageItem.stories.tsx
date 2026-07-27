@@ -139,6 +139,103 @@ export const ChatUsage: Story = {
   ),
 };
 
+export const LongJapaneseTextWrapping: Story = {
+  render: () => (
+    <Section
+      title="長文日本語の折り返し(#97)"
+      note="本文が親幅いっぱいまで使って折り返すことを確認する。アバターあり/なしの両方。"
+    >
+      <div className="flex max-w-xl flex-col gap-3 rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem authorName="川村静哉" timestamp="01:03" avatarSrc={AVATAR_SRC}>
+          今日のミーティングでは新しいデザインシステムのコンポーネント設計について話し合いました。特にメッセージ一覧のレイアウトが早く折り返してしまう問題があり、原因はヘッダー行のベースラインのずれとアクションバーの領域確保にあることがわかりました。
+        </MessageItem>
+        <MessageItem authorName="川村静哉" timestamp="01:03">
+          今日のミーティングでは新しいデザインシステムのコンポーネント設計について話し合いました。特にメッセージ一覧のレイアウトが早く折り返してしまう問題があり、原因はヘッダー行のベースラインのずれとアクションバーの領域確保にあることがわかりました。
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
+export const HeaderBaselineAlignment: Story = {
+  render: () => (
+    <Section
+      title="名前と時刻のベースライン(#97)"
+      note="アバターあり/なし × 名前が押せない/authorOnClick で押せる、の組み合わせ。いずれも名前と時刻のベースラインが揃うこと。"
+    >
+      <div className="flex max-w-xl flex-col gap-3 rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem authorName="川村静哉" timestamp="01:03" avatarSrc={AVATAR_SRC}>
+          アバターあり・押せない名前
+        </MessageItem>
+        <MessageItem authorName="川村静哉" timestamp="01:03">
+          アバターなし・押せない名前
+        </MessageItem>
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          avatarSrc={AVATAR_SRC}
+          authorOnClick={() => {}}
+        >
+          アバターあり・押せる名前(authorOnClick)
+        </MessageItem>
+        <MessageItem authorName="川村静哉" timestamp="01:03" authorOnClick={() => {}}>
+          アバターなし・押せる名前(authorOnClick)
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
+export const WithActionsSlot: Story = {
+  render: () => (
+    <Section
+      title="actionsSlot(#97)"
+      note="actions では表現できない Popover を伴うアクション(絵文字ピッカー等)向けの差し込み口。ヘッダー右側に actions の後ろに並ぶ。opacity 制御は当てないため常に表示される — 表示/非表示は消費側が持つ想定(実際の消費側では絵文字ピッカーの Popover トリガーをここに置く)。"
+    >
+      <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          actions={ACTIONS}
+          actionsSlot={
+            <button
+              type="button"
+              className="rounded-md border border-solid border-border bg-transparent px-2 py-1 font-body text-text text-xs"
+              onClick={() => {}}
+            >
+              😀 Popover
+            </button>
+          }
+        >
+          actions の後ろに任意のノード(ここでは Popover トリガーを模したボタン)を置ける
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
+export const InRowFlexParent: Story = {
+  render: () => (
+    <Section
+      title="行方向 flex の親に置いたとき(#97)"
+      note="消費側(insession-app)が MessageActionBar 等を兄弟として横に置く構成を再現。隣に shrink-0 の要素があっても MessageItem が残りの幅を取り切り、本文が広く使われること。"
+    >
+      <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
+        <div className="flex items-start gap-2">
+          <MessageItem authorName="川村静哉" timestamp="01:03" avatarSrc={AVATAR_SRC}>
+            隣に固定幅の兄弟要素があっても、本文はコンテナの残り幅いっぱいまで使って折り返す。ここが以前は狭くなって早く折り返していた。
+          </MessageItem>
+          <div className="shrink-0 rounded-md border border-dashed border-border-strong px-3 py-2 font-body text-text-dim text-xs">
+            兄弟要素
+            <br />
+            (shrink-0)
+          </div>
+        </div>
+      </div>
+    </Section>
+  ),
+};
+
 export const ThreadPostUsage: Story = {
   render: () => (
     <Section
