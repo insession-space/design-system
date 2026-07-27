@@ -43,7 +43,7 @@ export function MediaRow({
 }: MediaRowProps) {
   return (
     <div
-      className={`flex items-center gap-3 rounded-card bg-surface-2 p-2 ${className}`.trim()}
+      className={`flex items-center gap-3 rounded-card bg-surface p-2 ${className}`.trim()}
       {...rest}
     >
       {dragHandle && (

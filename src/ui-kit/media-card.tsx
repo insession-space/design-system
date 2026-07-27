@@ -6,8 +6,8 @@ import { Card } from '../components/surface.tsx';
 // 参加者を束ねる複合コンポーネントなので src/ui-kit/ に置く。
 //
 // ── 何を持ち、何を持たないか ─────────────────────────────
-// 持つのは「カバーをカード内側にインセットして置く枠 → 右上にバッジ列を絶対配置できる土台 →
-// タイトル → メタ行 → フッター」という並び・余白・truncate の取り決めだけ。
+// 持つのは「カバーをカード上端いっぱい(full-bleed)に置く枠 → 右上にバッジ列を絶対配置できる
+// 土台 → タイトル → メタ行 → フッター」という並び・余白・truncate の取り決めだけ。
 //
 // 逆に、次はいずれも呼び出し側の責務として意図的に持たない(feed-item.tsx / message-item.tsx と
 // 同じ線引き):
@@ -31,7 +31,7 @@ import { Card } from '../components/surface.tsx';
 // 増やしているのは「要素の実体を差し替える口」と「相互作用の見た目」の2つだけで、
 // `onPlay` のような用途固定 props は今回も足さない(MediaCard の設計思想は崩さない)。
 export type MediaCardProps = {
-  // カバー画像のスロット。枠(16:9・角丸・overflow-hidden)はこちらが持つので、
+  // カバー画像のスロット。枠(16:9・full-bleed・上側だけ角丸・overflow-hidden)はこちらが持つので、
   // 渡すのは中身(<img className="h-full w-full object-cover" …/> 等)だけでよい。
   cover?: ReactNode;
   // カバー右上に縦並びで置くバッジ列。器(縦積み・右上絶対配置)はこちらが持つので、
@@ -72,9 +72,17 @@ export function MediaCard({
         // 外枠は overlay の絶対配置の基準になるだけ。切り落とし(overflow-hidden)と角丸は
         // カバー自身の枠が持つので、ここで重ねて指定しない(重ねるとバッジが枠外へ
         // はみ出す演出を消費側が選べなくなる)。
-        <div className="relative">
+        //
+        // `-mx-4 -mt-4` は Card の padding="lg"(= p-4)をカバーの上/左/右だけ打ち消して、
+        // 画像をカード端まで出す(full-bleed)ため(#108)。下だけは打ち消さないので、
+        // タイトル以降は従来どおり padding の内側に収まる。padding="lg" はこの
+        // コンポーネントが固定しているので、この 4 との対応は MediaCard 内で閉じている。
+        <div className="relative -mx-4 -mt-4">
           {cover && (
-            <div className="aspect-video w-full overflow-hidden rounded-md bg-surface-3">
+            // full-bleed になったぶん、角丸は「カード上端の角」そのものになるので
+            // rounded-md(10px) ではなく Card と同じ rounded-t-card(16px)に合わせる。
+            // 下側は本文が続くため角丸を付けない。
+            <div className="aspect-video w-full overflow-hidden rounded-t-card bg-surface-3">
               {cover}
             </div>
           )}
