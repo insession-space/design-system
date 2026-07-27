@@ -1,4 +1,4 @@
-import { MessageItem } from '@insession/design-system';
+import { type LinkPreviewMeta, MessageItem } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 
@@ -257,6 +257,170 @@ export const ThreadPostUsage: Story = {
           ]}
         >
           この機能、待ってました！次のリリースが楽しみです。
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
+// ── OGP リンクプレビュー(#93) ─────────────────────────────
+// fetchLinkPreview は消費側(insession-app / loophub-app)が実装する差し込み口なので、
+// Storybook 上ではモック fetcher を渡して「即解決 / 遅延して解決 / 失敗」の3パターンを
+// 確認できるようにする。実際の HTTP 取得は行わない(DS は network を持たない)。
+const OG_IMAGE_SRC =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='382' height='200'%3E%3Crect width='382' height='200' fill='%2312d8c9'/%3E%3C/svg%3E";
+
+const MOCK_META: LinkPreviewMeta = {
+  url: 'https://insession.space/blog/release-notes',
+  title: 'InSession リリースノート',
+  description: '最新のアップデート内容をまとめて紹介します。',
+  siteName: 'InSession Blog',
+  imageUrl: OG_IMAGE_SRC,
+};
+
+// 即座に解決する fetcher。
+async function fetchLinkPreviewResolved(): Promise<LinkPreviewMeta | null> {
+  return MOCK_META;
+}
+
+// 1.5秒後に解決する fetcher。abort されたら reject して in-flight を確実に止める
+// (signal を無視すると unmount 後の setState 警告や不要な再取得につながる)。
+function fetchLinkPreviewDelayed(
+  _url: string,
+  signal: AbortSignal,
+): Promise<LinkPreviewMeta | null> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => resolve(MOCK_META), 1500);
+    signal.addEventListener('abort', () => {
+      clearTimeout(timer);
+      reject(new DOMException('aborted', 'AbortError'));
+    });
+  });
+}
+
+// null を返す(取得はできたがメタデータが無い)失敗パターン。
+async function fetchLinkPreviewNull(): Promise<LinkPreviewMeta | null> {
+  return null;
+}
+
+// reject する(取得自体が失敗する)失敗パターン。
+async function fetchLinkPreviewRejected(): Promise<LinkPreviewMeta | null> {
+  throw new Error('failed to fetch OGP metadata');
+}
+
+export const LinkPreviewResolved: Story = {
+  render: () => (
+    <Section
+      title="OGP プレビュー: 即解決"
+      note="fetchLinkPreview がすぐにメタデータを返すケース。本文の下・リアクション行の上にカードが並ぶ。"
+    >
+      <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          fetchLinkPreview={fetchLinkPreviewResolved}
+          reactions={[{ emoji: '👍', count: 2, label: 'いいね', onClick: () => {} }]}
+        >
+          この記事オススメです https://insession.space/blog/release-notes 見てみて
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
+export const LinkPreviewDelayed: Story = {
+  render: () => (
+    <Section
+      title="OGP プレビュー: 遅延解決"
+      note="取得に1.5秒かかるケース。その間 LinkPreview は loading(Skeleton)を表示する。Storybook を素早く切り替えても unmount 後の setState 警告が出ないことを確認する(abort されるため)。"
+    >
+      <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          fetchLinkPreview={fetchLinkPreviewDelayed}
+        >
+          読み込み中の見た目を確認 https://insession.space/blog/release-notes
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
+export const LinkPreviewFailedNull: Story = {
+  render: () => (
+    <Section
+      title="OGP プレビュー: 失敗(null)"
+      note="fetchLinkPreview が null を返すケース。カードもエラー UI も出ず、本文だけが残る。"
+    >
+      <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          fetchLinkPreview={fetchLinkPreviewNull}
+        >
+          メタデータが無いリンク https://example.com/no-metadata
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
+export const LinkPreviewFailedReject: Story = {
+  render: () => (
+    <Section
+      title="OGP プレビュー: 失敗(reject)"
+      note="fetchLinkPreview が reject するケース。こちらもカード・エラー UI とも出さず、黙って本文だけが残る。"
+    >
+      <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          fetchLinkPreview={fetchLinkPreviewRejected}
+        >
+          取得に失敗するリンク https://example.com/will-fail
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
+// URL ごとに別のメタデータを返す fetcher。previewUrls / maxLinkPreviews の確認用。
+const MOCK_META_BY_URL: Record<string, LinkPreviewMeta> = {
+  'https://insession.space/blog/release-notes': MOCK_META,
+  'https://insession.space/help': {
+    url: 'https://insession.space/help',
+    title: 'ヘルプセンター',
+    description: 'よくある質問と使い方ガイド。',
+    siteName: 'InSession Help',
+  },
+};
+
+async function fetchLinkPreviewByUrl(url: string): Promise<LinkPreviewMeta | null> {
+  return MOCK_META_BY_URL[url] ?? null;
+}
+
+export const LinkPreviewFromPreviewUrls: Story = {
+  render: () => (
+    <Section
+      title="OGP プレビュー: previewUrls で明示 + maxLinkPreviews=2"
+      note="children が JSX(文字列でない ReactNode)のケース。DS は本文から URL を機械的に検出できないため、呼び出し側が previewUrls で対象 URL を明示する。maxLinkPreviews を 2 にすると2件並ぶ(既定は 1 件)。"
+    >
+      <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          fetchLinkPreview={fetchLinkPreviewByUrl}
+          previewUrls={[
+            'https://insession.space/blog/release-notes',
+            'https://insession.space/help',
+          ]}
+          maxLinkPreviews={2}
+        >
+          <span>
+            本文は JSX なので自動検出できない。
+            <strong>previewUrls</strong> で渡した2件が並ぶ。
+          </span>
         </MessageItem>
       </div>
     </Section>

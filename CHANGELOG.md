@@ -1,5 +1,118 @@
 # @insession/design-system
 
+## 4.3.1
+
+### Patch Changes
+
+- 6c6f116: field の枠幅を 1.5px から 1px に変える（#35）
+
+  `Input` / `Textarea` / `SearchField`（`FIELD_BOX_BASE` を共有）と `Composer` / `UploadTile` の枠幅を `1.5px` から `1px` にした。
+
+  ## 理由: 1.5px は「効くブラウザと効かないブラウザがある」値だった
+
+  3 エンジン × DPR で実測した結果（左右合計を `getBoundingClientRect` で測定）:
+
+  | エンジン   | DPR1 | DPR2      | DPR3        |
+  | ---------- | ---- | --------- | ----------- |
+  | Chromium   | 1px  | 1px       | 1px         |
+  | Firefox    | 1px  | 1px       | 1px         |
+  | **WebKit** | 1px  | **1.5px** | **1.333px** |
+
+  つまり 1.5px が実際に描かれるのは **WebKit の DPR≥2 だけ**。据え置くと「iOS Safari では枠が太く Android Chrome では細い」「同じ Retina Mac でも Safari と Chrome で違う」という**意図しないプラットフォーム差が仕様として固定される**。消費側（insession-app）は Capacitor で iOS / Android の両方に出しているため実ユーザーに見える差になる。
+
+  ## なぜ 2px ではなく 1px か
+
+  - **1px は現状の大多数の見え方**（Chromium / Firefox / Android は既に 1px で描画されている）。変更による見た目の差が最小
+  - 2px にすると全プラットフォームで太くなるうえ、「Inputs は控えめ / コントロール（`Button` / `Checkbox` / `Radio` は `border-2`）」という**意図的な強弱の区別が消える**
+  - 1px なら設計意図（fields はコントロールより細い）を保ったまま、**宣言値と実描画が全エンジンで一致**する
+
+  ## 影響
+
+  **WebKit の DPR≥2（iOS / Retina Safari）でのみ枠がわずかに細くなる。** それ以外のプラットフォームでは見た目は変わらない（既に 1px で描かれていたため）。
+
+  修正後、全エンジン・全 DPR で `borderTopWidth: 1px` になることを実測で確認済み。
+
+## 4.3.0
+
+### Minor Changes
+
+- 24f321e: `MediaRow` / `MediaCard` / `MediaThumbnail` を追加する（#94）。破壊的変更は無い（新規コンポーネントのみ）。
+
+  **`MediaRow`（キュー/プレイリストの 1 行）**:
+
+  ```tsx
+  <MediaRow
+    dragHandle
+    thumbnail={<MediaThumbnail quality="4K" duration="3:32"><img … /></MediaThumbnail>}
+    title="深夜のプレイリスト特集"
+    subtitle="1番目 · Seiya が追加"
+    actions={
+      <>
+        <IconButton label="再生" icon={<Icon name="play_arrow" />} variant="ghost" touchSize={44} />
+        <IconButton label="お気に入りに追加" icon={<Icon name="star_outline" />} variant="ghost" touchSize={44} />
+        <IconButton label="キューから削除" icon={<Icon name="close" />} variant="ghost" touchSize={44} />
+      </>
+    }
+  />
+  ```
+
+  **`MediaCard`（メディア/ライブのカード）**:
+
+  ```tsx
+  <MediaCard
+    cover={<img … />}
+    overlay={
+      <>
+        <Badge tone="live" dot>LIVE</Badge>
+        <CircleBadge><Icon name="public" size={14} /></CircleBadge>
+      </>
+    }
+    title="Working hard"
+    meta="1 watching · playing · late night"
+    footer={<AvatarStack people={people} size={28} />}
+  />
+  ```
+
+  - `dragHandle` / `thumbnail` / `actions`（`MediaRow`）、`cover` / `overlay` / `footer`（`MediaCard`）はいずれも `ReactNode` のスロットで、`onPlay` / `isStarred` / `watchingCount` のような用途固定の意味づけ props は持たない。`title` / `subtitle` / `meta` も**整形済みの文字列**（または `ReactNode`）を受け取るだけで、i18n・データ取得・`kind: 'space-live' | …` のようなプロダクト固有の union は持たない
+  - サムネイルの尺・画質オーバーレイは補助コンポーネント `MediaThumbnail`（`src` または `children` / `duration` / `quality` / `alt`）に切り出した。画質ラベルは既存の `Badge`（`tone="neutral"`）を流用する
+  - `MediaCard` のバッジ列に置く正円バッジとして `CircleBadge` も追加した（`Badge` はピル/角丸矩形専用のため）
+  - ドラッグハンドルは装飾のみ（`aria-hidden="true"`）。実際の DnD 操作は消費側の責務
+
+- 12d0127: `MessageItem` に OGP リンクプレビュー(fetcher 注入)と、新規コンポーネント `LinkPreview` を追加した(#93)。**破壊的変更は無い**（`fetchLinkPreview` 未指定なら既存の描画と完全に同じ）。
+
+  **`LinkPreview`(新規・`src/components/link-preview.tsx`)**: メタデータを props で受け取るだけの presentational コンポーネント。大きい OG 画像を上に、その下にサイト名 → タイトル → 説明文(1〜2 行クランプ)を縦積みする。
+
+  ```tsx
+  <LinkPreview
+    meta={{ url, title, description, siteName, imageUrl }}
+    loading={false}
+  />
+  ```
+
+  - 画像が無いメタデータなら画像領域自体を出さない
+  - カード全体を 1 つの `<a>` として描く(`Surface` の `render` prop)。OG 画像は装飾扱い(`alt=""` / `aria-hidden`)にし、リンクのアクセシブル名は「タイトル + サイト名」で構成する
+  - `loading` の間は `Skeleton` でプレースホルダを出す
+
+  **`MessageItem`**: fetcher 注入の口を追加した。
+
+  ```tsx
+  <MessageItem
+    fetchLinkPreview={(url, signal) => fetchOgpMetadata(url, signal)}
+    maxLinkPreviews={1}
+  >
+    記事はこちら https://example.com/article です
+  </MessageItem>
+  ```
+
+  - `@insession/design-system` は public npm の presentational パッケージであり、fetch / network を自身で持たない。そのため実際の HTTP 取得(OGP の HTML パース・CORS/SSRF 対策・キャッシュを含む)は消費側(insession-app / loophub-app、別リポジトリ別 Issue)に委ね、DS は `fetchLinkPreview` という関数を受け取る口だけを持つ
+  - `fetchLinkPreview` 省略時は対象 URL の計算自体を行わず、既存の呼び出しに一切影響しない
+  - 本文(`children`)が文字列(または文字列を含む配列)のときだけ URL を自動検出する。`children` に JSX を渡す呼び出し側のため、対象 URL を明示できる `previewUrls?: string[]` も用意した(指定時は自動検出を行わない)
+  - `maxLinkPreviews?: number`(既定 1)で表示件数の上限を変更できる
+  - 取得は `AbortController` で管理し、unmount / 対象 URL 変化時に in-flight を abort する(unmount 後に setState しない)。同じ URL への重複呼び出しも抑制する
+  - `fetchLinkPreview` が `null` を返す/reject する場合はカードを出さず、エラー UI も出さない(本文だけが残る)
+
+  `src/index.ts` から `LinkPreview` / `LinkPreviewProps` / `LinkPreviewMeta` を追加 export した。
+
 ## 4.2.0
 
 ### Minor Changes
