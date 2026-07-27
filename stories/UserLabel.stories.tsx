@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // UserLabel のカタログ。アバター + ユーザー名(+ subtitle)を横並びで出す複合コンポーネント。
 // アバター寸法と文字サイズを size 1つで連動させるのが主目的(呼び出し側でのタイポずれ防止)。
 const meta: Meta<typeof UserLabel> = {
-  title: 'UI Kit/UserLabel',
+  title: 'Data Display/UserLabel',
   component: UserLabel,
   parameters: { layout: 'padded' },
 };

@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // Paper のカタログ。elevation=1 固定(境界のみ、影なし)の控えめな面。
 const meta: Meta = {
-  title: 'Surface/Paper',
+  title: 'Surfaces/Paper',
   parameters: { layout: 'padded' },
 };
 export default meta;

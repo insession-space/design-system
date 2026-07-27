@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // アイコンのみの正方形ボタン(claude design "INSESSION Design System" 準拠。loophub #682)。
 // variant: surface(既定。surface-2 面+border) / accent(coral 塗り) / ghost(透明地・hover のみ面)。
 const meta: Meta<typeof IconButton> = {
-  title: 'Components/IconButton',
+  title: 'Actions/IconButton',
   component: IconButton,
   parameters: { layout: 'padded' },
 };

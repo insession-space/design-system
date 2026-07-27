@@ -5,7 +5,7 @@ import { Section } from './tokens';
 
 // Popover(Base UI 委譲。#6) + その上に載る Menu(独立して開閉できる)。
 const meta: Meta = {
-  title: 'Components/Popover',
+  title: 'Overlays/Popover',
   parameters: { layout: 'padded' },
 };
 export default meta;

@@ -15,7 +15,7 @@ import { Section } from './tokens';
 // 折りたたみリスト。一覧の各行を要約1行に圧縮し、開いた1件だけが中身を出す（同時に開けるのは1件）。
 // 完全な制御コンポーネントなので、カタログ側で value/onChange を持つ薄いラッパーを噛ませる。
 const meta: Meta<typeof Accordion> = {
-  title: 'Components/Accordion',
+  title: 'Navigation/Accordion',
   parameters: { layout: 'padded' },
 };
 export default meta;

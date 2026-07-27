@@ -7,7 +7,7 @@ import { Section } from './tokens';
 // `<input type="range">` で手組みしていたものを DS に上げたもの。
 // 振る舞いは Base UI 委譲(Slider / RadioGroup / ToggleGroup)。
 const meta: Meta = {
-  title: 'Components/Segmented & Slider',
+  title: 'Inputs/Segmented & Slider',
   parameters: { layout: 'padded' },
 };
 export default meta;

@@ -7,7 +7,7 @@ import { Section } from './tokens';
 // 下からせり出す + ドラッグハンドルで高さを変えられる点が異なる。開いた直後は中途高さ(mid)、
 // 上ドラッグでフルハイト(full)まで拡張、下ドラッグで一定以下まで縮めると close する。
 const meta: Meta = {
-  title: 'Components/BottomSheet',
+  title: 'Overlays/BottomSheet',
   parameters: { layout: 'padded' },
 };
 export default meta;

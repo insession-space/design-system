@@ -7,7 +7,7 @@ import { Section } from './tokens';
 // Record<IconName, true> の型チェックに委ねる(足りない/余分なキーがあれば typecheck が落ちる)。
 // GoogleIcon / PersonIcon は props 不要の専用 SVG アイコンで、別セクションに含める。
 const meta: Meta = {
-  title: 'Components/Icons',
+  title: 'Foundations/Icons',
   parameters: { layout: 'padded' },
 };
 export default meta;

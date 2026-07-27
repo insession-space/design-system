@@ -7,7 +7,7 @@ import { Section } from './tokens';
 // #860 で設定モーダルがこれに準拠した現役プリミティブなので、実際の使われ方に近いデモにする
 // (項目を選ぶと右ペインの内容が切り替わる実動デモ)。
 const meta: Meta = {
-  title: 'Components/SplitModal',
+  title: 'Overlays/SplitModal',
   parameters: { layout: 'padded' },
 };
 export default meta;

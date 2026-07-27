@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // ロゴマーク(LOOPHUB ブランドの「リング+3ドット」マーク。loophub #724)。variant='row' は横並び
 // マーク+ワードマーク、variant='cluster' は単体マーク(プロダクト切替チップ等の小さな箇所向け)。
 const meta: Meta<typeof LogoMark> = {
-  title: 'Components/LogoMark',
+  title: 'Data Display/LogoMark',
   component: LogoMark,
   parameters: { layout: 'padded' },
 };

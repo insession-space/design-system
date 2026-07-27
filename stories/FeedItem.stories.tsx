@@ -14,7 +14,7 @@ import { Section } from './tokens';
 // 見た目だけを持ち、文言の解決・データ更新・遷移は呼び出し側が担う — カタログ側でも
 // 「2日前」のような**整形済みの文字列**を直に渡している。
 const meta: Meta = {
-  title: 'UI Kit/FeedItem',
+  title: 'Patterns/FeedItem',
   parameters: { layout: 'padded' },
 };
 export default meta;

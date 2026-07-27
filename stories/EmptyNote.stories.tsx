@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // DS の EmptyNote。空リスト/検索0件の一行メッセージ。文言は t() 済みを children で渡す。
 const meta: Meta<typeof EmptyNote> = {
-  title: 'Components/EmptyNote',
+  title: 'Feedback/EmptyNote',
   component: EmptyNote,
   parameters: { layout: 'padded' },
 };

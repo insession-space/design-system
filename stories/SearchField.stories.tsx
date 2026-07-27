@@ -6,7 +6,7 @@ import { Section } from './tokens';
 // 検索入力(claude design "INSESSION Design System" 準拠。loophub #682)。surface-2 面 + 1.5px
 // border + focus-within リング。左に search アイコンを固定表示する。
 const meta: Meta<typeof SearchField> = {
-  title: 'Components/SearchField',
+  title: 'Inputs/SearchField',
   component: SearchField,
   parameters: { layout: 'padded' },
 };

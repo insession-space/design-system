@@ -57,27 +57,31 @@ const preview: Preview = {
       matchers: { color: /(background|color)$/i, date: /Date$/i },
     },
     options: {
-      // 既定はアルファベット順で、Foundations が Components の後に来てしまう。
-      // カタログは「入口 → トークン → 骨格プリミティブ（Layout/Surface/Page） → 個別部品」の
-      // 順で読ませたいので明示的に並べる。骨格プリミティブは以前 Components/* に詰め込んで
-      // いたが、コンポーネント単位の story が増えて見づらくなったため、Components と並ぶ
-      // トップレベルの群（Layout / Surface / Page）に切り出した。
-      // Foundations の中は、色 → 書体 → その他トークン → elevation の順に固定する
-      // （elevation はトークンの話なので Foundations 側に置く）。
-      // Layout の中は Stack → Grid → 補助（Spacer/Divider/Center/Container）の順が読みやすい。
-      // 列挙していないものは '*' の位置（= Components の後ろ）へアルファベット順で入る。
+      // 既定はアルファベット順で、Foundations が Overlays 等の後ろに埋もれてしまう。
+      // Issue #68 でサイドバーを「役割ベース」のカテゴリツリーに再編したため、
+      // その役割の並び（入口 → 土台 → 骨格 → 操作・入力 → 表示・通知 → 構造 → 複合）で
+      // 明示的に固定する。既定のアルファベット順に戻すと、例えば Inputs が Foundations より
+      // 前に来るなど、読む順序と無関係な並びに戻ってしまうため必須。
+      // 各カテゴリ配下は個別に並びを固定せず、カテゴリ内はアルファベット順に任せる
+      // （部品数が増えても手を入れずに済む）。
+      // 先頭2つは Docs ページ（story を持たない入口）。'Introduction' がカタログの表紙、
+      // 'Overview' が Overview.mdx（カテゴリの分け方）で、どちらも部品カテゴリより前に置く。
+      // ここに列挙しないと '*' の位置＝末尾へ流れて入口が最後に来てしまう。
       storySort: {
         order: [
           'Introduction',
+          'Overview',
           'Foundations',
-          ['Colors', 'Typography', 'Tokens', 'Elevation'],
           'Layout',
-          ['Stack', 'Grid', 'Spacer', 'Divider', 'Center', 'Container'],
-          'Surface',
-          ['Surface', 'Paper', 'Card', 'Panel'],
+          'Surfaces',
+          'Actions',
+          'Inputs',
+          'Data Display',
+          'Feedback',
+          'Overlays',
+          'Navigation',
           'Page',
-          ['PageLayout', 'AppBar', 'Toolbar', 'PageHeader', 'Footer'],
-          'Components',
+          'Patterns',
           '*',
         ],
       },

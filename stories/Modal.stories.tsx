@@ -12,7 +12,7 @@ import { Section } from './tokens';
 // グローバル `button {}` 頼み。components.css の .modal button[type="submit"] の注記を参照）。
 // 新規の実装では使わないため、カタログにも載せない。
 const meta: Meta = {
-  title: 'Components/Modal',
+  title: 'Overlays/Modal',
   parameters: { layout: 'padded' },
 };
 export default meta;

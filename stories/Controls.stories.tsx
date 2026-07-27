@@ -6,7 +6,7 @@ import { Section } from './tokens';
 // DS の選択コントロール。Checkbox(22x22 / radius6 / fill+check) と Radio(円 / 2px枠 / accent ドット)
 // と Toggle(track 46x26 / knob 20x20)。いずれも振る舞いは Base UI 委譲(#22)。
 const meta: Meta = {
-  title: 'Components/Controls',
+  title: 'Inputs/Controls',
   parameters: { layout: 'padded' },
 };
 export default meta;

@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // Card のカタログ。elevation 既定2。padding 既定 md、radius 既定 card。
 const meta: Meta = {
-  title: 'Surface/Card',
+  title: 'Surfaces/Card',
   parameters: { layout: 'padded' },
 };
 export default meta;

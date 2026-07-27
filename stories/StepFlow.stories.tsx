@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // ステップ進行表示。done / current / todo の3状態ピル列(リレーゲームのフェーズ表示等 #974)。
 const meta: Meta<typeof StepFlow> = {
-  title: 'Components/StepFlow',
+  title: 'Navigation/StepFlow',
   component: StepFlow,
   parameters: { layout: 'padded' },
 };

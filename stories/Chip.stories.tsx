@@ -5,7 +5,7 @@ import { Section } from './tokens';
 
 // DS の Chip。タップできる要素(クイック返信/フィルター/タグ)。default / selected(accent) / icon 付き。
 const meta: Meta<typeof Chip> = {
-  title: 'Components/Chip',
+  title: 'Data Display/Chip',
   component: Chip,
   parameters: { layout: 'padded' },
 };
