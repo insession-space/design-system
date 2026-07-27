@@ -137,6 +137,9 @@ export default function MessageItem({
               // biome-ignore lint/suspicious/noArrayIndexKey: 絵文字は重複しうるため index を使う
               key={index}
               selected={reaction.reacted}
+              // 押しているかは面と枠(accent tint + accent 枠)で示す。check は出さない —
+              // 絵文字の隣にチェックが並ぶと、何に対する肯定なのかが読めなくなるため。
+              showCheck={false}
               aria-label={`${reaction.label} ${reaction.count}`}
               onClick={reaction.onClick}
             >

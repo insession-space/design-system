@@ -39,7 +39,7 @@ export const WithReactions: Story = {
   render: () => (
     <Section
       title="リアクション複数(reacted の有無が混在)"
-      note="reacted: true のピルは枠線と背景で強調され、check アイコンが先頭に付く(Chip の selected 仕様)。"
+      note="reacted: true のピルは枠線と背景で強調される。Chip の selected を showCheck={false} で使っているので、行頭に check は付かない(絵文字と並ぶと何に対する肯定か読めなくなるため)。"
     >
       <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
         <MessageItem
