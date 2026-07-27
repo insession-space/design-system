@@ -32,6 +32,15 @@ export type SideNavAccountItem = {
   disabled?: boolean;
   // この項目の直前に区切り線を引く。
   separatorBefore?: boolean;
+  // 遷移先。指定すると項目が <a href> になる（#81）。操作（onSelect だけ）で済ませると
+  // 中クリック / Cmd+クリックでの別タブ・リンクのコピーができず、読み上げも「リンク」に
+  // ならないため、遷移する項目には必ず href を渡す。role="menuitem" は保たれる。
+  // ⚠ ルーターには依存しない（素の <a>）。SPA 内リンクにしたい場合は items を使わず
+  //   `Menu` を直接組み、Menu.Item の render に router の Link を渡す。
+  href?: string;
+  // 別タブで開く外部リンク。target/rel を付け、行末に open_in_new を出す
+  // （SideNav.Item の external と同じ扱い）。href が無いときは無視される。
+  external?: boolean;
 };
 
 export type SideNavAccountProps = {
@@ -46,6 +55,8 @@ export type SideNavAccountProps = {
   bgColor?: string;
   // アカウントメニューの項目。省略すると行だけを描き、メニューを組まない。
   items?: SideNavAccountItem[];
+  // 項目が選ばれたときに呼ぶ。href 付きの項目でも呼ばれる（遷移は <a> 自身が行うので、
+  // ここは計測やメニューを閉じた後の後処理のためのフック）。
   onSelect?: (key: string) => void;
   // 行の大きさ（UserLabel へ透過）。既定 'sm'（アバター24px / 名前14px）は、レール既定幅
   // 232px で「アバター + 名前 + 開閉アイコン」が省略されずに収まる唯一の段。レールを広げて
@@ -74,6 +85,13 @@ const ROW_INTERACTIVE =
 const AFFORDANCE = 'shrink-0 text-text-faint';
 const AFFORDANCE_ICON_SIZE = 16;
 const MENU_ICON_SIZE = 18;
+const EXTERNAL_ICON_SIZE = 15;
+
+// 別タブで開くリンクに付ける属性。rel を落とすと開いた先から window.opener 経由で元タブを
+// 触れてしまうので、target と必ず対で付ける。
+function linkProps(item: SideNavAccountItem) {
+  return item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+}
 
 // レール最下部にあるので上方向へ開く（下に開くと画面外に出る）。幅はトリガー行に合わせて
 // 揃える（Base UI の Positioner が --anchor-width を出す）。
@@ -173,6 +191,20 @@ export default function SideNavAccount({
                   disabled={item.disabled}
                   danger={item.danger}
                   icon={item.icon && <Icon name={item.icon} size={MENU_ICON_SIZE} />}
+                  trailing={
+                    item.href != null &&
+                    item.external && <Icon name="open_in_new" size={EXTERNAL_ICON_SIZE} />
+                  }
+                  // href があれば <a> として描く（Base UI の render）。中クリック / Cmd+クリック
+                  // での別タブ・リンクのコピー・「リンク」としての読み上げが効く。
+                  // ⚠ disabled のときは <a> にしない。HTML の <a> に disabled は無く、
+                  //   data-disabled が付いても遷移自体は止まらないため（user-label.tsx が
+                  //   href={disabled ? undefined : href} で塞いでいるのと同じ理由）。
+                  render={
+                    item.href != null && !item.disabled ? (
+                      <a href={item.href} {...linkProps(item)} />
+                    ) : undefined
+                  }
                   onClick={() => onSelect?.(item.key)}
                 >
                   {item.label}
