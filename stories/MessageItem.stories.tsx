@@ -39,7 +39,7 @@ export const WithReactions: Story = {
   render: () => (
     <Section
       title="リアクション複数(reacted の有無が混在)"
-      note="reacted: true のピルは枠線と背景で強調される。Chip の selected を showCheck={false} で使っているので、行頭に check は付かない(絵文字と並ぶと何に対する肯定か読めなくなるため)。"
+      note="絵文字が主役、数字は従属。reacted: true のピルは accent の枠線だけで強調する(tint の面は敷かない — 面と数字が同系色に寄って読めなくなるため #103)。数字は押している/いないに関わらず text 色なので、どちらの状態でもコントラストが保たれる。"
     >
       <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
         <MessageItem
