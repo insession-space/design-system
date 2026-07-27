@@ -1,5 +1,78 @@
 # @insession/design-system
 
+## 4.2.0
+
+### Minor Changes
+
+- b1165f0: Button のボーダー消失を直し、Sign in with Apple 用 variant を追加する（#58 / #35 / #71 / #72）
+
+  - **#58 `Button variant="secondary"` の 2px アウトラインが描かれない問題を修正。** BASE の `border-transparent` と variant の `border-text` が同じ utilities レイヤーの `border-color` ユーティリティで、勝敗が配布 CSS の出力順で決まり BASE が勝っていた（実測 `border-top-color: rgba(0, 0, 0, 0)`）。`border-color` を **variant 側だけ**が持つ構造に変え、同一プロパティのユーティリティが同時に並ばないようにした（#17 / #21 と同じ方針）。消費側の `border-text!` 応急処置は外せる。
+  - **#72 `variant="apple"` を追加。** Apple HIG に沿った黒地 / 白文字 / 白ロゴで、ライトテーマでも黒地を維持する（`--color-apple` / `--color-on-apple` / `--color-apple-hover` を追加）。hover は黒地では効かない `brightness` ではなく面の変化で出す。
+  - **#35 field の枠幅を仕様どおり 1.5px にする。** 裸の任意値（`border-[1.5px]`）は Tailwind v4 が border-color 側と解釈しうる曖昧な書き方で、生成されないと DOM にクラスだけが出て枠が 1px になる。型を明示した書き方へ統一し（`Input` / `Textarea` / `SearchField` / `Composer` / `UploadTile`）、`pnpm check:styles` に任意値ユーティリティの生成検査を足した。
+  - **#71 `Stepper` の +/- ボタンに `cursor-pointer` を追加。** DS の他のボタン系だけが持っていて Stepper に無く、「押せることが分からない」状態だった。
+
+- 909f86e: `IconButton` にタッチ端末向けの `touchSize` を足し、設定行の `SettingRow` を追加し、`LogoMark` のワードマークを差し替え可能にする（#60 / #73 / #74）。**破壊的変更は無い**（既存 props の意味・既定値・見た目はいずれも据え置き）。
+
+  **`IconButton`（#60）**: 寸法をインライン style ではなくユーティリティ + CSS 変数で当てるようにし、`touchSize`（`@media (pointer: coarse)` のときに保証する最小の一辺）を追加した。
+
+  ```tsx
+  <IconButton label="リアクション" icon={…} size={30} touchSize={44} />
+  ```
+
+  - 従来は `style={{ width, height }}` だったため、インライン style があらゆるセレクタより強く、消費側が `@media (pointer: coarse)` やユーティリティで**上書きできなかった**（insession-app のリアクション送信ボタンが legacy CSS の 44px から 30px に縮み、Apple HIG のタップターゲット下限を割った）
+  - `touchSize` 省略時はタッチ端末でも `size` のまま。**既存呼び出しの見た目は変わらない**（実測: 既定 36px は 36x36px のまま / `size=30` は touch 環境でも 30x30px）
+  - 寸法がクラス側に移ったので、`className="max-md:size-11"` のようなバリアント付きユーティリティでも広げられる（実測で 44x44px）。`min-*` は `width`/`height` より常に強く、バリアント付きは base より後に出力されるため、クラスの並び順に依存しない
+
+  **`SettingRow`（#73・新規）**: 「ラベル（+ 説明）+ 末尾のコントロール」からなる設定行。
+
+  ```tsx
+  <SettingRow
+    label="効果音"
+    description="チャットの受信やリアクションで音を鳴らす"
+    trailing={<Toggle checked={sound} onChange={toggle} label="効果音" />}
+  />
+  ```
+
+  - **既定は非対話**（`<div>`）。`href` → `<a>` / `onClick` → `<button>`（`UserLabel` と同じ流儀）
+  - **対話的にしても `trailing` は対話要素の外（兄弟）に置く**ので、`<button>` の中に `<button>` / `<input>` が入る不正な DOM が構造的に起きない。廃止した `ListRow` は `<button>` 固定でこれができず、insession-app #1172 のアカウント設定 14 行が**1 行も載せられなかった**
+  - `descriptionLines` で説明文を 1 行省略 / 2〜3 行クランプ / 折り返し（既定）から選べる（旧 `ListRow` は `truncate` 固定だった）
+  - `icon` / `chevron` / `danger` / `disabled` / `ariaLabel` も持つ
+
+  **`LogoMark` / `BrandImage`（#74）**: ワードマークの `"LOOPHUB"` ハードコードをやめ、`wordmark`（`ReactNode`。**既定は従来どおり `'LOOPHUB'`**）と `mark`（マーク自体の差し替え）を追加した。あわせてライト/ダークで画像を出し分けるだけの `BrandImage` を追加した。
+
+  ```tsx
+  <LogoMark size={24} showWordmark wordmark="INSESSION" />
+  <BrandImage src={logoDark} lightSrc={logoLight} alt="InSession" height={28} />
+  ```
+
+  - DS は 2 プロダクト（InSession / loophub）で共有するので、新しい呼び出しは `wordmark` を明示する
+  - `BrandImage` は `<html data-theme="light">` の判定を DS 側へ引き取る（insession-app では利用箇所 8 つが `[[data-theme=light]_&]:hidden` の任意バリアント文字列を複製していた）。⚠ 表示切り替えなので**両方の画像が読み込まれる**（ロゴのような小さな SVG 前提）
+
+- 75b9fc5: 汎用の `Skeleton` と、`MessageItem`(#83)向けの `MessageItemSkeleton` を追加する(#87)。投稿一覧のような取得に時間がかかるリストで、読み込み中に「これから出る形」を見せてレイアウトシフトを防げるようにする。
+
+  ```tsx
+  <Skeleton width={120} height={14} />   // 矩形
+  <Skeleton circle size={24} />          // 円(アバターのプレースホルダ)
+  <Skeleton.Text lines={2} />            // テキスト複数行(最終行だけ短くする)
+
+  <MessageItemSkeleton />                               // 既定: アバター無し・本文1行・リアクション無し
+  <MessageItemSkeleton avatar lines={3} reactions={2} />
+  ```
+
+  - `Skeleton` の面には shimmer(淡いハイライトが左 → 右へ流れる)アニメーションが付く。`prefers-reduced-motion: reduce` では静止した面になる
+  - 装飾要素なので `aria-hidden="true"`。「読み込み中」であることの読み上げ(`aria-busy` / live region)は呼び出し側の責務
+  - `MessageItemSkeleton` は `MessageItem` と同じ VStack/HStack の gap・寸法でヘッダー行/本文/リアクション行を組んでおり、実データに差し替わったときのレイアウトシフトが最小になる。ホバーアクションのプレースホルダは出さない(読み込み中は操作できないため)
+
+  ⚠ shimmer の `@keyframes skeleton-shimmer` は `src/styles/components.css` に追加した。**従来方式(`@source` で `dist` を走査する)の消費側は、`@insession/design-system/components.css` を import していないと shimmer だけが静かに効かない**(面自体は出るのでビルドもエラーも通る)。README の記載どおり、1.4.0 以降は `components.css` の import が必要な点を改めて明記する。
+
+- 521a959: 面プリミティブに `render` を、`elevation` に直交する `tone` / `shadow` 軸を、余白スケールに `xs.5`（6px）を足す
+
+  - **`Surface` / `Paper` / `Card` / `Panel` に `render` プロップ**（Base UI の `useRender`。`SideNav` と同じ流儀）。`<Card render={<button type="button" />} interactive onClick={…}>` で**クリックできるカードを 1 要素で描ける**ようになり、「リセットした `<button>` > `Surface`」の入れ子と、消費側が書いていた打ち消しユーティリティ（`border-none bg-transparent p-0 shadow-none`）が不要になる。`<button>` の中に `<div>` を置く content model 違反も解消する。UA 既定のボタン外観（`appearance` / マージン / `text-align: center`）の打ち消しは **`render` を渡したときだけ** DS 側で当てる（#56）
+  - **`Surface` に `tone`（`'default' | 'tint'`）と `shadow`（`'auto' | 'none'`）**。`elevation` の段（1〜4 = Paper / Card / Popover / Modal）は増やさず、面の色だけ・影だけを切る直交軸として足した。消費側が `className="shadow-none"` / `className="bg-tint-5"` と 1 プロパティだけ上書きしていたパターンを props で表現できる。**新しい影の実値・トークンは追加していない**（#57）
+  - **`Gap` / `SurfacePadding` に `xs.5`（6px = `gap-1.5` / `p-1.5`）**。`xs`(4px) と `sm`(8px) の間に段が無く `Stack` に載せられなかったレイアウトを吸収する。`2xs` は「`xs` より小さい」と誤読されるため採らない（#57）
+
+  既定値は従来と同一なので、**既存の呼び出しの見た目は変わらない**（追加のみ）。
+
 ## 4.1.0
 
 ### Minor Changes
