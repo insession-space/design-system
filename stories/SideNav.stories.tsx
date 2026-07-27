@@ -103,6 +103,91 @@ export const ButtonItems: Story = {
   },
 };
 
+// 最下部のアカウントエリア。行（アバター + 名前 + メール + 上下シェブロン）を押すと、
+// items から組んだメニューが**上方向**に開く。
+const ACCOUNT_ITEMS = [
+  { key: 'profile', icon: 'account_circle', label: 'マイプロフィール' },
+  { key: 'settings', icon: 'settings', label: 'アカウント設定' },
+  { key: 'devices', icon: 'picture_in_picture', label: 'デバイス管理', disabled: true },
+  { key: 'signout', icon: 'logout', label: 'サインアウト', separatorBefore: true, danger: true },
+] as const;
+
+export const WithAccount: Story = {
+  render: () => {
+    const [picked, setPicked] = useState<string | null>(null);
+
+    return (
+      <Section
+        title="アカウントエリアを常設する"
+        note="items を渡すとメニュー付きのトリガーになる。レール最下部なのでメニューは上方向へ開き、幅はトリガー行に揃う。"
+      >
+        <Frame>
+          <SideNav.Root aria-label="メインナビゲーション" fullHeight={false}>
+            <SideNav.Brand href="#" aria-label="InSession">
+              <LogoMark size={34} />
+            </SideNav.Brand>
+            <SideNav.Group>
+              <SideNav.Item href="#" icon="home" active>
+                ホーム
+              </SideNav.Item>
+              <SideNav.Item href="#" icon="search">
+                探索
+              </SideNav.Item>
+            </SideNav.Group>
+            <SideNav.Group secondary>
+              <SideNav.Item href="#" external>
+                ヘルプ
+              </SideNav.Item>
+            </SideNav.Group>
+            <SideNav.Account
+              name="Cameron Yang"
+              subtitle="cam@untitledui.com"
+              status="live"
+              menuLabel="アカウントメニュー"
+              items={[...ACCOUNT_ITEMS]}
+              onSelect={setPicked}
+            />
+          </SideNav.Root>
+          <div className="flex-1 p-6 text-text-dim">
+            選択した項目: {picked ?? '（まだ選んでいない）'}
+          </div>
+        </Frame>
+      </Section>
+    );
+  },
+};
+
+// items を渡さない＝表示専用。押せる見た目（cursor / hover）を出さない。
+// 長い名前・メールはレール幅（232px）を破らずに省略される。
+export const AccountVariants: Story = {
+  render: () => (
+    <Section
+      title="表示専用 / 長いテキスト"
+      note="items 無しならメニューを組まず行だけを描く。名前とメールは行幅で truncate される。"
+    >
+      <Frame>
+        <SideNav.Root aria-label="ナビゲーション" fullHeight={false}>
+          <SideNav.Group>
+            <SideNav.Item href="#" icon="home" active>
+              ホーム
+            </SideNav.Item>
+          </SideNav.Group>
+          <div className="mt-auto flex flex-col gap-2">
+            <SideNav.Account name="Cameron Yang" subtitle="cam@untitledui.com" status="live" />
+            <SideNav.Account
+              name="Bartholomew Wintersmith-Ashcombe"
+              subtitle="bartholomew.wintersmith@very-long-domain-example.com"
+              menuLabel="アカウントメニュー"
+              items={[{ key: 'signout', icon: 'logout', label: 'サインアウト', danger: true }]}
+            />
+          </div>
+        </SideNav.Root>
+        <div className="flex-1 p-6 text-text-dim">コンテンツ列</div>
+      </Frame>
+    </Section>
+  ),
+};
+
 // `render` で要素の実体を差し替える（react-router の NavLink 等）。ここでは差し替えが効くことを
 // 示すため、data-testid 付きの独自要素へ差し替える。
 export const CustomElement: Story = {

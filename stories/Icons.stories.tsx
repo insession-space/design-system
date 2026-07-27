@@ -57,6 +57,7 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   open_in_new: true,
   expand_more: true,
   expand_less: true,
+  unfold_more: true,
   chat: true,
   reply: true,
   close: true,
