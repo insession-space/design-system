@@ -12,7 +12,7 @@ import { FIELD_BOX_BASE, FIELD_CONTROL, FIELD_LABEL, fieldLabelColor } from './i
 // field / control のクラス文字列を自前で二重に持っていた（片方だけ変えてもずれに気づけない）。
 // ここで input.tsx の定数を import して一本化する。
 //
-// 見た目は移行前と同じ: surface-2 面 + 1.5px border + radius-md + フォーカスリング。
+// 見た目: surface-2 面 + 1px border + radius-md + フォーカスリング（枠幅は #35 で 1.5px から変更）。
 // 左に search アイコンを固定表示する（常時 search 固定なので Input の prefix とは別プリミティブ）。
 // i18n は持たない（placeholder / label は呼び出し側が渡す）。
 //

@@ -21,7 +21,7 @@ import { useState } from 'react';
 // ラベルは mono・大文字（Label caps）。状態で label/border/ring を切替える:
 //   error → accent（枠 + ラベル + 下メッセージ）、focused → info（枠 + ラベル + リング）、
 //   default → text-dim / border。
-// field は surface-2 / border 1.5px / radius md(10) / pad 12/14 / font 15。prefix は field 内・input 左に
+// field は surface-2 / border 1px / radius md(10) / pad 12/14 / font 15。prefix は field 内・input 左に
 // mono の接頭辞（例 insession.app/r/）を text-dim で置く。i18n は持たない（label / error は文字列を受け取る）。
 export type InputProps = {
   label?: ReactNode;
@@ -40,15 +40,33 @@ export const FIELD_LABEL =
 // 一段浅く、共通側に py-3 を持たせると呼び出し側の py-2.5 では打ち消せない（同一プロパティの
 // ユーティリティは配布 CSS の出力順で勝敗が決まる。#21 と同じ構図で、実測でも py-3 が勝った）。
 // 「打ち消す」のをやめ、**縦 padding は各コンポーネントが必ず自分で指定する**契約にする。
-// ⚠ 枠幅の任意値は **型（length:）を明示して書く**（#35）。裸の任意値は Tailwind v4 が
-// border-color 側の任意値と解釈しうる曖昧な書き方で、実際に「配布 CSS にセレクタが0件
-// ＝ DOM にクラスは出るのに枠は border-solid の既定 1px で描かれる」欠損が起きていた
-// （報告時の実測 border-top-width: 1px。DS の Inputs 仕様は 1.5px）。
-// 現行 Tailwind では裸の書き方でも width として生成されるようになっているが、
-// 版によって解釈が変わる書き方に戻さないこと。型を明示すれば曖昧さ自体が消える。
-// 欠損そのものは scripts/check-styles.mjs の任意値クラス検査が回帰ネットになっている。
+// ⚠ **枠幅は 1px。1.5px に戻さないこと（#35）。**
+// 元の仕様は 1.5px だったが、3エンジン × DPR で実測したところ **効くブラウザと効かない
+// ブラウザがある値**だと分かった（左右合計を getBoundingClientRect で測定）:
+//
+//            DPR1    DPR2      DPR3
+//   Chromium 1px     1px       1px
+//   Firefox  1px     1px       1px
+//   WebKit   1px     1.5px     1.333px
+//
+// つまり 1.5px が実際に描かれるのは **WebKit の DPR≥2 だけ**。据え置くと
+// 「iOS Safari では枠が太く Android Chrome では細い」「同じ Retina Mac でも Safari と
+// Chrome で違う」という**意図しないプラットフォーム差が仕様として固定される**。
+// Capacitor で iOS / Android の両方に出しているので実ユーザーに見える差になる。
+//
+// 1px に寄せた理由（2px ではなく）:
+//   - 1px は **現状の大多数の見え方**（Chromium / Firefox / Android は既に 1px で描画）。変更が最小
+//   - 2px にすると全プラットフォームで太くなるうえ、「Inputs は控えめ / コントロール
+//     （Button・Checkbox・Radio）は border-2」という**意図的な強弱の区別が消える**
+//   - 1px なら設計意図（fields はコントロールより細い）を保ったまま、
+//     **宣言値と実描画が全エンジンで一致**する
+//
+// ⚠ もし将来また任意値の枠幅を使うなら、**型（`length:`）を明示して書く**こと。
+// 裸の任意値（`border-[1.5px]`）は Tailwind v4 が border-color 側と解釈しうる曖昧な
+// 書き方で、実際に「配布 CSS にセレクタが0件＝ DOM にクラスは出るのに枠が描かれない」
+// 欠損が起きていた。欠損自体は scripts/check-styles.mjs の任意値クラス検査が回帰ネット。
 export const FIELD_BOX_BASE =
-  'flex w-full bg-surface-2 border-[length:1.5px] border-solid rounded-md px-3.5 transition-[border-color,box-shadow] duration-(--dur-fast)';
+  'flex w-full bg-surface-2 border border-solid rounded-md px-3.5 transition-[border-color,box-shadow] duration-(--dur-fast)';
 export const FIELD_CONTROL =
   'flex-1 min-w-0 border-none outline-none bg-transparent text-md text-text placeholder:text-text-faint';
 
