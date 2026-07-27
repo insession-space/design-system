@@ -215,6 +215,24 @@ v1 は `ownerDocument` から描画先を自動検出していたが、Base UI �
 
 `Input` / `Textarea` / `SearchField` が共有する field の見た目定数（`FIELD_BOX_BASE`）は、**横 padding だけを持ち縦は持たない**。Input / Textarea は `py-3`、SearchField は `py-2.5` と一段浅く、共通側に `py-3` を置くと呼び出し側の `py-2.5` では**打ち消せない**（同一プロパティのユーティリティは配布 CSS の出力順で決まる。#21 と同じ構図）。この定数を使うときは**縦 padding を必ず自分で指定する**こと。
 
+### ⚠ BASE と variant は同じプロパティのユーティリティを持たない（Button）
+
+`Button` の `BASE` は **`border-color` を持たない**。BASE の `border-transparent` と `secondary` の `border-text` はどちらも同じ utilities レイヤーの `border-color` ユーティリティで詳細度が等しく、**勝敗が配布 CSS の出力順で決まって BASE 側が勝っていた**（実測で `secondary` の `border-top-color` が `rgba(0, 0, 0, 0)` ＝ 仕様の 2px アウトラインが描かれず、消費側に `border-text!` という `!important` の応急処置を書かせていた。#58）。`Toggle` / `Radio` が #17 / #21 で採った「状態別クラスは**排他的に**1つだけ出す」方針と同じで、`border-color` は **variant 側だけ**が持つ。
+
+**`ButtonVariant` を足すときは、`background-color` / `color` / `border-color` をそれぞれちょうど1つずつ書くこと**（`border-*` を書き忘れると枠色がブラウザ既定の `currentColor` になる）。`data-disabled:` / `hover:` 付きのユーティリティは `[data-disabled]` / `:hover` のぶん詳細度が一段高く、素のユーティリティに常に勝つので BASE に置いてよい。
+
+### Sign in with Apple 用の `variant="apple"`（v4.2）
+
+Apple の HIG が「黒地・白文字・白ロゴ」を規定しているため、`Button` に専用の variant を持つ。`--color-apple` / `--color-on-apple` はテーマオーバーレイを持たず、**ライトテーマでも黒地のまま**。hover は `brightness` が黒地では効かない（乗算なので黒のまま）ため、白を少量混ぜた `--color-apple-hover` への面変化で表現する。`AppleIcon` は `currentColor` に従うのでロゴも白になる。
+
+```tsx
+<Button variant="apple" icon={<AppleIcon />}>Sign in with Apple</Button>
+```
+
+### ⚠ 任意値ユーティリティは型を明示する
+
+`border-[1.5px]` のような**裸の任意値**は Tailwind v4 が別プロパティ（この場合 `border-color`）の任意値と解釈しうる曖昧な書き方で、実際に**ユーティリティが生成されず、DOM にクラスは出るのに枠が既定の 1px で描かれる**欠損を出荷したことがある（#35）。長さなら `border-[length:1.5px]` のように型を明示する。`pnpm check:styles` は**ソース中の任意値ユーティリティが配布 CSS に生成されているか**も検査する（この種の欠損の回帰ネット）。
+
 ### Toast は Provider + キューになった（v3）
 
 **`<Toast title=… />` を自分で置く使い方は廃止した。** Base UI の Toast は「Provider が持つキューに add して Viewport が描画する」命令的 API で、見た目部品として単体では置けない。

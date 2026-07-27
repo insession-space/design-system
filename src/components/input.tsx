@@ -40,8 +40,15 @@ export const FIELD_LABEL =
 // 一段浅く、共通側に py-3 を持たせると呼び出し側の py-2.5 では打ち消せない（同一プロパティの
 // ユーティリティは配布 CSS の出力順で勝敗が決まる。#21 と同じ構図で、実測でも py-3 が勝った）。
 // 「打ち消す」のをやめ、**縦 padding は各コンポーネントが必ず自分で指定する**契約にする。
+// ⚠ 枠幅の任意値は **型（length:）を明示して書く**（#35）。裸の任意値は Tailwind v4 が
+// border-color 側の任意値と解釈しうる曖昧な書き方で、実際に「配布 CSS にセレクタが0件
+// ＝ DOM にクラスは出るのに枠は border-solid の既定 1px で描かれる」欠損が起きていた
+// （報告時の実測 border-top-width: 1px。DS の Inputs 仕様は 1.5px）。
+// 現行 Tailwind では裸の書き方でも width として生成されるようになっているが、
+// 版によって解釈が変わる書き方に戻さないこと。型を明示すれば曖昧さ自体が消える。
+// 欠損そのものは scripts/check-styles.mjs の任意値クラス検査が回帰ネットになっている。
 export const FIELD_BOX_BASE =
-  'flex w-full bg-surface-2 border-[1.5px] border-solid rounded-md px-3.5 transition-[border-color,box-shadow] duration-(--dur-fast)';
+  'flex w-full bg-surface-2 border-[length:1.5px] border-solid rounded-md px-3.5 transition-[border-color,box-shadow] duration-(--dur-fast)';
 export const FIELD_CONTROL =
   'flex-1 min-w-0 border-none outline-none bg-transparent text-md text-text placeholder:text-text-faint';
 
