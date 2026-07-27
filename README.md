@@ -267,6 +267,23 @@ Base UI の Drawer は**位置を自分で当てず CSS 変数として出すだ
 >
 > この2つを取り違えると「スクロールしない」「AppBar の sticky が効かない」という形で崩れる。`scroll="body"` はメイン側に `min-h-0` が必須で（これが無いと flex item が子の内容ぶん伸びて `h-dvh` を突き破り、`overflow-y-auto` に有効な高さ制約が生まれない）、逆に `scroll="page"` でメインに `overflow-y-auto` を付けると `position: sticky` の追従先がメインになって AppBar が固定されなくなる。`PageLayout` はこの組み合わせを prop 1つに閉じ込めているので、**`className` で高さや overflow を上書きしないこと**。
 
+### 余白スケール（`gap` / `padding`）の対応表
+
+`Stack` / `Grid` の `gap` と `Surface` の `padding` は**同じ語彙・同じ刻み**を共有する（並べて使ったときに余白の見た目が一致するようにするため）。
+
+| 値 | px | `gap` | `padding` |
+| --- | --- | --- | --- |
+| `none` | 0 | `gap-0` | `p-0` |
+| `xs` | 4 | `gap-1` | `p-1` |
+| `xs.5` | 6 | `gap-1.5` | `p-1.5` |
+| `sm` | 8 | `gap-2` | `p-2` |
+| `md` | 12 | `gap-3` | `p-3` |
+| `lg` | 16 | `gap-4` | `p-4` |
+| `xl` | 24 | `gap-6` | `p-6` |
+| `2xl` | 32 | `gap-8` | `p-8` |
+
+> ⚠ **`xs.5`（6px）は #57 で足した半刻み。** カード内の詰まった縦積み（アバター + 名前）で自然に出る寸法だが、`xs`(4) と `sm`(8) の間に段が無いために消費側が `Stack` に載せられず `className` で組むことになっていた。**`2xs` とは呼ばない** —— t シャツスケールでは `2xs` は「`xs` より小さい」を意味するのに実際は `xs` より大きく、逆の印象を与えるため。Tailwind 自身の半刻み（`gap-1.5`）に合わせた `xs.5` なら、`xs` と `sm` の間にあることが名前だけで分かる。**これ以上の任意値は許さない**（`gap` に任意値を通すと DS 側で刻みを変えても消費側へ伝播しなくなり、スケールを持つ意味が消える）。
+
 ### elevation スケールの対応表
 
 `Surface` の `elevation` は 0〜4 の1軸で「背景 + 境界 + 影」の組を決める。`theme.css` に追加した `--shadow-elevation-0`〜`4` は**既存の `--shadow-soft` / `-popover` / `-overlay` を参照するだけの別名トークン**で、新しい影の実値は増やしていない。
@@ -278,6 +295,51 @@ Base UI の Drawer は**位置を自分で当てず CSS 変数として出すだ
 | 2 | `bg-surface` | `border-border` | `shadow-elevation-2`（= 既存 `shadow-soft`） | Card |
 | 3 | `bg-surface` | `border-border-strong` | `shadow-elevation-3`（= 既存 `shadow-popover`） | Popover / Menu |
 | 4 | `bg-surface` | `border-border` | `shadow-elevation-4`（= 既存 `shadow-overlay`） | Modal |
+
+#### elevation に直交する2軸（`tone` / `shadow`）
+
+**`elevation` の段は増やさず、面の色だけ・影だけを切る直交プロパティを持つ（#57）。** 段を足すと「1〜4 が Paper / Card / Popover / Modal に対応する」という既存の意味が薄まるうえ、必要だったのは「2 の影だけ落としたい」「1 の背景だけ tint にしたい」という**組の一部差し替え**であって新しい段ではなかったため。
+
+| prop | 値 | 効果 |
+| --- | --- | --- |
+| `tone` | `'default'`（既定） | 背景は `elevation` が決めるもの |
+| | `'tint'` | 背景だけ `bg-tint-5`（地の色をわずかに持ち上げただけの面）。境界と影は `elevation` のまま |
+| `shadow` | `'auto'`（既定） | 影は `elevation` が決めるもの |
+| | `'none'` | 影だけ落とす（背景と境界は欲しいが浮かせたくない面。リストの中に並ぶ行） |
+
+```tsx
+// ❌ これまで（className で1プロパティだけ上書き）
+<Surface elevation={2} className="shadow-none">…</Surface>
+<Surface elevation={1} className="bg-tint-5">…</Surface>
+
+// ✅ これから
+<Surface elevation={2} shadow="none">…</Surface>
+<Surface elevation={1} tone="tint">…</Surface>
+```
+
+⚠ **新しい影の実値もトークンも増やしていない。** `tint-5` は `theme.css` の既存トークン、`shadow="none"` は既存の組から影を引くだけ。**既定値が従来と同一なので、既存の呼び出しの見た目は 1px も動かない。**
+
+⚠ **境界は `elevation` だけが決める（直交軸を持たせていない）。** 4辺すべてに境界を引けない場所（AppBar は下端だけ / Footer は上端だけ）は `Surface` を使わず `ELEVATION_BG` / `ELEVATION_BORDER_COLOR` を直接引く設計になっており、境界の軸をここへ足すと同じことを2通りで表現できてしまうため。
+
+### クリックできる面（`render`）
+
+`Surface` / `Paper` / `Card` / `Panel` は **Base UI の `useRender` ベースの `render` プロップ**を持つ（#56。`SideNav` と同じ流儀）。面そのものを任意の要素として描けるので、クリックできるカードを1要素で書ける。
+
+```tsx
+// ❌ これまで（「リセットした <button> > Surface」の入れ子）
+<button type="button" className="border-none bg-transparent p-0 text-left shadow-none">
+  <Card>…</Card>
+</button>
+
+// ✅ これから
+<Card render={<button type="button" />} interactive onClick={…}>…</Card>
+```
+
+- **DOM が1段浅くなる**うえ、`<button>` の中に `<div>` を置く **content model 違反**も同時に消える。
+- **消費側は打ち消しユーティリティ（`border-none bg-transparent p-0 shadow-none`）を書かなくてよい。** 面（背景 / 境界 / 影 / padding）は `elevation` 側のクラスが当て、UA 既定のボタン外観（OS の面・枠・`text-align: center`・マージン・`appearance`）は DS が `render` を渡されたときだけ打ち消す。
+- **打ち消しは `render` を渡したときだけ当てる。** `m-0` / `text-left` は同じプロパティのユーティリティ（`mt-4` / `text-center`）と強さが並ぶため、既定の `<div>` にまで常時当てると消費側の `className` が勝てるかどうかが Tailwind の出力順に依存してしまう。
+- ホバーの持ち上げとフォーカスリングは従来どおり `interactive` が担う（`render` は要素の実体を替えるだけで、インタラクションの見た目は持たない）。
+- **`render` を足したのは面プリミティブだけ。** 他のプリミティブが `render` を Omit しているのは意図的で、一括導入はしない。
 
 既存コンポーネントとの対応をもう少し細かく言うと:
 
@@ -301,9 +363,13 @@ Base UI の Drawer は**位置を自分で当てず CSS 変数として出すだ
 | これまで | これから |
 | --- | --- |
 | `<div className="flex flex-col gap-3">` | `<VStack gap="md">` |
+| `<div className="flex flex-col gap-1.5">` | `<VStack gap="xs.5">` |
 | `<div className="flex items-center gap-2">` | `<HStack gap="sm" align="center">` |
 | `<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">` | `<Grid columns={{ base: 1, md: 2, lg: 3 }} gap="md">` |
 | `<div className="rounded-card border border-border bg-surface p-4 shadow-soft">` | `<Card padding="lg">` |
+| `<Surface elevation={2} className="shadow-none">` | `<Surface elevation={2} shadow="none">` |
+| `<Surface elevation={1} className="bg-tint-5">` | `<Surface elevation={1} tone="tint">` |
+| `<button className="border-none bg-transparent p-0 text-left shadow-none"><Card>…</Card></button>` | `<Card render={<button type="button" />} interactive>` |
 | `<div className="mx-auto w-full max-w-[1024px] px-4">` | `<Container size="lg">` |
 
 ⚠ **`className` は逃げ道として残っているが、props を正とする。** 生の Tailwind ユーティリティに直接戻すと、DS 側でトークン（gap の刻み・elevation の組・コンテナ幅など）を変更しても消費側へ伝播しなくなる。

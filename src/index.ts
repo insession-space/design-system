@@ -224,6 +224,8 @@ export {
   type SurfacePadding,
   type SurfaceProps,
   type SurfaceRadius,
+  type SurfaceShadow,
+  type SurfaceTone,
 } from './components/surface.tsx';
 export {
   Tabs,
