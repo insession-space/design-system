@@ -180,6 +180,14 @@ export {
   type SegmentedControlItem,
   type SegmentedControlProps,
 } from './components/segmented-control.tsx';
+export {
+  SideNav,
+  type SideNavBrandProps,
+  type SideNavGroupProps,
+  type SideNavItemProps,
+  type SideNavItemState,
+  type SideNavRootProps,
+} from './components/side-nav.tsx';
 export { default as Slider, type SliderProps } from './components/slider.tsx';
 export { default as Spinner, type SpinnerProps } from './components/spinner.tsx';
 export {
