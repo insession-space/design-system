@@ -105,10 +105,20 @@ export const ButtonItems: Story = {
 
 // 最下部のアカウントエリア。行（アバター + 名前 + メール + 上下シェブロン）を押すと、
 // items から組んだメニューが**上方向**に開く。
+// 遷移する項目には href を渡す（<a> になるので中クリックで別タブに開ける・読み上げも
+// 「リンク」になる）。external は別タブ + 行末の open_in_new。押すだけの項目は href 無し。
 const ACCOUNT_ITEMS = [
-  { key: 'profile', icon: 'account_circle', label: 'マイプロフィール' },
-  { key: 'settings', icon: 'settings', label: 'アカウント設定' },
-  { key: 'devices', icon: 'picture_in_picture', label: 'デバイス管理', disabled: true },
+  { key: 'profile', icon: 'account_circle', label: 'マイプロフィール', href: '#profile' },
+  { key: 'settings', icon: 'settings', label: 'アカウント設定', href: '#settings' },
+  { key: 'help', icon: 'help', label: 'ヘルプ', href: 'https://example.com', external: true },
+  // disabled + href。<a> にしない（遷移が止まらないため）ことの確認も兼ねる。
+  {
+    key: 'devices',
+    icon: 'picture_in_picture',
+    label: 'デバイス管理',
+    href: '#devices',
+    disabled: true,
+  },
   { key: 'signout', icon: 'logout', label: 'サインアウト', separatorBefore: true, danger: true },
 ] as const;
 
