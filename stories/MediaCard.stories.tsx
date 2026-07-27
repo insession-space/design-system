@@ -87,6 +87,32 @@ export const WithoutFooter: Story = {
   ),
 };
 
+export const Clickable: Story = {
+  render: () => (
+    <Section
+      title="render (クリックできるカード)"
+      note="render={<button type='button' />} + interactive でカード全体を1要素(<button>)として描く。Surface/Card と同じ render の口をそのまま通しているだけで、MediaCard 自身は用途固定の onPlay 等を持たない。"
+    >
+      <div className="max-w-sm">
+        <MediaCard
+          render={<button type="button" />}
+          interactive
+          onClick={() => {}}
+          cover={cover}
+          overlay={
+            <Badge tone="live" dot>
+              LIVE
+            </Badge>
+          }
+          title="Working hard"
+          meta="1 watching · playing · late night"
+          footer={<AvatarStack people={people} size={28} />}
+        />
+      </div>
+    </Section>
+  ),
+};
+
 export const LongTitleAndMeta: Story = {
   render: () => (
     <Section

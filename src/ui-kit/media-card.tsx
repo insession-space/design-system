@@ -1,3 +1,4 @@
+import type { useRender } from '@base-ui/react/use-render';
 import type { ComponentProps, ReactNode } from 'react';
 import { Card } from '../components/surface.tsx';
 
@@ -18,6 +19,17 @@ import { Card } from '../components/surface.tsx';
 //     このコンポーネント自身は「右上に縦積みできる器」を提供するだけに留める。これにより
 //     配信/動画/イベントなど種別が増えても DS 側は変わらない。
 //   - 参加者データの取得・アバターの解決。`footer` に `<AvatarStack …/>` を差してもらう。
+//
+// ── クリックできるカード(`render`) ──────────────────────────
+// 内側の `Card` は surface.tsx の `useRender` ベースの `render` を持つ(#56)。MediaCard の
+// props ベースを `ComponentProps<'div'>` から `useRender.ComponentProps<'div'>` に揃えて
+// `render` をそのまま `Card` へ通す(`...rest` 経由)。これで「カード全体がクリック可能」な
+// UI を、消費側が `<button>` の中に `<div>` を置く content model 違反を犯さずに1要素で
+// 書ける(`<MediaCard render={<button type="button" />} interactive onClick={…} …/>`)。
+// `interactive` も同じ理由で通す(ホバーの持ち上げ・フォーカスリングは `Surface` 側の
+// `interactive` が担うため。render とは独立した prop で、既定は false=従来どおり)。
+// 増やしているのは「要素の実体を差し替える口」と「相互作用の見た目」の2つだけで、
+// `onPlay` のような用途固定 props は今回も足さない(MediaCard の設計思想は崩さない)。
 export type MediaCardProps = {
   // カバー画像のスロット。枠(16:9・角丸・overflow-hidden)はこちらが持つので、
   // 渡すのは中身(<img className="h-full w-full object-cover" …/> 等)だけでよい。
@@ -31,8 +43,11 @@ export type MediaCardProps = {
   meta?: ReactNode;
   // 最下部のスロット。`<AvatarStack …/>` を想定する。
   footer?: ReactNode;
+  // ホバーの持ち上げ + フォーカスリング(Surface の interactive と同じ意味)。既定は false
+  // (従来どおり非対話)。`render` でクリック可能な要素に差し替えるときに一緒に渡す想定。
+  interactive?: boolean;
   className?: string;
-} & Omit<ComponentProps<'div'>, 'className' | 'children' | 'title'>;
+} & Omit<useRender.ComponentProps<'div'>, 'className' | 'children' | 'title'>;
 
 export function MediaCard({
   cover,
@@ -40,11 +55,19 @@ export function MediaCard({
   title,
   meta,
   footer,
+  interactive,
   className = '',
   ...rest
 }: MediaCardProps) {
   return (
-    <Card elevation={2} radius="card" padding="lg" className={className} {...rest}>
+    <Card
+      elevation={2}
+      radius="card"
+      padding="lg"
+      interactive={interactive}
+      className={className}
+      {...rest}
+    >
       {(cover || overlay) && (
         // 外枠は overlay の絶対配置の基準になるだけ。切り落とし(overflow-hidden)と角丸は
         // カバー自身の枠が持つので、ここで重ねて指定しない(重ねるとバッジが枠外へ
