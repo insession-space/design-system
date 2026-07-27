@@ -1,5 +1,4 @@
 import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from 'react';
-import Chip from '../components/chip.tsx';
 import IconButton from '../components/icon-button.tsx';
 import { HStack, VStack } from '../components/layout.tsx';
 import LinkPreview, { type LinkPreviewMeta } from '../components/link-preview.tsx';
@@ -7,7 +6,7 @@ import Icon, { type IconName } from '../icons/icon.tsx';
 import { hasSlotContent } from './slot.ts';
 import UserLabel from './user-label.tsx';
 
-// 「誰かの投稿1件」を表す複合コンポーネント(#83)。UserLabel / Chip / IconButton を束ねるので
+// 「誰かの投稿1件」を表す複合コンポーネント(#83)。UserLabel / IconButton を束ねるので
 // src/ui-kit/ に置く。
 //
 // ── 何を持ち、何を持たないか ─────────────────────────────
@@ -167,6 +166,23 @@ function resolveTargetUrls(urls: string[], max: number): string[] {
 // 併記することで、キーボードで tab 移動してきたときも見える(#83 受け入れ条件)。
 const ACTIONS_VISIBILITY =
   'opacity-0 transition-opacity duration-(--dur-fast) group-hover:opacity-100 group-focus-within:opacity-100';
+
+// ── リアクションピル(#103) ─────────────────────────────
+// Chip ではなく専用の button で描く。Chip の既定は「クイック返信/フィルター/タグ」向けの
+// 12.5px + px-3.5 py-[7px] で、主役が絵文字1文字+数字しかないリアクションピルには余白が
+// 過大になり、絵文字だけが小さく見える。さらに Chip の selected は accent tint の面に accent の
+// 文字を載せるため、数字が背景に溶ける。
+// ⚠ これを Chip に className を渡して打ち消すことはできない。Tailwind の同一プロパティの
+// ユーティリティ(px-3.5 と px-2、bg-tint-22 と bg-surface-2)は「クラスを後ろに書いた方」ではなく
+// 「生成CSSで後に来た方」が勝つため、上書きが効くかがビルド順に依存してしまう。Chip 本体
+// (＝フィルター/タグ/入力トークンとしての見た目)は変えられないので、ここで閉じる。
+const REACTION_BASE =
+  'inline-flex items-center gap-1 rounded-pill border border-solid px-2 py-1 cursor-pointer select-none transition-colors duration-(--dur-fast)';
+const REACTION_DEFAULT = 'bg-surface-2 border-border-strong enabled:hover:bg-surface-hover';
+// 押している状態は「面」ではなく accent の枠で示す。tint の面を敷くと、その上に載る数字が
+// どの色でも同系色に寄って読みづらくなるため(#103)。数字は常に text 色なのでコントラストは
+// 押している/いないに関わらず保たれる。
+const REACTION_SELECTED = 'bg-surface-2 border-accent enabled:hover:bg-surface-hover';
 
 // 投稿者名を押せるようにしている(href / onClick)ときだけ、その内側に載る時刻を「押せない飾り」に
 // 落とすためのハンドラ。preventDefault が <a href> の遷移を、stopPropagation が <button> の
@@ -365,19 +381,26 @@ export default function MessageItem({
       {reactions != null && reactions.length > 0 && (
         <HStack gap="xs" wrap className="mt-0.5">
           {reactions.map((reaction, index) => (
-            <Chip
+            <button
               // biome-ignore lint/suspicious/noArrayIndexKey: 絵文字は重複しうるため index を使う
               key={index}
-              selected={reaction.reacted}
-              // 押しているかは面と枠(accent tint + accent 枠)で示す。check は出さない —
-              // 絵文字の隣にチェックが並ぶと、何に対する肯定なのかが読めなくなるため。
-              showCheck={false}
+              type="button"
+              aria-pressed={reaction.reacted ?? false}
               aria-label={`${reaction.label} ${reaction.count}`}
               onClick={reaction.onClick}
+              className={`${REACTION_BASE} ${reaction.reacted ? REACTION_SELECTED : REACTION_DEFAULT}`}
             >
-              <span aria-hidden="true">{reaction.emoji}</span>
-              <span>{reaction.count}</span>
-            </Chip>
+              <span aria-hidden="true" className="text-[15px] leading-none">
+                {reaction.emoji}
+              </span>
+              <span
+                className={`text-[11.5px] leading-none tabular-nums text-text ${
+                  reaction.reacted ? 'font-bold' : 'font-semibold'
+                }`}
+              >
+                {reaction.count}
+              </span>
+            </button>
           ))}
         </HStack>
       )}
