@@ -16,7 +16,7 @@ import { Section } from './tokens';
 // #53 の後半4プリミティブ。消費側(insession-app)が legacy CSS や打ち消しユーティリティで
 // 手組みしていたものを DS に上げたもの。
 const meta: Meta = {
-  title: 'Components/Upload & Color & Row',
+  title: 'Inputs/Upload & Color & Row',
   parameters: { layout: 'padded' },
 };
 export default meta;

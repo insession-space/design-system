@@ -8,7 +8,7 @@ import { Section } from './tokens';
 // 実際に入力・送信できる形で見せる(送信ボタンの disabled 判定・自動伸長など、controlled で無いと
 // 確認できない挙動があるため)。
 const meta: Meta<typeof Composer> = {
-  title: 'Components/Composer',
+  title: 'Inputs/Composer',
   component: Composer,
   parameters: { layout: 'padded' },
 };

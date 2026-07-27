@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // Panel のカタログ。elevation=1 固定、radius 既定 panel。サイドバー/セクション囲み用。
 const meta: Meta = {
-  title: 'Surface/Panel',
+  title: 'Surfaces/Panel',
   parameters: { layout: 'padded' },
 };
 export default meta;

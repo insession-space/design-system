@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // DS の Lozenge。状態/メタの mono 大文字ラベル(LIVE / PENDING / REC / BETA)。塗り控えめ・非操作。
 const meta: Meta<typeof Lozenge> = {
-  title: 'Components/Lozenge',
+  title: 'Data Display/Lozenge',
   component: Lozenge,
   parameters: { layout: 'padded' },
 };

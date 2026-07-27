@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // DS の Avatar。画像 or ラベル(既定は名前の先頭1文字)の円。size / color / status / ring を注入。
 // 複数人を重ねて出すなら AvatarStack を使う。
 const meta: Meta<typeof Avatar> = {
-  title: 'Components/Avatar',
+  title: 'Data Display/Avatar',
   component: Avatar,
   parameters: { layout: 'padded' },
 };

@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // DS の CountChip。件数を出す小さな pill。タブや Bottom Nav のアイコンへ重ねて使う。
 // 状態・意味のラベルは Badge、タップできる要素は Chip。
 const meta: Meta<typeof CountChip> = {
-  title: 'Components/CountChip',
+  title: 'Data Display/CountChip',
   component: CountChip,
   parameters: { layout: 'padded' },
 };

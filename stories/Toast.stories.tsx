@@ -6,7 +6,7 @@ import { Section } from './tokens';
 // 描画する**命令的 API になった（#23）。見た目部品として単体で置くことはできないので、
 // カタログでも Provider + Viewport を張ってボタンから add する形で見せる。
 const meta: Meta = {
-  title: 'Components/Toast',
+  title: 'Feedback/Toast',
   parameters: { layout: 'padded' },
 };
 export default meta;

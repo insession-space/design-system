@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // サイズ可変のローディングインジケータ。薄いミントのリング + ミントの先頭。
 const meta: Meta<typeof Spinner> = {
-  title: 'Components/Spinner',
+  title: 'Feedback/Spinner',
   component: Spinner,
   parameters: { layout: 'padded' },
 };

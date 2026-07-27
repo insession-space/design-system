@@ -5,7 +5,7 @@ import { Section } from './tokens';
 
 // Modal を土台にした確認ダイアログ。confirmVariant で実行ボタンを primary/danger に。
 const meta: Meta = {
-  title: 'Components/ConfirmModal',
+  title: 'Overlays/ConfirmModal',
   parameters: { layout: 'padded' },
 };
 export default meta;

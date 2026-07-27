@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // DS の複数行テキスト入力。Input と同じ見た目・同じ状態遷移の textarea 版。
 const meta: Meta<typeof Textarea> = {
-  title: 'Components/Textarea',
+  title: 'Inputs/Textarea',
   component: Textarea,
   parameters: { layout: 'padded' },
 };

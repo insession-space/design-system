@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // DS の AvatarStack(+N overflow)。people を重ねて描画し、max を超えた分は +N の中立トークンで示す。
 // presence 表示などの将来集約先(token/props ベース)。
 const meta: Meta<typeof AvatarStack> = {
-  title: 'Components/AvatarStack',
+  title: 'Data Display/AvatarStack',
   component: AvatarStack,
   parameters: { layout: 'padded' },
 };

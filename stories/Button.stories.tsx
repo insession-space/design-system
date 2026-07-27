@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // DS のボタン。variant(primary/accent/secondary/ghost/danger/join) × size × loading/disabled。
 const meta: Meta<typeof Button> = {
-  title: 'Components/Button',
+  title: 'Actions/Button',
   component: Button,
   parameters: { layout: 'padded' },
 };

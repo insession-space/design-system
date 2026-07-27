@@ -4,7 +4,7 @@ import { Section } from './tokens';
 
 // DS のテキスト入力。ラベル(mono caps) + default / focus(info リング) / error(accent) 状態。
 const meta: Meta<typeof Input> = {
-  title: 'Components/Input',
+  title: 'Inputs/Input',
   component: Input,
   parameters: { layout: 'padded' },
 };

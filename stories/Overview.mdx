@@ -1,0 +1,118 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { chrome } from '../.storybook/ds-theme';
+
+{/* サイドバー先頭に来るカテゴリ解説ページ（Issue #68）。
+    ページ組みは Introduction.mdx に合わせて inline style で書く —
+    preview.css の @source は ../stories を走査するが、.mdx のクラス名まで拾えるかは
+    保証がなく、拾えなければ「クラスは DOM に出るのに CSS が無い」で静かに崩れる。 */}
+
+<Meta title="Overview/カテゴリの分け方" />
+
+# カテゴリの分け方
+
+サイドバーは**役割ベース**で 11 個のカテゴリに分かれています。新しい story を足すときや、
+どのカテゴリに置くか迷ったときの判断基準をここにまとめます。
+
+## カテゴリ一覧
+
+{/* MDX は GFM のパイプ表を解釈しないので（書くと生テキストのまま出る）、表は JSX で組む。 */}
+<table style={{ borderCollapse: 'collapse', width: '100%', margin: '1rem 0' }}>
+  <thead>
+    <tr>
+      {['カテゴリ', '含む部品'].map((h) => (
+        <th key={h} style={{
+          textAlign: 'left',
+          padding: '.5rem .7rem',
+          borderBottom: `1px solid ${chrome.borderStrong}`,
+          color: chrome.textDim,
+          fontSize: '.8rem',
+        }}>{h}</th>
+      ))}
+    </tr>
+  </thead>
+  <tbody>
+    {[
+      ['Foundations', 'Colors / Typography / Elevation / Tokens / Icons'],
+      ['Layout', 'Stack / Grid / Container / Center / Spacer / Divider'],
+      ['Surfaces', 'Surface / Paper / Panel / Card'],
+      ['Actions', 'Button / IconButton / Link'],
+      ['Inputs', 'Input / Textarea / SearchField / Controls / Stepper / Segmented & Slider / Upload & Color & Row / Composer'],
+      ['Data Display', 'Avatar / AvatarStack / UserLabel / Badge / CountChip / Chip / Lozenge / Status / LogoMark'],
+      ['Feedback', 'Toast / Spinner / RingTimer / EmptyNote'],
+      ['Overlays', 'Modal / ConfirmModal / SplitModal / BottomSheet / Popover'],
+      ['Navigation', 'Tabs / StepFlow / Accordion'],
+      ['Page', 'AppBar / Toolbar / PageHeader / Footer / PageLayout'],
+      ['Patterns', 'FeedItem'],
+    ].map(([category, members]) => (
+      <tr key={category}>
+        <td style={{ padding: '.5rem .7rem', borderBottom: `1px solid ${chrome.border}`, fontWeight: 700 }}>
+          {category}
+        </td>
+        <td style={{ padding: '.5rem .7rem', borderBottom: `1px solid ${chrome.border}`, color: chrome.textDim }}>
+          {members}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+## 何を置くか / 置かないか
+
+### Foundations
+
+個別の部品ではなく、カタログ全体が乗っている**土台**。トークン・色・タイポグラフィ・
+アイコンセットなど、単体の UI パーツとして使うものではなく「他の全部品が参照する値/素材」を置く。
+
+### Layout vs Surfaces
+
+どちらも「骨格プリミティブ」だが、**地の色を持つかどうか**で分ける。
+
+- **Layout**: 余白と配置だけを扱う。背景色・境界線・影を持たない（Stack / Grid / Spacer など）。
+- **Surfaces**: 面。背景・境界・影を持ち、その上に他の要素が乗る（Surface / Paper / Panel / Card）。
+
+判断に迷ったら「これを透明にしても成立するか」で聞く。成立するなら Layout、成立しないなら Surfaces。
+
+### Page vs Layout
+
+**Page** はアプリの骨格として**画面上の位置が決まっている**もの（AppBar は上、Footer は下、
+PageLayout は画面全体の器）。**Layout** はどこにでも置ける汎用の配置プリミティブ。
+「この部品はアプリ内で1箇所にしか出てこない」と言えるなら Page。
+
+### Actions vs Inputs
+
+**Actions** は押すと何かが起きる（ナビゲーション/コマンドの実行）。**Inputs** は値を編集して
+呼び出し元に返す。フォームの一部として値を持ち回るなら Inputs、押した瞬間に完結するなら Actions。
+
+見た目がボタンでも、押した結果が「値の変化」なら Inputs。Controls（Checkbox / Radio / Toggle）と
+Stepper は押す操作だが `value` / `onChange` を持つ値エディタなので Inputs に置いている。
+
+### Data Display vs Feedback
+
+**Data Display** はある時点の状態を表す**静的な表示**（Badge / Chip / Status など、再描画されるまで
+変わらない）。**Feedback** は処理中や処理結果を**一時的に**伝える（Toast は数秒で消える、
+Spinner は処理が終わると消える）。「消えることが前提か」で聞き分けられる。
+
+### Overlays
+
+ページの上に重ねて出す層。Modal / Popover / BottomSheet など、元のレイアウトを覆う/浮かせるもの。
+
+### Navigation
+
+同一ページ内でコンテンツの表示範囲を切り替えるもの（Tabs / Accordion）や、複数ステップの
+進行を示すもの（StepFlow）。値そのものを編集する Stepper（数値増減）は名前が似ているが Inputs。
+
+### Patterns
+
+**複数のプリミティブを組み合わせた具体ユースケース**。単体の部品ではなく「この画面ではこう組む」
+という一例を見せるためのもの。**汎用性より用途が先に立つ**なら Patterns（例: FeedItem は
+Avatar + UserLabel + 本文 + アクションの組み合わせ）。単体で再利用できる部品は他のカテゴリへ。
+
+## 新しい部品を足すとき
+
+1. 上の表の判断基準に沿って、まず「地の色を持つか」「押すのか編集するのか」「一時的に消えるか」
+   のような**二択の質問**でカテゴリを絞る。
+2. 既存の同カテゴリの部品と役割が似ているか見比べる（迷ったら近い部品と同じカテゴリに置く）。
+3. `meta.title` は `<カテゴリ>/<部品名>`（例: `Inputs/Input`）。カテゴリ名は上の一覧の表記
+   （複数形・スペースを含む表記も含め）とそろえる — 表記ゆれがあるとサイドバーでカテゴリが分裂する。
+4. どのカテゴリにも当てはまらない場合だけ、このページに新しいカテゴリを足すことを検討する
+   （`.storybook/preview.tsx` の `storySort.order` にも追加すること）。

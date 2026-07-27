@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // ステータス表現。StatusDot(点) / StatusBadge(点 + ラベルのピル)。
 // Badge(new/live の一過性強調)とは用途が別で、継続的な状態を表す。
 const meta: Meta = {
-  title: 'Components/Status',
+  title: 'Data Display/Status',
   parameters: { layout: 'padded' },
 };
 export default meta;

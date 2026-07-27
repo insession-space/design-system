@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // DS の Badge。非対話の status/meta ラベル。
 // タップできる要素は Chip、継続的な状態の点+枠は StatusBadge、mono-caps の状態タグは Lozenge。
 const meta: Meta<typeof Badge> = {
-  title: 'Components/Badge',
+  title: 'Data Display/Badge',
   component: Badge,
   parameters: { layout: 'padded' },
 };

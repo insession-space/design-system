@@ -6,7 +6,7 @@ import { Section } from './tokens';
 // 色 + ウェイトで区別する。色は --color-link / --color-link-hover、focus は全リンク共通の
 // グローバル :focus-visible（--color-focus-ring）。
 const meta: Meta<typeof Link> = {
-  title: 'Components/Link',
+  title: 'Actions/Link',
   component: Link,
   parameters: { layout: 'padded' },
 };

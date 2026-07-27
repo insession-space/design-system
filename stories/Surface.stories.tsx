@@ -6,7 +6,7 @@ import { Section } from './tokens';
 // 対応表は Foundations/Elevation にあるので、ここでは Surface の使い方
 // (padding/radius/elevation の指定と interactive 挙動)にフォーカスする。
 const meta: Meta = {
-  title: 'Surface/Surface',
+  title: 'Surfaces/Surface',
   parameters: { layout: 'padded' },
 };
 export default meta;

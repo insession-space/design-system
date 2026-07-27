@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // タブ / セグメンテッドコントロール。下線式(media-tabs 相当)。compound API(Tabs.Root/List/Tab/Panel)。
 // badge(CountChip)は Tab の children に直接置く。trailing は List の children の後ろに置く。
 const meta: Meta<typeof Tabs.Root> = {
-  title: 'Components/Tabs',
+  title: 'Navigation/Tabs',
   parameters: { layout: 'padded' },
 };
 export default meta;

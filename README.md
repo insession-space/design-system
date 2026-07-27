@@ -8,6 +8,13 @@ InSession と loophub が共有するデザインシステム。**純粋 leaf UI
 - **カタログ（Storybook）: https://design-system.insession.space/**
 - 消費側: `insession-space/insession-app`（InSession 本体・admin・lp・help）、`insession-space/loophub-app`（web・lp）
 
+## カタログのカテゴリ体系
+
+Storybook のサイドバーは役割ベースで並んでいる: `Foundations` / `Layout` / `Surfaces` /
+`Actions` / `Inputs` / `Data Display` / `Feedback` / `Overlays` / `Navigation` / `Page` / `Patterns`。
+各カテゴリに何を置くか（`Layout` と `Surfaces` の違いなど）の判断基準は、カタログの
+**Overview / カテゴリの分け方** ページ参照。
+
 ## セットアップ（消費側アプリ）
 
 ```bash

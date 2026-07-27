@@ -6,7 +6,7 @@ import { Section } from './tokens';
 // DS の Stepper。− / 値 / ＋ の数値増減。振る舞いは Base UI の NumberField へ委譲していて、
 // 矢印キー(↑↓)・PageUp/Down・値の直接入力・min/max での端 disabled・clamp が入っている。
 const meta: Meta<typeof Stepper> = {
-  title: 'Components/Stepper',
+  title: 'Inputs/Stepper',
   component: Stepper,
   parameters: { layout: 'padded' },
 };

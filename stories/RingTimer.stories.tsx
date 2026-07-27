@@ -5,7 +5,7 @@ import { Section } from './tokens';
 // 円形カウントダウンタイマー。時間計算はしない純粋表示部品(リレーゲーム等の残り時間表示 #974)。
 // secondsLeft <= urgentThreshold で accent 色 + 脈動に切り替わる。
 const meta: Meta<typeof RingTimer> = {
-  title: 'Components/RingTimer',
+  title: 'Feedback/RingTimer',
   component: RingTimer,
   parameters: { layout: 'padded' },
 };
