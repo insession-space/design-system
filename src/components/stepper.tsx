@@ -37,8 +37,13 @@ export type StepperProps = {
   className?: string;
 };
 
+// ⚠ `cursor-pointer` は必須（#71）。DS の他のボタン系（Button / IconButton / ListRow /
+// ToolButton）はいずれも持っているのに Stepper だけ抜けていて、ホバーしてもポインタが矢印のまま
+// ＝「押せることが分からない」状態だった。消費側 insession-app の素の `button { cursor: pointer }`
+// が暗黙に埋めていたため長く露見しなかった（その基底を撤去した時点で露出した）。
+// data-disabled 側の cursor-not-allowed は `&[data-disabled]` で詳細度が一段高く、常に勝つ。
 const BTN =
-  'w-[30px] h-[30px] pointer-coarse:w-10 pointer-coarse:h-10 p-0 inline-flex items-center justify-center text-lg leading-none rounded-full bg-tint-7 border border-solid border-border text-text-dim transition-[background,box-shadow] hover:not-data-disabled:bg-tint-13 hover:not-data-disabled:shadow-glow data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed';
+  'w-[30px] h-[30px] pointer-coarse:w-10 pointer-coarse:h-10 p-0 inline-flex items-center justify-center text-lg leading-none rounded-full bg-tint-7 border border-solid border-border text-text-dim cursor-pointer transition-[background,box-shadow] hover:not-data-disabled:bg-tint-13 hover:not-data-disabled:shadow-glow data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed';
 
 // 値の表示。移行前は span に min-w-[34px] / text-center / text-lg / font-bold / tabular-nums を
 // 当てていた。<input> になったが、枠・背景・アウトラインを消して同じ見た目に保つ。

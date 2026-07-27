@@ -129,6 +129,15 @@
   --color-snackbar-danger: #ff9ab8;
   --color-snackbar-danger-border: rgba(255, 154, 184, 0.3);
 
+  /* カラー: Sign in with Apple 専用(#72)。Apple の Human Interface Guidelines がボタンの配色を
+     規定しており、黒地 / 白文字 / 白ロゴが基本形。**テーマに追従させない**（ライトテーマでも
+     黒地のまま）ので、ファイル末尾のライトオーバーレイには意図的に書かない。
+     hover は brightness では変化が出ない（黒は乗算なので何倍しても黒のまま）ため、
+     白を少量混ぜた面へ変えて「押せる」フィードバックを出す。 */
+  --color-apple: #000000;
+  --color-on-apple: #ffffff;
+  --color-apple-hover: color-mix(in srgb, rgb(255 255 255) 14%, var(--color-apple));
+
   /* フォント: 新 DS(claude design "INSESSION Design System" #463)に一新。
      JetBrains Mono を「製品フォント」= UI・見出し・本文・ラベル・メタ・数値すべてに使う。
      Archivo はロゴ/ワードマーク専用(現状ロゴは SVG アセット)。日本語フォールバックは維持。

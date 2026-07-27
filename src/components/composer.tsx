@@ -126,7 +126,7 @@ export default function Composer({
   return (
     <form
       onSubmit={handleFormSubmit}
-      className={`flex flex-col rounded-card border-[1.5px] border-solid bg-surface transition-[border-color,box-shadow] duration-(--dur-fast) ${
+      className={`flex flex-col rounded-card border-[length:1.5px] border-solid bg-surface transition-[border-color,box-shadow] duration-(--dur-fast) ${
         flash ? 'border-mint shadow-focus' : 'border-border'
       } ${className}`.trim()}
     >

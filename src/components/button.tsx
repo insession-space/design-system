@@ -5,7 +5,8 @@ import Spinner from './spinner.tsx';
 
 // DS のボタン（純粋 leaf UI）。claude design "INSESSION Design System" のボタン仕様に準拠（#463 / #663）。
 // variant: primary=中立塗り(fill) / accent=コーラル / secondary=2px アウトライン / ghost=テキスト(info) /
-//   live=ライブ緑の pill + 先頭ドット(Join session。DS の正名) / danger=危険(アプリ固有・DS外だが必要)。
+//   live=ライブ緑の pill + 先頭ドット(Join session。DS の正名) / danger=危険(アプリ固有・DS外だが必要) /
+//   apple=Sign in with Apple 用の黒地・白文字(Apple HIG。ライトテーマでも黒地のまま。#72)。
 // `join` は歴史的別名として live にマップする（後方互換。消費側は当面そのまま動く）。
 // radius は既定 DS の md(10px)。pill prop で rounded-pill、live/join は常に pill。font 15px、
 // weight は primary/accent/secondary/danger/live=700・ghost=600。disabled は DS の沈んだ面(surface-3 + text-dim)。
@@ -19,7 +20,8 @@ export type ButtonVariant =
   | 'ghost'
   | 'danger'
   | 'live'
-  | 'join';
+  | 'join'
+  | 'apple';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export type ButtonProps = {
@@ -43,6 +45,17 @@ export type ButtonProps = {
 // border-2 を基底に置き、secondary(2px 枠)と他(透明枠)で外形を揃える(box-border)。
 // 角丸(rounded-md / rounded-pill)は同一ユーティリティの競合を避けるため BASE に含めず
 // radius として一方だけを組み立てて付与する(#517)。
+// ⚠ **border-color も BASE に持たせない(#58)。** かつて BASE が `border-transparent` を持ち
+// secondary が `border-text` を足していたが、どちらも同じ utilities レイヤーの border-color
+// ユーティリティで詳細度が等しく、**勝敗が配布 CSS の出力順で決まって BASE 側が勝っていた**
+// （実測で secondary の border-top-color が rgba(0,0,0,0) = 仕様の 2px アウトラインが消えた
+// 状態で出荷されていた。消費側は `border-text!` の !important で応急処置していた）。
+// toggle.tsx / radio.tsx が #17 / #21 で採った方針と同じく、**同一プロパティのユーティリティは
+// 排他的に1つだけ出す**。ここでは border-color を VARIANT 側だけが持つ契約にしている。
+// → 新しい variant を足すときは **必ず border-* を1つ書くこと**（書き忘れると枠色が
+//   ブラウザ既定の currentColor になり、意図しない枠が出る）。
+// data-disabled: の border-transparent は `&[data-disabled]` で詳細度が一段高く、
+// variant 側の素の border-* に常に勝つので BASE に残してよい（順序に依存しない）。
 // ⚠ disabled 系は `disabled:` / `enabled:` ではなく **`data-disabled:` / `not-data-disabled:`**
 // で書く（#33）。Base UI の Button に `focusableWhenDisabled` を渡すと、`disabled` 属性を出さず
 // **`aria-disabled` に切り替わる**（disabled なボタンがキーボードナビから消える問題への対処。
@@ -52,20 +65,32 @@ export type ButtonProps = {
 // 出すので、そちらを見れば両方の経路（disabled 属性 / aria-disabled）を1つの書き方で拾える。
 // 値は移行前から変えていない。
 const BASE =
-  'inline-flex items-center justify-center gap-2 border-2 border-solid border-transparent box-border font-display cursor-pointer select-none transition-[transform,filter,background,color,box-shadow] duration-(--dur-fast) ease-spring not-data-disabled:active:scale-[0.97] data-disabled:bg-surface-3 data-disabled:text-text-dim data-disabled:border-transparent data-disabled:cursor-not-allowed data-disabled:shadow-none focus-visible:shadow-focus focus-visible:outline-none';
+  'inline-flex items-center justify-center gap-2 border-2 border-solid box-border font-display cursor-pointer select-none transition-[transform,filter,background,color,box-shadow] duration-(--dur-fast) ease-spring not-data-disabled:active:scale-[0.97] data-disabled:bg-surface-3 data-disabled:text-text-dim data-disabled:border-transparent data-disabled:cursor-not-allowed data-disabled:shadow-none focus-visible:shadow-focus focus-visible:outline-none';
 
 // hover も `enabled:hover:` ではなく `hover:not-data-disabled:` で書く（理由は BASE のコメント）。
+// ⚠ **各 variant は background-color / color / border-color をそれぞれちょうど1つずつ持つ**。
+// BASE 側は同じプロパティのユーティリティを一切持たないので、出力順の勝負が起きない（#58）。
 const VARIANT: Record<ButtonVariant, string> = {
-  primary: 'bg-fill text-on-fill font-bold hover:not-data-disabled:brightness-[.93]',
-  accent: 'bg-accent text-on-accent font-bold hover:not-data-disabled:brightness-[.93]',
+  primary:
+    'bg-fill border-transparent text-on-fill font-bold hover:not-data-disabled:brightness-[.93]',
+  accent:
+    'bg-accent border-transparent text-on-accent font-bold hover:not-data-disabled:brightness-[.93]',
   secondary:
     'bg-transparent border-text text-text font-bold hover:not-data-disabled:bg-surface-hover',
-  ghost: 'bg-transparent text-info font-semibold hover:not-data-disabled:bg-surface-hover',
+  ghost:
+    'bg-transparent border-transparent text-info font-semibold hover:not-data-disabled:bg-surface-hover',
   danger:
     'bg-danger-surface border-danger-border text-danger font-bold hover:not-data-disabled:brightness-[.93]',
-  live: 'bg-success text-white font-bold hover:not-data-disabled:brightness-[.93]',
+  live: 'bg-success border-transparent text-white font-bold hover:not-data-disabled:brightness-[.93]',
   // 後方互換: join は live と同一。
-  join: 'bg-success text-white font-bold hover:not-data-disabled:brightness-[.93]',
+  join: 'bg-success border-transparent text-white font-bold hover:not-data-disabled:brightness-[.93]',
+  // Sign in with Apple 用（#72）。Apple の HIG が黒地 / 白文字 / 白ロゴを規定しているので、
+  // **ライトテーマでも黒地のまま**にする（--color-apple はテーマオーバーレイを持たない）。
+  // hover は brightness では動かない（黒は乗算で黒のまま）ため、白を少量混ぜた
+  // --color-apple-hover への面変化で表現する。AppleIcon は currentColor に従うので
+  // text-on-apple がそのままロゴ色になる。
+  apple:
+    'bg-apple border-apple text-on-apple font-bold hover:not-data-disabled:bg-apple-hover hover:not-data-disabled:border-apple-hover',
 };
 
 // DS の padding。primary/accent/danger/live は 12/22。ghost は横を詰める(テキストボタン)。
