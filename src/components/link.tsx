@@ -25,7 +25,14 @@ import {
 //     （`<Link asChild variant="pill"><RouterLink to="/">…</RouterLink></Link>`）。
 //   - className だけ欲しい場合は `linkClass(variant)` を直接 className に渡す
 //     （react-router `Link` の className に載せる用途で最も手軽）。
-export type LinkVariant = 'inline' | 'subtle' | 'pill' | 'wrapper';
+//   bare    = 既に自前の色を持つ行/セルへ「下線を消す」だけを足す器（#82 フォローアップ）。
+//             wrapper との違いは `text-inherit` を出さないこと。色を持つ要素（Menu.Item の
+//             tone クラス等）と同じ要素に wrapper を重ねると、どちらも単一クラス（特異度が
+//             同じ）なので配布 CSS の**出力順**で勝敗が決まり、text-inherit が tone の色を
+//             静かに潰す（menu.tsx の bg-transparent と同じ失敗モード。実測で danger の
+//             警告色が消えることを確認した）。色を出さない bare なら衝突自体が起きない。
+//             ⚠ 色を持たない素の <a> に使うと UA 既定のリンク色が出る。必ず色を持つ要素に。
+export type LinkVariant = 'inline' | 'subtle' | 'pill' | 'wrapper' | 'bare';
 
 // 下線は使わない（ボタンテキスト調）。色・ウェイトはトークン経由。arbitrary は 4/8px リズムに
 // 載らない値のみ（py-[7px] 等）。
@@ -36,6 +43,7 @@ const VARIANT: Record<LinkVariant, string> = {
     'text-link text-sm font-semibold no-underline cursor-pointer transition-colors duration-(--dur-fast) hover:text-link-hover',
   pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-pill uppercase no-underline cursor-pointer transition-[background,color,transform] duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent hover:-translate-y-px',
   wrapper: 'text-inherit no-underline cursor-pointer',
+  bare: 'no-underline cursor-pointer',
 };
 
 // variant のクラス文字列。react-router `Link`/`NavLink` の className にそのまま渡せる。
@@ -48,7 +56,10 @@ export type LinkProps = {
   // 子要素（react-router の Link/NavLink 等）へクラスだけを注入して DS 化する。
   asChild?: boolean;
   className?: string;
-  children: ReactNode;
+  // 中身は任意。Base UI の `render` に渡す器として使う場合（<Menu.Item render={<Link
+  // variant="wrapper" href="…" />}> など）、children は Base UI 側が注入するのでここでは
+  // 渡さない。それ以外の通常利用では必ず中身を書く。
+  children?: ReactNode;
 } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'className'>;
 
 export default function Link({
