@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from 'react';
 import type { AvatarStatus } from '../components/avatar.tsx';
+import Link from '../components/link.tsx';
 import { Menu } from '../components/menu.tsx';
 import Icon, { type IconName } from '../icons/icon.tsx';
 import UserLabel from './user-label.tsx';
@@ -195,14 +196,18 @@ export default function SideNavAccount({
                     item.href != null &&
                     item.external && <Icon name="open_in_new" size={EXTERNAL_ICON_SIZE} />
                   }
-                  // href があれば <a> として描く（Base UI の render）。中クリック / Cmd+クリック
-                  // での別タブ・リンクのコピー・「リンク」としての読み上げが効く。
+                  // href があれば DS の Link として描く（Base UI の render）。中クリック /
+                  // Cmd+クリックでの別タブ・リンクのコピー・「リンク」としての読み上げが効く。
+                  // variant='bare' は下線を消すだけの器。行のタイポ・色は Menu.Item の tone
+                  // クラスが持つ（DS は preflight を配らないので素の <a> だと下線が残る）。
+                  // wrapper ではなく bare を使うのは、wrapper の text-inherit が同じ要素の
+                  // tone クラスと特異度が同じで、出力順しだいで danger の警告色を潰すため。
                   // ⚠ disabled のときは <a> にしない。HTML の <a> に disabled は無く、
                   //   data-disabled が付いても遷移自体は止まらないため（user-label.tsx が
                   //   href={disabled ? undefined : href} で塞いでいるのと同じ理由）。
                   render={
                     item.href != null && !item.disabled ? (
-                      <a href={item.href} {...linkProps(item)} />
+                      <Link variant="bare" href={item.href} {...linkProps(item)} />
                     ) : undefined
                   }
                   onClick={() => onSelect?.(item.key)}

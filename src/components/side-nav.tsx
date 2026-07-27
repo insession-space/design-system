@@ -2,6 +2,7 @@ import { useRender } from '@base-ui/react/use-render';
 import type * as React from 'react';
 import { createContext, useContext } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { linkClass } from './link.tsx';
 
 // 画面左の縦ナビ（左レール）。#76。insession-app（web / help）と loophub-app が同型の左レールを
 // それぞれ持っていたのを、アプリ非依存のプリミティブとしてここへ集約する。
@@ -41,7 +42,9 @@ const ROOT =
 // className で混ぜると Tailwind の出力順次第で勝ち負けが決まるため、prop で排他にする。
 const ROOT_HEIGHT = { true: 'h-dvh', false: 'h-full' } as const;
 
-const BRAND = 'flex items-center px-1.5 py-0.5';
+// ブランド枠は <a>。DS は preflight を配らないので、中にテキストを置くと UA 既定の下線が
+// 出る。下線の打ち消しは Link に一元化する（linkClass。'wrapper' は色を持たない器）。
+const BRAND = `flex items-center px-1.5 py-0.5 ${linkClass('wrapper')}`;
 
 const GROUP = 'flex flex-col gap-2';
 // 副次リンク群は最下部へ寄せ、区切り線を上に置く。
