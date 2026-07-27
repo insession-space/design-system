@@ -1,5 +1,91 @@
 # @insession/design-system
 
+## 4.1.0
+
+### Minor Changes
+
+- 64b30e4: `SideNav` のリンクから UA 既定の下線を取り除き、打ち消しを `Link` に一元化する。
+
+  - `SideNav.Account` の `href` 付きメニュー項目を DS の `Link` で描くようにした。DS は preflight を配らないため、素の `<a>` では下線が残っていた（`Menu` の行クラスは `no-underline` を持たない）
+  - `SideNav.Brand` の下線打ち消しも `linkClass` 由来にした
+  - `Link` に **`bare` variant** を追加した（`no-underline cursor-pointer`。色を出さない）。`wrapper` の `text-inherit` は、自前の色クラスを持つ要素（`Menu.Item` の tone など）へ重ねると特異度が同じで配布 CSS の出力順しだいに色を潰す（実測で `danger` の警告色が消えた）。色を持つ要素へ下線打ち消しだけを足すときは `bare` を使う
+  - `Link` の `children` を任意にした。Base UI の `render` に渡す器として使う場合（`<Menu.Item render={<Link variant="bare" href="…" />}>`）、children は Base UI 側が注入するため
+
+- 2986b48: `SideNav.Account` を追加する。左レール最下部に常設するログインユーザーのエリアで、行（アバター + 名前 + 補助テキスト + 上下シェブロン）と、押したときに開くアカウントメニューをセットで持つ。
+
+  ```tsx
+  <SideNav.Account
+    name="Cameron Yang"
+    subtitle="cam@untitledui.com"
+    status="live"
+    menuLabel="アカウントメニュー"
+    items={[
+      { key: 'profile', icon: 'account_circle', label: 'マイプロフィール' },
+      { key: 'signout', icon: 'logout', label: 'サインアウト', separatorBefore: true, danger: true },
+    ]}
+    onSelect={(key) => …}
+  />
+  ```
+
+  - メニューは既存の `Menu`（Base UI）で組むため、矢印キー移動・typeahead・フォーカストラップがそのまま効く。レール最下部にあるので**上方向**へ開き、幅はトリガー行に揃う
+  - 項目は `items` 配列。`separatorBefore` で区切り線、`danger` で警告色、`disabled` で操作不可
+  - `items` を渡さなければ行だけを描く（表示専用）。込み入ったメニューが要るときは `Menu` を直接組む
+  - 行の中身は既存の `UserLabel` に委譲するのでアバター寸法と文字サイズが常に連動する。既定 `size='sm'` はレール既定幅 232px で名前が省略されずに収まる段
+  - 開閉アフォーダンス用に `unfold_more` アイコンを追加した
+
+- cd2d92d: `MessageItem` を追加する。「誰かの投稿 1 件」を表す複合コンポーネントで、InSession の space 内チャット発言にも loophub のスレッド投稿/コメントにも使える汎用部品として作った。
+
+  ```tsx
+  <MessageItem
+    authorName="川村静哉"
+    authorHref="/u/kawamura"
+    timestamp="01:03"
+    reactions={[
+      { emoji: "🙂", count: 1, reacted: true, label: "にっこり", onClick },
+    ]}
+    actions={[
+      { icon: "push_pin", label: "ピン留め", onClick },
+      { icon: "reply", label: "返信", onClick },
+      { icon: "add_reaction", label: "リアクション", onClick },
+    ]}
+  >
+    本文
+  </MessageItem>
+  ```
+
+  - ヘッダー行の表示名は既存の `UserLabel` に委譲する(押せる/押せない分岐も `UserLabel` 任せ)
+  - `avatarSrc` を渡すとアバター付き、省略するとアバター無しのコンパクト表示になる
+  - `actions` はホバー/キーボードフォーカス時のみ表示される(`group-focus-within` を併記しキーボード操作でも到達できる)
+  - `reactions` のピルは既存の `Chip`(`selected`)を使い、`reacted: true` のものを視覚的に強調する(面と枠だけで示し、check は出さない)
+
+  これに合わせて `Chip` に `showCheck?: boolean`(既定 `true`)を追加した。`false` にすると `selected` の色(accent tint + accent 枠)だけを使い、行頭の check を出さない。行頭に絵文字が来るリアクションピルで、チェックと絵文字が並んで意味が読めなくなるのを避けるため。既定は据え置きなのでフィルター/選択トークンとしての既存の見た目は変わらない。
+
+  また `UserLabel` に `hideAvatar?: boolean`(既定 `false`)を追加した。true のときアバターの `div` ごと描画しない。既存呼び出し側の見た目・挙動は変わらない(省略時の既定はアバター表示のまま)。
+
+- 51c4ae7: `SideNav.Account` のメニュー項目を `href`（リンク）にも対応させる。
+
+  ```tsx
+  items={[
+    { key: 'profile', icon: 'account_circle', label: 'マイプロフィール', href: '/users/me' },
+    { key: 'help',    icon: 'help',           label: 'ヘルプ', href: 'https://…', external: true },
+    { key: 'signout', icon: 'logout',         label: 'サインアウト', danger: true }, // href 無し＝操作
+  ]}
+  ```
+
+  - `href` を渡した項目は `<a href>` として描かれる（`role="menuitem"` は保たれる）。操作（`onSelect` だけ）だと中クリック / Cmd+クリックでの別タブ・リンクのコピーができず、読み上げも「リンク」にならないため
+  - `external` で別タブ（`target="_blank"` + `rel="noopener noreferrer"`）になり、行末に `open_in_new` が出る（`SideNav.Item` の `external` と同じ扱い）
+  - `href` 付きの項目でも `onSelect(key)` は従来どおり呼ばれる（計測や後処理のフック）
+  - `disabled` の項目は `href` があっても `<a>` にしない（HTML の `<a>` に `disabled` は無く、遷移が止まらないため）
+
+- 691affd: `SideNav`（左レール）を追加する。insession-app（web / help）と loophub-app が別々に持っていた同型の縦ナビを、アプリ非依存のプリミティブとして DS へ集約する。
+
+  Base UI 準拠の compound parts（`SideNav.Root` / `.Brand` / `.Group` / `.Item`）で、要素の実体は `render` プロップで差し替えられる（`<SideNav.Item render={<NavLink to="/" />} />`）。`href` を渡せば `<a>`、渡さなければ `<button type="button">` として描画される。
+
+  - active は DS が導出せず呼び出し側が `active` で渡す（ルーターを DS に持ち込まない）。`aria-current="page"` と `data-active` が付く
+  - `Group` の `secondary` で最下部寄せ + 上区切り線 + 弱色になり、配下の `Item` へ Context 越しに伝わる（`data-secondary`）
+  - `Item` は `icon` / `trailing`（バッジ等）/ `external`（別タブ + `open_in_new`）を持つ
+  - `Root` は `aria-label` 必須の `<nav>`。`fullHeight`（既定 true）で `h-dvh` / `h-full` を切り替える
+
 ## 4.0.0
 
 ### Major Changes
