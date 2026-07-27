@@ -42,6 +42,53 @@ export const VariantsBySizes: Story = {
   ),
 };
 
+export const TouchTarget: Story = {
+  render: () => (
+    <Section
+      title="タッチ端末のタップ領域(touchSize)"
+      note="touchSize は @media (pointer: coarse) のときだけ効く最小の一辺(#60)。指で押す操作系は Apple HIG のタップターゲット下限 44 を渡す。省略時はタッチでも size のまま(既存の見た目を変えない)。寸法はインライン style ではなくユーティリティ + CSS 変数で当てているので、className のバリアント付きユーティリティでも広げられる。マウスのブラウザでは差が出ないので、DevTools のデバイスエミュレーション(またはタッチ端末)で確認する。"
+    >
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-4">
+          <span className="w-56 shrink-0 text-smd font-semibold text-text-dim">
+            size=30（touchSize 無し）
+          </span>
+          <IconButton
+            label="リアクション(既定)"
+            icon={<Icon name="settings" size={16} />}
+            size={30}
+            data-testid="ib-plain"
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="w-56 shrink-0 text-smd font-semibold text-text-dim">
+            size=30 / touchSize=44
+          </span>
+          <IconButton
+            label="リアクション(タッチ44px)"
+            icon={<Icon name="settings" size={16} />}
+            size={30}
+            touchSize={44}
+            data-testid="ib-touch"
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="w-56 shrink-0 text-smd font-semibold text-text-dim">
+            className の上書き(max-md:size-11)
+          </span>
+          <IconButton
+            label="狭幅で44px"
+            icon={<Icon name="settings" size={16} />}
+            size={30}
+            className="max-md:size-11"
+            data-testid="ib-class"
+          />
+        </div>
+      </div>
+    </Section>
+  ),
+};
+
 export const Disabled: Story = {
   render: () => (
     <Section

@@ -145,7 +145,34 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 | `ToggleGroup` + `ToolButton` | ツールバーの道具選択。`multiple` で複数同時 on にもできる（太字 + 斜体など） |
 | `Tabs` | **表示するパネルを切り替える**とき（`SegmentedControl` はパネルを持たない値の選択） |
 
-`Badge` / `Chip` / `Lozenge` / `Spinner` / `EmptyNote` / `LogoMark` / `Icon` 系 / `Status` / `Link` / `Composer` / `UserLabel` / `UploadTile` / `ColorInput` は**振る舞いを持たない見た目部品**なので Base UI に載せていない（相当パートが無いか、載せても得るものが無い）。`UserLabel` は `href` / `onClick` を受けて操作可能になるが、素の `<a href>` / `<button onClick>` で足りる（開閉も選択状態もキーボードナビゲーションも持たない）。`UploadTile` / `ColorInput` はネイティブの `<input type="file">` / `<input type="color">` が機能を持っているので、DS が足すのは見た目とドラッグ&ドロップの状態管理だけ。`StepFlow` は `<ol>`/`<li>` + `aria-current="step"` というネイティブのセマンティクスで表現している（`role="progressbar"` は中身が読み上げ対象から外れるため不適切）。`SplitModal` は `Modal` / `BottomSheet` 経由で間接的に載っている。
+`Badge` / `Chip` / `Lozenge` / `Spinner` / `EmptyNote` / `LogoMark` / `BrandImage` / `Icon` 系 / `Status` / `Link` / `Composer` / `UserLabel` / `SettingRow` / `UploadTile` / `ColorInput` は**振る舞いを持たない見た目部品**なので Base UI に載せていない（相当パートが無いか、載せても得るものが無い）。`UserLabel` は `href` / `onClick` を受けて操作可能になるが、素の `<a href>` / `<button onClick>` で足りる（開閉も選択状態もキーボードナビゲーションも持たない）。`UploadTile` / `ColorInput` はネイティブの `<input type="file">` / `<input type="color">` が機能を持っているので、DS が足すのは見た目とドラッグ&ドロップの状態管理だけ。`StepFlow` は `<ol>`/`<li>` + `aria-current="step"` というネイティブのセマンティクスで表現している（`role="progressbar"` は中身が読み上げ対象から外れるため不適切）。`SplitModal` は `Modal` / `BottomSheet` 経由で間接的に載っている。
+
+### 設定行は `SettingRow`（末尾に対話要素を置ける行）
+
+「ラベル + 説明 + 末尾の `Toggle` / `SegmentedControl` / `Button`」からなる**設定行**は `SettingRow` を使う。
+
+```tsx
+<SettingRow
+  label="効果音"
+  description="チャットの受信やリアクションで音を鳴らす"
+  trailing={<Toggle checked={sound} onChange={toggle} label="効果音" />}
+/>
+```
+
+- **既定は非対話**（`<div>`）。`href` → `<a>` / `onClick` → `<button>`（`UserLabel` と同じ流儀で、真偽値 prop は持たない）
+- **対話的にしても `trailing` は対話要素の外（兄弟）に描く。** `<button>` の中に `<button>` / `<input>` が入る不正な DOM が構造的に起きないので、行を押す操作と末尾のコントロールの操作が両立する（廃止した `ListRow` は `<button>` 固定でこれができなかった）
+- 説明文は既定で折り返す。1 行省略や 2〜3 行クランプは `descriptionLines` で選ぶ
+- 面（背景・境界）は持たないので、`Paper` / `Card` の中に `Divider` で区切って並べる
+
+### ⚠ タップ領域は `IconButton` の `touchSize` で確保する
+
+`IconButton` の `size` は**ユーティリティ + CSS 変数**で当てている（インライン style ではない）。タッチ端末で押される操作系は `touchSize` に **44**（Apple HIG のタップターゲット下限）を渡す。
+
+```tsx
+<IconButton label="リアクション" icon={…} size={30} touchSize={44} />
+```
+
+`touchSize` は `@media (pointer: coarse)` のときの**最小**の一辺で、省略時はタッチでも `size` のまま（既存呼び出しの見た目を変えないための既定）。`className="max-md:size-11"` のようなバリアント付きユーティリティでも広げられる。
 
 オーバーレイ系はパートを組み合わせる compound API。
 
