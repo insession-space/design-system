@@ -180,13 +180,12 @@ export {
   type SegmentedControlItem,
   type SegmentedControlProps,
 } from './components/segmented-control.tsx';
-export {
-  SideNav,
-  type SideNavBrandProps,
-  type SideNavGroupProps,
-  type SideNavItemProps,
-  type SideNavItemState,
-  type SideNavRootProps,
+export type {
+  SideNavBrandProps,
+  SideNavGroupProps,
+  SideNavItemProps,
+  SideNavItemState,
+  SideNavRootProps,
 } from './components/side-nav.tsx';
 export { default as Slider, type SliderProps } from './components/slider.tsx';
 export { default as Spinner, type SpinnerProps } from './components/spinner.tsx';
@@ -249,12 +248,17 @@ export { default as AppleIcon } from './icons/apple-icon.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
 export { default as PersonIcon } from './icons/person-icon.tsx';
+export { SideNav } from './side-nav-parts.ts';
 export {
   FeedItem,
   FeedItemAttachment,
   type FeedItemAttachmentProps,
   type FeedItemProps,
 } from './ui-kit/feed-item.tsx';
+export type {
+  SideNavAccountItem,
+  SideNavAccountProps,
+} from './ui-kit/side-nav-account.tsx';
 export {
   default as UserLabel,
   type UserLabelProps,
