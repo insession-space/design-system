@@ -270,6 +270,14 @@ export {
   type FeedItemProps,
 } from './ui-kit/feed-item.tsx';
 export {
+  CircleBadge,
+  type CircleBadgeProps,
+  MediaCard,
+  type MediaCardProps,
+} from './ui-kit/media-card.tsx';
+export { MediaRow, type MediaRowProps } from './ui-kit/media-row.tsx';
+export { MediaThumbnail, type MediaThumbnailProps } from './ui-kit/media-thumbnail.tsx';
+export {
   default as MessageItem,
   type MessageItemAction,
   type MessageItemProps,
