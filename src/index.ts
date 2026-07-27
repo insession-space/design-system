@@ -100,6 +100,11 @@ export {
   linkClass,
 } from './components/link.tsx';
 export {
+  default as LinkPreview,
+  type LinkPreviewMeta,
+  type LinkPreviewProps,
+} from './components/link-preview.tsx';
+export {
   BrandImage,
   type BrandImageProps,
   default as LogoMark,
