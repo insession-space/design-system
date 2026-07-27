@@ -87,6 +87,42 @@ export const StatusAndRing: Story = {
   ),
 };
 
+export const Interactive: Story = {
+  render: () => (
+    <Section
+      title="操作可能な行(href / onClick)"
+      note="href なら <a>、onClick なら <button>、どちらも無ければ <div>。旧 ListRow を廃止してここへ集約したので、消費側は打ち消しユーティリティ(bg-transparent / border-none / p-0 …)を書かなくてよい。"
+    >
+      <div className="flex max-w-120 flex-col rounded-card border border-solid border-border bg-surface p-2">
+        <UserLabel
+          name="リンクの行(a)"
+          src={AVATAR_SRC}
+          subtitle="href を渡すと中クリックで別タブに開ける"
+          href="#userlabel-link-demo"
+        />
+        <UserLabel
+          name="ボタンの行(button)"
+          src={AVATAR_SRC}
+          subtitle="onClick を渡すとモーダルを開く等の操作にできる"
+          onClick={() => {}}
+        />
+        <UserLabel
+          name="押せない行(disabled)"
+          src={AVATAR_SRC}
+          subtitle="hover の面を出さず、押せると誤解させない"
+          onClick={() => {}}
+          disabled
+        />
+        <UserLabel
+          name="表示だけの行(div)"
+          src={AVATAR_SRC}
+          subtitle="href も onClick も無ければ従来どおり非操作"
+        />
+      </div>
+    </Section>
+  ),
+};
+
 export const LongName: Story = {
   render: () => (
     <Section title="長い名前の truncate" note="コンテナ幅を超える名前/subtitle は1行で省略する。">
