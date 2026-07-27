@@ -21,7 +21,7 @@ import {
 // という状態で、insession-app にも 4 箇所の raw な textarea が残っていた。ここを埋める。
 //
 // ── Input との関係 ──────────────────────────────────
-// ラベル(mono caps) / field(surface-2 + 1.5px border + radius md) / 状態の優先度
+// ラベル(mono caps) / field(surface-2 + 1px border + radius md) / 状態の優先度
 // (error > focused > default) と色は **Input と完全に同一**。定数と状態関数を input.tsx から
 // import して共有しているので、値を変えれば両方に効く（移行前は同じ文字列を二重に持っていた）。
 //
