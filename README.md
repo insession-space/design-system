@@ -145,7 +145,7 @@ Storybook のツールバーに Theme トグルがあり、カタログ上でラ
 | `ToggleGroup` + `ToolButton` | ツールバーの道具選択。`multiple` で複数同時 on にもできる（太字 + 斜体など） |
 | `Tabs` | **表示するパネルを切り替える**とき（`SegmentedControl` はパネルを持たない値の選択） |
 
-`Badge` / `Chip` / `Lozenge` / `Spinner` / `EmptyNote` / `LogoMark` / `Icon` 系 / `Status` / `Link` / `Composer` / `ListRow` / `UploadTile` / `ColorInput` は**振る舞いを持たない見た目部品**なので Base UI に載せていない（相当パートが無いか、載せても得るものが無い）。`ListRow` は素の `<button onClick>` で足りる（開閉も選択状態もキーボードナビゲーションも持たない）。`UploadTile` / `ColorInput` はネイティブの `<input type="file">` / `<input type="color">` が機能を持っているので、DS が足すのは見た目とドラッグ&ドロップの状態管理だけ。`StepFlow` は `<ol>`/`<li>` + `aria-current="step"` というネイティブのセマンティクスで表現している（`role="progressbar"` は中身が読み上げ対象から外れるため不適切）。`SplitModal` は `Modal` / `BottomSheet` 経由で間接的に載っている。
+`Badge` / `Chip` / `Lozenge` / `Spinner` / `EmptyNote` / `LogoMark` / `Icon` 系 / `Status` / `Link` / `Composer` / `UserLabel` / `UploadTile` / `ColorInput` は**振る舞いを持たない見た目部品**なので Base UI に載せていない（相当パートが無いか、載せても得るものが無い）。`UserLabel` は `href` / `onClick` を受けて操作可能になるが、素の `<a href>` / `<button onClick>` で足りる（開閉も選択状態もキーボードナビゲーションも持たない）。`UploadTile` / `ColorInput` はネイティブの `<input type="file">` / `<input type="color">` が機能を持っているので、DS が足すのは見た目とドラッグ&ドロップの状態管理だけ。`StepFlow` は `<ol>`/`<li>` + `aria-current="step"` というネイティブのセマンティクスで表現している（`role="progressbar"` は中身が読み上げ対象から外れるため不適切）。`SplitModal` は `Modal` / `BottomSheet` 経由で間接的に載っている。
 
 オーバーレイ系はパートを組み合わせる compound API。
 

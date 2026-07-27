@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import Avatar, { type AvatarStatus } from '../components/avatar.tsx';
 import { type Gap, HStack, VStack } from '../components/layout.tsx';
 
@@ -12,6 +12,16 @@ import { type Gap, HStack, VStack } from '../components/layout.tsx';
 //
 // アバターは隣に同じ名前が出るぶん装飾でしかないので aria-hidden で支援技術から隠す
 // (隠さないと Avatar の alt と fallback の頭文字で名前が二重に読まれる)。
+//
+// ── 操作可能な「人の行」も担う ───────────────────────────
+// href を渡せば <a>、onClick を渡せば <button>、どちらも無ければ既定の <div> を描く。
+// 人を表す行は「表示だけ」「プロフィールへ遷移」「モーダルを開く」の3通りがあり、消費側が
+// 外側を素の <button>/<a> で包むと打ち消しユーティリティの列(bg-transparent / border-none /
+// p-0 / text-left …)を毎回書くことになる。それを DS 側へ引き取る。
+//
+// 旧 ListRow を廃止してここへ集約した。ListRow は icon/label/description を別々に受ける形で、
+// 人の行に使うと「アバター寸法と文字サイズを連動させる」という UserLabel の保証が効かず、
+// label を <span> で包む実装のため UserLabel を入れると不正なネストになっていた。
 //
 // ⚠ Avatar は status / ring を指定しないと legacy 経路(素の img/span。見た目を消費側 CSS に
 // 依存)を返す(avatar.tsx 参照)。UserLabel は status 指定の有無で見た目・fallback 挙動が
@@ -58,8 +68,30 @@ export type UserLabelProps = {
   ring?: boolean;
   color?: string;
   bgColor?: string;
+  // 遷移先。指定すると行全体が <a> になる(中クリックで別タブ・リンクのコピーができる)。
+  href?: string;
+  // href と併用するリンク属性。href が無いときは無視される。
+  target?: string;
+  rel?: string;
+  // 押したときの動作。href が無く onClick があると行全体が <button> になる。
+  // href と onClick を両方渡した場合は <a> が優先され、onClick はそのリンクのハンドラになる。
+  onClick?: (e: MouseEvent<HTMLElement>) => void;
+  // 操作可能なとき(href / onClick)のみ意味を持つ。押せない見た目にして操作を止める。
+  disabled?: boolean;
+  // 操作可能なときの読み上げラベル。省略時は中身(名前 + subtitle)がそのまま読まれる。
+  ariaLabel?: string;
   className?: string;
 };
+
+// 操作可能にしたときだけ当てる打ち消し + 状態表現。素の <button> / <a> が持つ既定
+// (塗り・padding・下線・色)を消し、面はホバーでだけ出す。行そのものが押せることを
+// 示すため cursor と focus リングをここで持つ(消費側で毎回書かせない)。
+const INTERACTIVE =
+  'w-full rounded-md border-none bg-transparent p-0 text-left no-underline transition-colors duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-none';
+const INTERACTIVE_ENABLED = 'cursor-pointer hover:bg-surface-hover';
+// ⚠ hover の面は disabled のときに出さない。薄いのに反応する見た目は押せると誤解させる
+// (list-row.tsx が持っていた注意点をここへ引き継ぐ)。
+const INTERACTIVE_DISABLED = 'cursor-not-allowed opacity-50';
 
 export default function UserLabel({
   name,
@@ -70,11 +102,25 @@ export default function UserLabel({
   ring,
   color,
   bgColor,
+  href,
+  target,
+  rel,
+  onClick,
+  disabled = false,
+  ariaLabel,
   className = '',
 }: UserLabelProps) {
   const spec = SIZE[size];
-  return (
-    <HStack gap={spec.gap} align="center" className={`min-w-0 ${className}`.trim()}>
+  // href → <a> / onClick → <button> / どちらも無ければ既定の <div>(HStack のまま)。
+  // 「押せるのに div」を避けるため、操作を受け取るときだけ要素を差し替える。
+  const interactive = href != null || onClick != null;
+  const interactiveClass = interactive
+    ? ` ${INTERACTIVE} ${disabled ? INTERACTIVE_DISABLED : INTERACTIVE_ENABLED}`
+    : '';
+  const rootClass = `min-w-0${interactiveClass} ${className}`.trim();
+
+  const body = (
+    <HStack gap={spec.gap} align="center" className={interactive ? 'min-w-0' : rootClass}>
       {/* アバターは隣の名前と同じ情報しか持たない装飾なので支援技術から隠す。隠さないと
           Avatar の alt(= name)と fallback の頭文字が読み上げられ、名前が二重に読まれる。 */}
       <div aria-hidden="true" className="shrink-0">
@@ -109,4 +155,37 @@ export default function UserLabel({
       </div>
     </HStack>
   );
+
+  if (href != null) {
+    return (
+      // disabled なリンクは HTML に無いので、遷移を止めつつ支援技術にも無効だと伝える。
+      <a
+        href={disabled ? undefined : href}
+        target={target}
+        rel={rel}
+        aria-label={ariaLabel}
+        aria-disabled={disabled || undefined}
+        onClick={disabled ? (e) => e.preventDefault() : onClick}
+        className={rootClass}
+      >
+        {body}
+      </a>
+    );
+  }
+
+  if (onClick != null) {
+    return (
+      <button
+        type="button"
+        disabled={disabled}
+        aria-label={ariaLabel}
+        onClick={onClick}
+        className={rootClass}
+      >
+        {body}
+      </button>
+    );
+  }
+
+  return body;
 }

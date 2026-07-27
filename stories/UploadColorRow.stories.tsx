@@ -1,22 +1,21 @@
 import {
   AppleIcon,
-  Badge,
   ColorInput,
   ColorSwatchGroup,
   GoogleIcon,
   Icon,
-  ListRow,
-  Toggle,
   UploadTile,
 } from '@insession/design-system';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import { Section } from './tokens';
 
-// #53 の後半4プリミティブ。消費側(insession-app)が legacy CSS や打ち消しユーティリティで
+// #53 の後半プリミティブ。消費側(insession-app)が legacy CSS や打ち消しユーティリティで
 // 手組みしていたものを DS に上げたもの。
+// ListRow はここに同居していたが廃止し、人の行は UserLabel(href/onClick)へ集約した
+// (UserLabel.stories.tsx を参照)。
 const meta: Meta = {
-  title: 'Inputs/Upload & Color & Row',
+  title: 'Inputs/Upload & Color',
   parameters: { layout: 'padded' },
 };
 export default meta;
@@ -107,42 +106,6 @@ export const Colors: Story = {
             />
             <span className="font-body text-sm text-text-dim">size=20</span>
           </div>
-        </div>
-      </Section>
-    );
-  },
-};
-
-export const Rows: Story = {
-  render: () => {
-    const [notify, setNotify] = useState(true);
-    return (
-      <Section
-        title="ListRow"
-        note="画面内に置くクリックできる行。MenuPlainItem は role=menuitem 前提なのでメニュー外では使えない。消費側は打ち消しユーティリティの列で毎回手組みしていた。"
-      >
-        <div className="flex max-w-120 flex-col rounded-card border border-solid border-border bg-surface p-2">
-          <ListRow icon={<Icon name="settings" size={20} />} label="スペースの設定" chevron />
-          <ListRow
-            icon={<Icon name="extension" size={20} />}
-            label="プラグイン"
-            description="Watch Party / Pomodoro / Tetris"
-            trailing={<Badge tone="info">3</Badge>}
-            chevron
-          />
-          <ListRow
-            icon={<Icon name="notifications" size={20} />}
-            label="通知"
-            trailing={<Toggle checked={notify} onChange={() => setNotify((v) => !v)} />}
-          />
-          <ListRow
-            icon={<Icon name="group" size={20} />}
-            label="とても長いラベルでも行から溢れずに省略されることを確認するための行です"
-            description="説明側も同様に1行で省略される"
-            chevron
-          />
-          <ListRow icon={<Icon name="logout" size={20} />} label="ログアウト" danger />
-          <ListRow icon={<Icon name="lock" size={20} />} label="disabled な行" disabled chevron />
         </div>
       </Section>
     );

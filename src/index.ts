@@ -99,7 +99,6 @@ export {
   type LinkVariant,
   linkClass,
 } from './components/link.tsx';
-export { default as ListRow, type ListRowProps } from './components/list-row.tsx';
 export {
   default as LogoMark,
   type LogoMarkProps,
