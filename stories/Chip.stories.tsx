@@ -48,3 +48,20 @@ export const Variants: Story = {
     </Section>
   ),
 };
+
+export const WithoutCheck: Story = {
+  render: () => (
+    <Section
+      title="showCheck={false}"
+      note="selected の色(accent tint + 枠)だけを使い、行頭の check を出さない。リアクションピル(MessageItem)のように、行頭に絵文字が来てチェックと並ぶと意味が読めなくなる用途で使う。既定は true。"
+    >
+      <div className="flex flex-wrap items-center gap-2.25">
+        <Chip selected>既定(check あり)</Chip>
+        <Chip selected showCheck={false}>
+          🙂 1
+        </Chip>
+        <Chip showCheck={false}>🎉 3</Chip>
+      </div>
+    </Section>
+  ),
+};

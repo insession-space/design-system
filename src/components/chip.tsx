@@ -4,6 +4,10 @@ import Icon from '../icons/icon.tsx';
 // DS の Chip（純粋 leaf UI）。claude design "INSESSION Design System" の Chip 仕様に準拠（#463 / #663）。
 // タップできる要素（クイック返信・フィルター・タグ・入力トークン）。非対話の status ラベルは Badge を使う。
 // 既定=surface-2 + border-strong、selected=accent tint(12%) + accent 枠(55%) + accent 文字 + check。
+// ⚠ selected の check は showCheck={false} で落とせる。リアクションピル(#83 の MessageItem)は
+// 「自分が押している」ことを面と枠で示すため selected の色は要るが、絵文字の隣に check が並ぶと
+// 何に対する肯定か読めなくなるので、色だけ使って check を出さない。既定は true なので
+// フィルター/選択トークンとしての従来の見た目は変わらない。
 // pill、12.5px、weight は selected?700:600。pad は DS の3系統（removable / avatar / 既定）。
 // avatar は 22x22 の円（label + color。既定は success green）。removable は末尾に close(text-dim)。
 // i18n は持たない（ラベルは children）。
@@ -17,7 +21,9 @@ export type ChipAvatar = {
 export type ChipProps = {
   // 選択状態。true で accent tint + 枠 + チェックになる。
   selected?: boolean;
-  // 行頭アイコン（任意。selected 時は check が優先されるため出さない）。
+  // selected のときに行頭の check を出すか。既定 true。false にすると色だけが変わる。
+  showCheck?: boolean;
+  // 行頭アイコン（任意。selected かつ showCheck のときは check が優先されるため出さない）。
   icon?: ReactNode;
   // 行頭のアバター円（任意）。
   avatar?: ChipAvatar;
@@ -43,6 +49,7 @@ const SELECTED =
 
 export default function Chip({
   selected = false,
+  showCheck = true,
   icon,
   avatar,
   removable = false,
@@ -69,7 +76,7 @@ export default function Chip({
           {avatar.label}
         </span>
       )}
-      {selected ? <Icon name="check" size={16} /> : icon}
+      {selected && showCheck ? <Icon name="check" size={16} /> : icon}
       {children}
       {removable && (
         <span
