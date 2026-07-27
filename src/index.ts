@@ -255,6 +255,12 @@ export {
   type FeedItemAttachmentProps,
   type FeedItemProps,
 } from './ui-kit/feed-item.tsx';
+export {
+  default as MessageItem,
+  type MessageItemAction,
+  type MessageItemProps,
+  type MessageItemReaction,
+} from './ui-kit/message-item.tsx';
 export type {
   SideNavAccountItem,
   SideNavAccountProps,

@@ -63,6 +63,9 @@ export type UserLabelProps = {
   // 名前の下に出す補助テキスト(役割・肩書きなど)。省略時は1行表示になる。
   subtitle?: ReactNode;
   size?: UserLabelSize;
+  // true でアバターを描画しない(コンパクト表示)。既定 false(常時表示)は変えない —
+  // 既存呼び出し側の見た目を変えないための後方互換の既定値。
+  hideAvatar?: boolean;
   // 以下は Avatar へそのまま透過する。
   status?: AvatarStatus;
   ring?: boolean;
@@ -98,6 +101,7 @@ export default function UserLabel({
   src,
   subtitle,
   size = 'md',
+  hideAvatar = false,
   status,
   ring,
   color,
@@ -122,19 +126,22 @@ export default function UserLabel({
   const body = (
     <HStack gap={spec.gap} align="center" className={interactive ? 'min-w-0' : rootClass}>
       {/* アバターは隣の名前と同じ情報しか持たない装飾なので支援技術から隠す。隠さないと
-          Avatar の alt(= name)と fallback の頭文字が読み上げられ、名前が二重に読まれる。 */}
-      <div aria-hidden="true" className="shrink-0">
-        <Avatar
-          ds
-          name={name}
-          src={src}
-          size={spec.avatar}
-          status={status}
-          ring={ring}
-          color={color}
-          bgColor={bgColor}
-        />
-      </div>
+          Avatar の alt(= name)と fallback の頭文字が読み上げられ、名前が二重に読まれる。
+          hideAvatar=true のときはこの div 自体を描画しない(コンパクト表示。#83)。 */}
+      {!hideAvatar && (
+        <div aria-hidden="true" className="shrink-0">
+          <Avatar
+            ds
+            name={name}
+            src={src}
+            size={spec.avatar}
+            status={status}
+            ring={ring}
+            color={color}
+            bgColor={bgColor}
+          />
+        </div>
+      )}
       {/* min-w-0 が無いと flex の既定(min-width: auto)により子の truncate が効かない
           (feed-item.tsx の FeedItemAttachment と同じ理由)。 */}
       <div className="min-w-0 flex-1">

@@ -123,6 +123,20 @@ export const Interactive: Story = {
   ),
 };
 
+export const HideAvatar: Story = {
+  render: () => (
+    <Section
+      title="hideAvatar"
+      note="true でアバターの div ごと描画しない(コンパクト表示。#83 の MessageItem で使う想定)。省略時の既定は false(常時アバター表示)で既存呼び出し側の見た目は変わらない。"
+    >
+      <div className="flex flex-col items-start gap-4">
+        <UserLabel name="Seiya" subtitle="hideAvatar なし(既定)" src={AVATAR_SRC} />
+        <UserLabel name="Seiya" subtitle="hideAvatar" src={AVATAR_SRC} hideAvatar />
+      </div>
+    </Section>
+  ),
+};
+
 export const LongName: Story = {
   render: () => (
     <Section title="長い名前の truncate" note="コンテナ幅を超える名前/subtitle は1行で省略する。">
