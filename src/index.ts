@@ -187,6 +187,11 @@ export type {
   SideNavItemState,
   SideNavRootProps,
 } from './components/side-nav.tsx';
+export {
+  default as Skeleton,
+  type SkeletonProps,
+  type SkeletonTextProps,
+} from './components/skeleton.tsx';
 export { default as Slider, type SliderProps } from './components/slider.tsx';
 export { default as Spinner, type SpinnerProps } from './components/spinner.tsx';
 export {
@@ -261,6 +266,10 @@ export {
   type MessageItemProps,
   type MessageItemReaction,
 } from './ui-kit/message-item.tsx';
+export {
+  default as MessageItemSkeleton,
+  type MessageItemSkeletonProps,
+} from './ui-kit/message-item-skeleton.tsx';
 export type {
   SideNavAccountItem,
   SideNavAccountProps,

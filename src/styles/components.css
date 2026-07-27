@@ -234,6 +234,23 @@
     flex-shrink: 0;
   }
 
+  /* ---- Skeleton ----
+   * 読み込み中のプレースホルダ(#87)。面そのものは bg-surface-2(Tailwind ユーティリティ)を
+   * className 側で当てるので、ここでは shimmer のハイライトだけを background-image として
+   * 重ねる(background-color とは別プロパティなので競合しない)。ハイライトの色も生の値では
+   * なく既存トークン(--color-text-dim)を color-mix で薄めて作る。 */
+  .skeleton-shimmer {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--color-text-dim) 20%, transparent) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: skeleton-shimmer 1.6s linear infinite;
+  }
+
   /* ---- @keyframes ----
    * コンポーネントは `animate-[card-in_0.4s_var(--ease-spring)_both]` のような Tailwind の
    * arbitrary animation ユーティリティでこれらを参照する。ユーティリティ側は名前を書くだけで
@@ -297,6 +314,16 @@
     }
     50% {
       transform: scale(1.07);
+    }
+  }
+
+  /* Skeleton の shimmer。ハイライトを左(-150%)から右(150%)へ流す。 */
+  @keyframes skeleton-shimmer {
+    from {
+      background-position: -150% 0;
+    }
+    to {
+      background-position: 150% 0;
     }
   }
 
@@ -368,6 +395,13 @@
 
     .bottom-sheet {
       transition: none;
+    }
+
+    /* Skeleton は面を静止させる(ハイライトのグラデーションごと消し、surface-2 のベタ塗りに
+       戻す)。animation だけ止めるとグラデーションが片側に固定されたまま残ってしまうため。 */
+    .skeleton-shimmer {
+      animation: none;
+      background-image: none;
     }
 
     /* Accordion は開閉そのものを止めるのではなく、遷移を消して即座に切り替える。
