@@ -21,11 +21,30 @@ export type IconButtonProps = {
   variant?: IconButtonVariant;
   // 一辺の長さ(px)。既定 36。
   size?: number;
+  // タッチ端末(`@media (pointer: coarse)`)のときに保証する最小の一辺(px)。省略時は size と同じ
+  // ＝タッチでも寸法は変わらない(既存呼び出しの見た目を変えないための既定)。指を使う操作系
+  // (リアクション送信・再生操作など)は Apple HIG のタップターゲット下限に合わせて 44 を渡す。
+  touchSize?: number;
   className?: string;
 } & Omit<React.ComponentProps<typeof BaseButton>, 'className' | 'render'>;
 
+// ⚠ 寸法はインライン style ではなくユーティリティクラス + CSS 変数で当てる(#60)。
+// インライン style の width/height はあらゆるセレクタより強く、消費側が
+// `@media (pointer: coarse)` やバリアント付きユーティリティで**上書きできない**ため。
+// 実害として insession-app のリアクション送信ボタンが legacy CSS の 44px から 30px へ
+// 縮んだ(タップターゲット下限割れ)。
+//
+// - `size-(--icon-button-size)` … 既定の寸法。値は style の CSS 変数で渡す
+//   (寸法は任意の数値なので `size-9` のような静的クラスへは落とせない。動的なクラス名合成は
+//    @source 走査に引っかからず配布 CSS が欠けるので禁止 — layout.tsx の GAP_CLASS 参照)
+// - `pointer-coarse:min-w-/min-h-(--icon-button-touch-size)` … タッチ端末での下限。
+//   min-* は width/height より常に強く、かつバリアント付きは base より後に出力されるので、
+//   クラスの並び順に依存せず決定論的に効く(README「レイヤーと上書き」の注意点を回避する)
+//
+// これにより消費側は (a) `touchSize={44}` を渡す (b) `className="max-md:size-11"` のような
+// バリアント付きユーティリティを足す、のどちらでも「通常 30px / タッチ 44px」を表現できる。
 const BASE =
-  'inline-flex shrink-0 items-center justify-center rounded-md cursor-pointer transition-colors duration-(--dur-fast) data-disabled:cursor-not-allowed data-disabled:opacity-(--disabled-opacity) focus-visible:shadow-focus focus-visible:outline-none';
+  'inline-flex shrink-0 items-center justify-center rounded-md cursor-pointer transition-colors duration-(--dur-fast) size-(--icon-button-size) pointer-coarse:min-w-(--icon-button-touch-size) pointer-coarse:min-h-(--icon-button-touch-size) data-disabled:cursor-not-allowed data-disabled:opacity-(--disabled-opacity) focus-visible:shadow-focus focus-visible:outline-none';
 
 const VARIANT: Record<IconButtonVariant, string> = {
   surface:
@@ -41,9 +60,11 @@ export default function IconButton({
   icon,
   variant = 'surface',
   size = 36,
+  touchSize,
   type = 'button',
   className = '',
   disabled,
+  style,
   ...rest
 }: IconButtonProps) {
   return (
@@ -51,7 +72,13 @@ export default function IconButton({
       type={type}
       aria-label={label}
       disabled={disabled}
-      style={{ width: size, height: size }}
+      style={{
+        ...({
+          '--icon-button-size': `${size}px`,
+          '--icon-button-touch-size': `${touchSize ?? size}px`,
+        } as React.CSSProperties),
+        ...style,
+      }}
       className={`${BASE} ${VARIANT[variant]} ${className}`.trim()}
       {...rest}
     >

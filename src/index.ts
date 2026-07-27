@@ -100,6 +100,8 @@ export {
   linkClass,
 } from './components/link.tsx';
 export {
+  BrandImage,
+  type BrandImageProps,
   default as LogoMark,
   type LogoMarkProps,
   type LogoMarkVariant,
@@ -180,6 +182,11 @@ export {
   type SegmentedControlItem,
   type SegmentedControlProps,
 } from './components/segmented-control.tsx';
+export {
+  default as SettingRow,
+  type SettingRowDescriptionLines,
+  type SettingRowProps,
+} from './components/setting-row.tsx';
 export type {
   SideNavBrandProps,
   SideNavGroupProps,
