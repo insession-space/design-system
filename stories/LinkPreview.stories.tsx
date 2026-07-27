@@ -19,7 +19,10 @@ const OG_IMAGE_SRC =
 
 export const WithImage: Story = {
   render: () => (
-    <Section title="画像あり" note="OG 画像・サイト名・タイトル・説明文がすべて揃うケース。">
+    <Section
+      title="画像あり"
+      note="MediaCard に委譲している(#112)。カバーは 16:9 に切り落とされ、タイトルとサイト名は各1行 truncate。説明文は出さない(縦幅を食わないため)。"
+    >
       <div className="max-w-md">
         <LinkPreview
           meta={{
@@ -39,7 +42,7 @@ export const WithoutImage: Story = {
   render: () => (
     <Section
       title="画像なし"
-      note="imageUrl が無いメタデータでは画像領域自体を出さない(汎用プレースホルダは残さない)。"
+      note="imageUrl が無いメタデータではカバー領域自体を出さない(MediaCard に cover を渡さない)。"
     >
       <div className="max-w-md">
         <LinkPreview
@@ -59,7 +62,7 @@ export const NoSiteName: Story = {
   render: () => (
     <Section
       title="siteName 省略"
-      note="siteName が無い OGP はよくあるため、その場合は url のホスト名を表示に使う。"
+      note="siteName が無い OGP はよくあるため、その場合は url のホスト名を meta 行に使う。"
     >
       <div className="max-w-md">
         <LinkPreview
@@ -76,8 +79,8 @@ export const NoSiteName: Story = {
 export const LongTitleAndDescription: Story = {
   render: () => (
     <Section
-      title="長いタイトル・説明(クランプ確認)"
-      note="タイトル・説明文とも line-clamp-2 で2行にクランプされ、それ以上は省略される。"
+      title="長いタイトル(truncate 確認)"
+      note="MediaCard のタイトル/メタは各1行 truncate。溢れた分は省略される(チャットの縦幅を食わないための設計)。"
     >
       <div className="max-w-md">
         <LinkPreview
@@ -100,10 +103,28 @@ export const Loading: Story = {
   render: () => (
     <Section
       title="loading"
-      note="meta が未解決の間の表示。Skeleton で画像領域とテキスト2〜3行分のプレースホルダを出す。"
+      note="meta が未解決の間の表示。MediaCard と同じ形(カバー + タイトル + メタ)の Skeleton を出す。"
     >
       <div className="max-w-md">
         <LinkPreview loading />
+      </div>
+    </Section>
+  ),
+};
+
+export const NoTitle: Story = {
+  render: () => (
+    <Section
+      title="タイトルが無い"
+      note="OGP にタイトルが無いページ。空のタイトル行を出さず、サイト名(またはホスト名)を主役に繰り上げる。"
+    >
+      <div className="max-w-md">
+        <LinkPreview
+          meta={{
+            url: 'https://example.com/untitled',
+            siteName: 'Example Site',
+          }}
+        />
       </div>
     </Section>
   ),
