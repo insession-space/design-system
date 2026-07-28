@@ -73,8 +73,11 @@ const BASE =
 const VARIANT: Record<ButtonVariant, string> = {
   primary:
     'bg-fill border-transparent text-on-fill font-bold hover:not-data-disabled:brightness-[.93]',
+  // ⚠ 塗りは accent ではなく **accent-fill**(#130)。accent(彩度100%)をボタンの面積で敷くと
+  // 目に刺さるため、色相を保ったまま彩度を 35% 落とした専用トークンに分離してある。
+  // accent 本体はバッジ・枠・ティント面が引き続き使うので動かしていない。
   accent:
-    'bg-accent border-transparent text-on-accent font-bold hover:not-data-disabled:brightness-[.93]',
+    'bg-accent-fill border-transparent text-on-accent font-bold hover:not-data-disabled:brightness-[.93]',
   secondary:
     'bg-transparent border-text text-text font-bold hover:not-data-disabled:bg-surface-hover',
   ghost:
