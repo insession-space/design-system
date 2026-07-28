@@ -53,6 +53,11 @@ const preview: Preview = {
   ],
   parameters: {
     layout: 'padded',
+    // 全 story に axe を走らせ、違反があればテストを落とす（`pnpm test:a11y`）。
+    // 'error' にしないと違反はパネルに出るだけで CI が緑のまま通ってしまう。
+    // 個別の story で抑制する必要が出たら、その story の parameters.a11y.config.rules に
+    // **理由をコメントで添えて** 書く（黙って全体を off にしない）。
+    a11y: { test: 'error' },
     controls: {
       matchers: { color: /(background|color)$/i, date: /Date$/i },
     },

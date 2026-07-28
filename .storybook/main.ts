@@ -24,7 +24,9 @@ const fontFace = (weight: 400 | 700) => {
 // このパッケージ自身の theme.css を単一ソースにした(.storybook/preview.css を参照)。
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.@(ts|tsx)', '../stories/**/*.mdx'],
-  addons: ['@storybook/addon-docs'],
+  // addon-a11y は「パネルで目視する」だけでなく、addon-vitest 経由で全 story に axe を
+  // 走らせる CI 検査の実体でもある（vitest.config.ts / preview.tsx の a11y.test を参照）。
+  addons: ['@storybook/addon-docs', '@storybook/addon-a11y', '@storybook/addon-vitest'],
   // public/ を成果物へそのままコピーする。ここに置いた CNAME が
   // storybook-static/CNAME として出て、GitHub Pages のカスタムドメイン
   // (design-system.insession.space) を宣言する（README「カタログの公開」参照）。
