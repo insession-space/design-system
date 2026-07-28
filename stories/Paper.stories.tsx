@@ -15,7 +15,7 @@ export const Default: Story = {
   render: () => (
     <Section title="Paper" note="elevation=1 固定。境界のみの控えめな面。">
       <Paper padding="md" className="max-w-md">
-        <p className="text-smd text-text">境界だけで面を表現する(影なし)。</p>
+        <p className="text-base text-text">境界だけで面を表現する(影なし)。</p>
       </Paper>
     </Section>
   ),

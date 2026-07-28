@@ -26,10 +26,10 @@ export type MediaThumbnailProps = {
 } & Omit<ComponentProps<'div'>, 'className' | 'children'>;
 
 // Badge の既定(px-2.5 py-1 / 11px)は本文中のラベル向けの寸法で、96px 幅のサムネイルに重ねると
-// 面積を食いすぎて絵が見えなくなる。オーバーレイのときだけ最小段(--text-2xs = 10px)まで詰める。
+// 面積を食いすぎて絵が見えなくなる。オーバーレイのときだけ最小段(--text-xs = 10px)まで詰める。
 // ⚠ クラス名は静的な文字列として持つ(動的合成は Tailwind の @source 走査に載らず配布 CSS が
 // 欠ける。scripts/check-styles.mjs が検査している層)。
-const OVERLAY_BADGE = 'absolute bottom-1 left-1 px-1.5 py-0.5 text-2xs';
+const OVERLAY_BADGE = 'absolute bottom-1 left-1 px-1.5 py-0.5 text-xs';
 
 export function MediaThumbnail({
   src,

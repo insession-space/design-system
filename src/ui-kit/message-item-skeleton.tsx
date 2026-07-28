@@ -14,10 +14,10 @@ import Skeleton from '../components/skeleton.tsx';
 //
 // ── 各行の高さは px の決め打ちにしない ───────────────────
 // 最初の実装は各バーの height を px で固定していたが、実物(UserLabel の text-small / Chip の
-// text-[12.5px] 等)は font-size と line-height(またはブラウザ既定の "normal")が生む
-// 「strut」で行の高さが決まっており、バーの決め打ち px はそれと一致しない(実測で1件あたり
-// 23px のズレが出た)。そのため、この実装は MessageItem / UserLabel / Chip が実際に使っている
-// テキストクラス(font-body text-small / font-body text-xs / text-[12.5px] など)をそのまま
+// text-sm 等)は font-size と line-height が生む「strut」で行の高さが決まっており、バーの
+// 決め打ち px はそれと一致しない(実測で1件あたり 23px のズレが出た)。そのため、この実装は
+// MessageItem / UserLabel / Chip が実際に使っている
+// テキストクラス(font-body text-small / font-body text-xs / text-sm など)をそのまま
 // バーの外側の span に当て、バー自体は `<span>` の中の装飾(高さ 0.7em 程度)として置くだけに
 // する。span はこれらの HStack の子であるため flex アイテムとして自動的に block 化され、
 // テキストが無くても strut ぶんの高さを確保する(CSS の仕様上、フォントサイズ/行間を持つ
@@ -110,16 +110,18 @@ export default function MessageItemSkeleton({
 // 間は shimmer のハイライトで辛うじて区別が付くが、prefers-reduced-motion: reduce では
 // そのハイライトごと消えるため、ベタ塗りのピルが1つ残るだけになってしまう。
 //
-// 中の2つの span は Chip の絵文字 span(aria-hidden)/ 件数 span に対応する場所。⚠ 実測すると
-// 絵文字を実際に置いた行の高さ(21px)は、同じ text-[12.5px] の「テキストが無いときの
-// strut」だけでは再現できない(絵文字グリフを描く際にフォールバックの絵文字フォントが
-// 使われ、そのフォントの行間メトリクスがテキスト用フォントより大きいため)。したがって
-// 1つ目のバーだけ絵文字の見かけの縁(実測 16×17px)に合わせた明示サイズにしている
-// (Chip 側の絵文字サイズが変わったときはここも実測して合わせ直すこと)。2つ目(件数)は
-// 通常の数字と同じ挙動なので、他の場所と同じ 0.7em の相対指定で strut に委ねている。
+// 中の2つの span は Chip の絵文字 span(aria-hidden)/ 件数 span に対応する場所。1つ目のバーは
+// 絵文字の見かけの縁(16×17px)に合わせた明示サイズにしている。2つ目(件数)は通常の数字と同じ
+// 挙動なので、他の場所と同じ 0.7em の相対指定で strut に委ねている。
+//
+// ⚠ この 16×17px は「line-height: normal のとき、絵文字グリフのフォールバックフォントの
+// 行間メトリクスがテキスト用フォントより大きくなる」ことへの対処として実測した値だった。
+// #117 で全サイズトークンに実数の line-height を焼き込んだため、行の高さはフォントの
+// メトリクスではなく指定した line-height が決めるようになっており、この前提はもう成り立たない。
+// 高さを触るときは実測し直すこと。
 function ReactionPillSkeleton() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-pill border border-solid border-border-strong px-3.5 py-[7px] text-[12.5px]">
+    <span className="inline-flex items-center gap-1.5 rounded-pill border border-solid border-border-strong px-3.5 py-[7px] text-sm">
       <span>
         <Skeleton width={16} height={17} />
       </span>

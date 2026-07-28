@@ -106,7 +106,7 @@ export default function UploadTile({
       onDrop={onDrop}
     >
       {icon ? <span className="flex items-center text-text-dim">{icon}</span> : null}
-      <span className="font-body text-md font-semibold text-text">{label}</span>
+      <span className="font-body text-base font-semibold text-text">{label}</span>
       {hint ? <span className="font-body text-sm text-text-dim">{hint}</span> : null}
       <input
         id={inputId}

@@ -18,13 +18,13 @@ export const Default: Story = {
     <Section title="Footer" note="境界は上端(border-t)だけ。padding で内側の余白を切替。">
       <div className="flex max-w-md flex-col gap-4">
         <Footer padding="sm">
-          <p className="text-2xs text-text-faint">padding=&quot;sm&quot;</p>
+          <p className="text-xs text-text-faint">padding=&quot;sm&quot;</p>
         </Footer>
         <Footer padding="md">
-          <p className="text-2xs text-text-faint">padding=&quot;md&quot;(既定)</p>
+          <p className="text-xs text-text-faint">padding=&quot;md&quot;(既定)</p>
         </Footer>
         <Footer padding="lg">
-          <p className="text-2xs text-text-faint">padding=&quot;lg&quot;</p>
+          <p className="text-xs text-text-faint">padding=&quot;lg&quot;</p>
         </Footer>
       </div>
     </Section>

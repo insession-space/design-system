@@ -33,8 +33,8 @@ export function Section({
 }) {
   return (
     <section className="mb-8">
-      <h3 className="font-display text-xl font-bold text-text mb-1">{title}</h3>
-      {note && <p className="text-smd text-text-dim mb-4 leading-normal">{note}</p>}
+      <h3 className="font-body text-lg font-bold text-text mb-1">{title}</h3>
+      {note && <p className="text-base text-text-dim mb-4 leading-normal">{note}</p>}
       {children}
     </section>
   );
@@ -47,9 +47,9 @@ export function ColorSwatch({ varName, label }: { varName: string; label: string
     <div className="rounded-card border border-solid border-border overflow-hidden bg-surface">
       <div className="h-18" style={{ background: `var(${varName})` }} />
       <div className="p-3">
-        <div className="text-smd font-semibold text-text">{label}</div>
-        <code className="text-2xs text-text-faint">{varName}</code>
-        <div className="text-2xs text-text-dim mt-1">{resolved || '—'}</div>
+        <div className="text-base font-semibold text-text">{label}</div>
+        <code className="text-xs text-text-faint">{varName}</code>
+        <div className="text-xs text-text-dim mt-1">{resolved || '—'}</div>
       </div>
     </div>
   );
@@ -64,12 +64,12 @@ export function LineSwatch({ varName, label }: { varName: string; label: string 
         className="border-b-2 border-solid pb-2 mb-2"
         style={{ borderBottomColor: `var(${varName})` }}
       >
-        <span className="text-md font-semibold" style={{ color: `var(${varName})` }}>
+        <span className="text-base font-semibold" style={{ color: `var(${varName})` }}>
           {label}
         </span>
       </div>
-      <code className="text-2xs text-text-faint">{varName}</code>
-      <div className="text-2xs text-text-dim mt-1">{resolved || '—'}</div>
+      <code className="text-xs text-text-faint">{varName}</code>
+      <div className="text-xs text-text-dim mt-1">{resolved || '—'}</div>
     </div>
   );
 }
@@ -90,9 +90,9 @@ export function BoxSwatch({
       <div
         className={`w-24 h-18 bg-tint-13 border border-solid border-border-strong ${boxClassName ?? ''}`}
       />
-      <div className="text-smd font-semibold text-text">{label}</div>
-      <code className="text-2xs text-text-faint">{varName}</code>
-      <div className="text-2xs text-text-dim">{resolved || '—'}</div>
+      <div className="text-base font-semibold text-text">{label}</div>
+      <code className="text-xs text-text-faint">{varName}</code>
+      <div className="text-xs text-text-dim">{resolved || '—'}</div>
     </div>
   );
 }
@@ -112,9 +112,9 @@ function TokenTableRow({ varName, label }: { varName: string; label: string }) {
   const resolved = useResolvedVar(varName);
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-2.5 bg-tint-3 border-b border-solid border-border">
-      <span className="text-smd text-text">{label}</span>
-      <code className="text-2xs text-text-faint">{varName}</code>
-      <span className="text-smd text-text-dim tabular-nums">{resolved || '—'}</span>
+      <span className="text-base text-text">{label}</span>
+      <code className="text-xs text-text-faint">{varName}</code>
+      <span className="text-base text-text-dim tabular-nums">{resolved || '—'}</span>
     </div>
   );
 }

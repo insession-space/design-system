@@ -47,6 +47,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "check": "biome check .",
     "check:styles": "node scripts/check-styles.mjs",
+    "check:typography": "node scripts/check-typography.mjs",
     "format": "biome format --write .",
     "storybook": "pnpm build:css && storybook dev -p 6006",
     "build-storybook": "pnpm build:css && storybook build -o storybook-static",

@@ -79,7 +79,7 @@ export default function RingTimer({
         >
           {Math.max(0, Math.round(secondsLeft))}
         </span>
-        {caption && <span className="mt-1 text-2xs text-text-dim">{caption}</span>}
+        {caption && <span className="mt-1 text-xs text-text-dim">{caption}</span>}
       </div>
     </Progress.Root>
   );

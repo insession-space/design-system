@@ -25,7 +25,7 @@ export const VariantsBySizes: Story = {
       <div className="flex flex-col gap-6">
         {VARIANTS.map((variant) => (
           <div key={variant} className="flex items-center gap-4">
-            <span className="w-20 shrink-0 text-smd font-semibold text-text-dim">{variant}</span>
+            <span className="w-20 shrink-0 text-base font-semibold text-text-dim">{variant}</span>
             {SIZES.map((size) => (
               <IconButton
                 key={size}
@@ -50,7 +50,7 @@ export const TouchTarget: Story = {
     >
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
-          <span className="w-56 shrink-0 text-smd font-semibold text-text-dim">
+          <span className="w-56 shrink-0 text-base font-semibold text-text-dim">
             size=30（touchSize 無し）
           </span>
           <IconButton
@@ -61,7 +61,7 @@ export const TouchTarget: Story = {
           />
         </div>
         <div className="flex items-center gap-4">
-          <span className="w-56 shrink-0 text-smd font-semibold text-text-dim">
+          <span className="w-56 shrink-0 text-base font-semibold text-text-dim">
             size=30 / touchSize=44
           </span>
           <IconButton
@@ -73,7 +73,7 @@ export const TouchTarget: Story = {
           />
         </div>
         <div className="flex items-center gap-4">
-          <span className="w-56 shrink-0 text-smd font-semibold text-text-dim">
+          <span className="w-56 shrink-0 text-base font-semibold text-text-dim">
             className の上書き(max-md:size-11)
           </span>
           <IconButton

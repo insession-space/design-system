@@ -98,7 +98,7 @@ function MenuPopup({ padding = true, scroll = true, className, ...props }: MenuP
 // bg-transparent を単に落とすだけにしないのは、DS が preflight を配っていないため
 // PlainItem(<button>)に UA 既定の buttonface 背景が残るから。排他で出せば両方満たせる。
 const MENU_ROW_BASE =
-  'flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-[15px] shadow-none transition-colors duration-(--dur-fast) cursor-pointer';
+  'flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-base shadow-none transition-colors duration-(--dur-fast) cursor-pointer';
 
 // Base UI の Item/RadioItem/CheckboxItem は <div> を描画するため、disabled は data-disabled
 // 属性で表現される(:disabled は button 等のフォーム要素にしか適用されないため効かない)。

@@ -16,10 +16,10 @@ export const Default: Story = {
     <Section title="Card" note="elevation 既定2。padding 既定 md、radius 既定 card。">
       <div className="flex flex-wrap gap-4">
         <Card className="max-w-xs">
-          <p className="text-smd text-text">既定(elevation=2)。</p>
+          <p className="text-base text-text">既定(elevation=2)。</p>
         </Card>
         <Card elevation={4} className="max-w-xs">
-          <p className="text-smd text-text">elevation=4(Modal と同じ組)。</p>
+          <p className="text-base text-text">elevation=4(Modal と同じ組)。</p>
         </Card>
       </div>
     </Section>

@@ -73,7 +73,7 @@ export default function Slider({
           )}
           {valueLabel ? (
             // 数字が並ぶので tabular-nums。値が動いても幅が揺れない。
-            <span className="font-mono text-xs text-text-dim tabular-nums">{valueLabel}</span>
+            <span className="font-body text-xs text-text-dim tabular-nums">{valueLabel}</span>
           ) : null}
         </div>
       )}

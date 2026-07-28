@@ -155,46 +155,63 @@
   /* フォント: 新 DS(claude design "INSESSION Design System" #463)に一新。
      JetBrains Mono を「製品フォント」= UI・見出し・本文・ラベル・メタ・数値すべてに使う。
      Archivo はロゴ/ワードマーク専用(現状ロゴは SVG アセット)。日本語フォールバックは維持。
-     → display / body / mono すべて JetBrains Mono に揃える(旧: display/body=Archivo を廃止)。 */
+     → display / body / mono すべて JetBrains Mono に揃える(旧: display/body=Archivo を廃止)。
+
+     ⚠ 3 つは同値なので、**このパッケージのコンポーネントは font-body だけを使う**(#117)。
+     同値のまま font-display / font-mono を使い分けても見た目は変わらず、「使い分けている
+     ように見えるが実は揃っている」状態が読み手を誤解させるだけだった。display だけを別の
+     フォントにしたくなった時点で、その回に使い分けを再導入する。トークン定義は消費側の
+     互換のため別名として残す(唯一の例外は LogoMark のワードマーク。再導入の足場)。 */
   --font-display: "JetBrains Mono", "Hiragino Sans", "Noto Sans JP", monospace;
   --font-body: "JetBrains Mono", "Hiragino Sans", "Noto Sans JP", monospace;
   --font-mono: "JetBrains Mono", "Hiragino Sans", "Noto Sans JP", monospace;
 
-  /* タイポグラフィ: サイズ(既存 px の実測から)。行間は付けず normal 固定にし、
-     必要な箇所だけ leading-* で上書きする(既存の見た目と揃えるため) */
-  --text-2xs: 10px;
-  --text-2xs--line-height: normal;
+  /* タイポグラフィ: 補助スケール = 「サイズだけを与える」下位ユーティリティ(#117)。
+     weight を自分で決めたい UI の細部(バッジ・ボタン・入力・メタ情報)で使う。
+     文章には下のセマンティック階層を使うこと。
+
+     ⚠ line-height に normal を使わない。normal は実行環境のフォントが行高を決めるため、
+     同じ font-size でも環境によって行送りがブレる。これが「画面ごとにフォントが揃って
+     いない」体感の主因だった(#117)ので、全段に実数を焼き込んで決定論的にする。
+
+     ⚠ 段は 4 つだけ。旧スケールは 10〜56px を 13 段(ほぼ 1px 刻み)で持っていて、
+     「13px と 14px のどちらを使うべきか」が誰にも決められなかった。選べない粒度は
+     統一を壊すので、意図的に粗くしている。中間の値が欲しくなったら、それは補助
+     スケールではなくセマンティック階層で表現すべき役割が隠れているサイン。 */
   --text-xs: 11px;
-  --text-xs--line-height: normal;
+  --text-xs--line-height: 1.35;
   --text-sm: 12px;
-  --text-sm--line-height: normal;
-  --text-smd: 13px;
-  --text-smd--line-height: normal;
+  --text-sm--line-height: 1.4;
   --text-base: 14px;
-  --text-base--line-height: normal;
-  --text-md: 15px;
-  --text-md--line-height: normal;
+  --text-base--line-height: 1.45;
   --text-lg: 16px;
-  --text-lg--line-height: normal;
-  --text-xl: 17px;
-  --text-xl--line-height: normal;
-  --text-2xl: 18px;
-  --text-2xl--line-height: normal;
-  --text-3xl: 21px;
-  --text-3xl--line-height: normal;
-  --text-4xl: 24px;
-  --text-4xl--line-height: normal;
-  --text-5xl: 30px;
-  --text-5xl--line-height: normal;
-  --text-6xl: 56px;
-  --text-6xl--line-height: normal;
+  --text-lg--line-height: 1.4;
+
+  /* ⚠ Tailwind 既定テーマが持つ上の段を明示的に消す(#117)。@theme から自分の上書きを
+     削るだけでは足りない — 上書きが無くなると Tailwind の既定値(text-xl=20px /
+     2xl=24px / 3xl=30px / 4xl=36px / 5xl=48px / 6xl=60px …)が表に出てきて、**廃止した
+     はずのユーティリティが、DS が意図したのとは違うサイズで静かに生き続ける**。
+     クラス名は DOM に出て CSS も当たるので、型検査もビルドも lint も緑のまま通る。
+     (7xl 以上は DS が一度も定義していないが、同じ理由で塞いでおく) */
+  --text-xl: initial;
+  --text-2xl: initial;
+  --text-3xl: initial;
+  --text-4xl: initial;
+  --text-5xl: initial;
+  --text-6xl: initial;
+  --text-7xl: initial;
+  --text-8xl: initial;
+  --text-9xl: initial;
 
   /* タイポグラフィ: DS のセマンティック階層(claude design "INSESSION Design System" 準拠。#463)。
-     サイズだけでなく weight / letter-spacing / line-height を役割ごとに焼き込むので、
-     text-display / text-h1 / text-h2 / text-body / text-small / text-label を当てるだけで
-     DS の見出し・本文・ラベルの見た目になる。label は uppercase + mono を併用する
-     (font-mono と uppercase ユーティリティ、または .label クラスと組み合わせる)。
-     ※適用(既存見出しの置換)は画面フェーズで段階的に行う。ここでは語彙を用意する。 */
+     **これが既定**。サイズだけでなく weight / letter-spacing / line-height を役割ごとに
+     焼き込むので、text-display / text-h1 / text-h2 / text-body / text-small / text-label を
+     当てるだけで DS の見出し・本文・ラベルの見た目になり、font-bold 等の併記が要らない。
+     label は uppercase を併用する(uppercase ユーティリティ、または .label クラス)。
+
+     補助スケールとサイズが重なる段(text-base=text-small=14px / text-lg=text-body=16px)が
+     あるのは意図的で、違いは weight と line-height を持つかどうか。文章はこちら、weight を
+     自分で決めたい UI 細部は補助スケール、と使い分ける。 */
   --text-display: 44px;
   --text-display--line-height: 1;
   --text-display--font-weight: 800;

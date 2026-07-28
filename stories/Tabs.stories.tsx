@@ -75,7 +75,7 @@ export const WithTrailing: Story = {
           trailing={
             <button
               type="button"
-              className="ml-auto self-center pr-2 text-smd text-text-faint hover:text-text-dim"
+              className="ml-auto self-center pr-2 text-base text-text-faint hover:text-text-dim"
             >
               クリア
             </button>
@@ -118,13 +118,13 @@ export const WithPanel: Story = {
           <Tabs.Tab value="history">履歴</Tabs.Tab>
           <Tabs.Tab value="playlist">プレイリスト</Tabs.Tab>
         </Tabs.List>
-        <Tabs.Panel value="queue" className="py-3 text-smd text-text-dim">
+        <Tabs.Panel value="queue" className="py-3 text-base text-text-dim">
           キューの中身。
         </Tabs.Panel>
-        <Tabs.Panel value="history" className="py-3 text-smd text-text-dim">
+        <Tabs.Panel value="history" className="py-3 text-base text-text-dim">
           履歴の中身。
         </Tabs.Panel>
-        <Tabs.Panel value="playlist" className="py-3 text-smd text-text-dim">
+        <Tabs.Panel value="playlist" className="py-3 text-base text-text-dim">
           プレイリストの中身。
         </Tabs.Panel>
       </Tabs.Root>

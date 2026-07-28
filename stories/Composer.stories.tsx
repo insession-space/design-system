@@ -35,7 +35,7 @@ function BasicComposerDemo({ size }: { size: 'default' | 'compact' }) {
         size={size}
       />
       {sent.length > 0 && (
-        <ul className="flex flex-col gap-1 text-smd text-text-dim">
+        <ul className="flex flex-col gap-1 text-base text-text-dim">
           {sent.map((text, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: 送信順に積むだけの表示専用リスト
             <li key={i}>{text}</li>
@@ -54,11 +54,11 @@ export const Basic: Story = {
     >
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-1.5">
-          <span className="text-smd font-semibold text-text-dim">default</span>
+          <span className="text-base font-semibold text-text-dim">default</span>
           <BasicComposerDemo size="default" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <span className="text-smd font-semibold text-text-dim">compact</span>
+          <span className="text-base font-semibold text-text-dim">compact</span>
           <BasicComposerDemo size="compact" />
         </div>
       </div>
@@ -100,7 +100,7 @@ function ActionsComposerDemo() {
         }
       />
       {sent.length > 0 && (
-        <ul className="flex flex-col gap-1 text-smd text-text-dim">
+        <ul className="flex flex-col gap-1 text-base text-text-dim">
           {sent.map((text, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: 送信順に積むだけの表示専用リスト
             <li key={i}>{text}</li>
@@ -160,7 +160,7 @@ function MaxLengthComposerDemo() {
         sendLabel="送信"
         maxLength={MAX_LENGTH}
       />
-      <span className="text-2xs text-text-faint tabular-nums">
+      <span className="text-xs text-text-faint tabular-nums">
         {value.length} / {MAX_LENGTH}
       </span>
     </div>
@@ -192,7 +192,7 @@ export const States: Story = {
     >
       <div className="flex max-w-md flex-col gap-6">
         <div className="flex flex-col gap-1.5">
-          <span className="text-smd font-semibold text-text-dim">disabled</span>
+          <span className="text-base font-semibold text-text-dim">disabled</span>
           <Composer
             value=""
             onChange={() => {}}
@@ -203,15 +203,15 @@ export const States: Story = {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <span className="text-smd font-semibold text-text-dim">flash(送信直後)</span>
+          <span className="text-base font-semibold text-text-dim">flash(送信直後)</span>
           <FlashComposerDemo />
         </div>
         <div className="flex flex-col gap-1.5">
-          <span className="text-smd font-semibold text-text-dim">maxLength 到達</span>
+          <span className="text-base font-semibold text-text-dim">maxLength 到達</span>
           <MaxLengthComposerDemo />
         </div>
         <div className="flex flex-col gap-1.5">
-          <span className="text-smd font-semibold text-text-dim">複数行の自動伸長</span>
+          <span className="text-base font-semibold text-text-dim">複数行の自動伸長</span>
           <AutoGrowComposerDemo />
         </div>
       </div>
@@ -231,7 +231,7 @@ function ChatPanelDemo() {
           <div
             // biome-ignore lint/suspicious/noArrayIndexKey: 送信順に積むだけの表示専用リスト
             key={i}
-            className="max-w-[80%] self-start rounded-card bg-surface px-3 py-2 text-smd text-text"
+            className="max-w-[80%] self-start rounded-card bg-surface px-3 py-2 text-base text-text"
           >
             {text}
           </div>

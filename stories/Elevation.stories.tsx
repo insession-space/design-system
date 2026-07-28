@@ -38,9 +38,9 @@ export const ElevationScale: Story = {
                 padding="md"
                 className="flex h-20 w-28 items-center justify-center"
               >
-                <span className="text-smd font-semibold text-text">elevation {elevation}</span>
+                <span className="text-base font-semibold text-text">elevation {elevation}</span>
               </Surface>
-              <div className="flex flex-col items-center gap-0.5 text-2xs text-text-dim">
+              <div className="flex flex-col items-center gap-0.5 text-xs text-text-dim">
                 <span>背景: {tokens.bg}</span>
                 <span>境界: {tokens.border}</span>
                 <span>影: {tokens.shadow}</span>

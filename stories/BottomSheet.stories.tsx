@@ -25,8 +25,8 @@ function BottomSheetDemo() {
         closeLabel="閉じる"
         ariaLabel="参加者"
       >
-        <h3 className="font-display text-lg font-bold text-text mb-3">参加者</h3>
-        <p className="text-smd text-text-dim leading-normal">
+        <h3 className="font-body text-lg font-bold text-text mb-3">参加者</h3>
+        <p className="text-base text-text-dim leading-normal">
           上部のハンドルをドラッグすると中途高さ⇄フルハイトを切り替えられる。下に大きくドラッグすると閉じる。
         </p>
       </BottomSheet>
@@ -51,7 +51,7 @@ function BottomSheetComposerDemo({ defaultSnapPoint }: { defaultSnapPoint?: 'mid
         defaultSnapPoint={defaultSnapPoint}
       >
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2">
-          <p className="text-smd text-text-dim leading-normal">
+          <p className="text-base text-text-dim leading-normal">
             上から順に読む中身。ここは mid でも見えている。
           </p>
         </div>

@@ -59,7 +59,7 @@ const ROW =
 // 子孫セレクタ（[&_label]:cursor-pointer）でも書けるが、その記法は Tailwind のソース走査で
 // 拾われず配布 CSS に生成されなかった（実測。check:styles は素のクラス名しか見ないので
 // この欠損を検出できない）。
-const LABEL = 'cursor-[inherit] text-md text-text';
+const LABEL = 'cursor-[inherit] text-base text-text';
 
 export default function Checkbox({ label, className = '', disabled, ...rest }: CheckboxProps) {
   return (

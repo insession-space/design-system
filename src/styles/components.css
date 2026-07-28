@@ -64,7 +64,8 @@
   /* 既定経路のモーダルは中央寄せの h2 と、装飾済みの submit ボタンを前提にしている
      （ConfirmModal の <h2>、および消費側のフォーム型モーダル）。 */
   .modal h2 {
-    font-size: 17px;
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height);
     font-weight: 700;
     text-align: center;
     margin-bottom: 6px;
@@ -78,8 +79,9 @@
   .modal button[type="submit"] {
     margin-top: 6px;
     padding: 14px;
-    font-size: 15px;
-    letter-spacing: 0.08em;
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    letter-spacing: var(--tracking-pill);
   }
 
   /* モーダル右上のクローズアイコン。
@@ -99,7 +101,9 @@
     border-radius: 50%;
     background: transparent;
     color: var(--color-text-dim);
-    font-family: var(--font-display);
+    font-family: var(--font-body);
+    /* typography-scale-exempt: 「×」グリフの寸法であってテキスト階層ではない(#117)。
+       本文スケールに乗せると、アイコンの大きさを変えたいだけでテキストの段を触ることになる。 */
     font-size: 21px;
     font-weight: 700;
     line-height: 1;
@@ -204,7 +208,8 @@
     border-radius: 50%;
     background: var(--color-surface);
     color: var(--color-text-dim);
-    font-family: var(--font-display);
+    font-family: var(--font-body);
+    /* typography-scale-exempt: 上の .modal-close と同じ理由(#117)。「×」グリフの寸法。 */
     font-size: 18px;
     font-weight: 700;
     line-height: 1;

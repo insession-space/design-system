@@ -140,7 +140,7 @@ export default function Composer({
         disabled={disabled}
         rows={1}
         autoComplete="off"
-        className={`max-h-[120px] resize-none border-none bg-transparent font-body text-md leading-snug text-text outline-none placeholder:text-text-faint ${textareaPad}`}
+        className={`max-h-[120px] resize-none border-none bg-transparent font-body text-base leading-snug text-text outline-none placeholder:text-text-faint ${textareaPad}`}
       />
       <div className={`flex items-center justify-between gap-2 ${actionsPad}`}>
         <div className="flex items-center gap-0.5">{actions}</div>

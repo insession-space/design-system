@@ -72,7 +72,7 @@ export function StatusBadge({
 }: StatusBadgeProps) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-pill border border-solid px-2 py-0.5 text-2xs font-extrabold uppercase tracking-tag ${BADGE_TONE[tone]} ${className}`.trim()}
+      className={`inline-flex shrink-0 items-center gap-1.5 rounded-pill border border-solid px-2 py-0.5 text-xs font-extrabold uppercase tracking-tag ${BADGE_TONE[tone]} ${className}`.trim()}
     >
       {dot && <StatusDot tone={tone} size={6} pulse={pulse} />}
       {children}

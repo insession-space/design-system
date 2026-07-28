@@ -87,7 +87,7 @@ export default function ConfirmModal({
             {/* AlertDialog.Title/.Description は既定で h2/p を描画するので、components.css の
                 `.modal h2` 装飾がそのまま乗る（旧実装の生 h2/p と見た目は同一）。 */}
             <AlertDialog.Title>{title}</AlertDialog.Title>
-            <AlertDialog.Description className="break-words text-center text-base leading-[1.55] text-text-dim">
+            <AlertDialog.Description className="break-words text-center text-base text-text-dim">
               {children}
             </AlertDialog.Description>
             <div className="mt-2 flex gap-2.5">

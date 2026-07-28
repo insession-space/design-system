@@ -29,7 +29,7 @@ export const Default: Story = {
       scroll="body"
       appBar={
         <AppBar
-          left={<span className="text-md font-semibold text-text">InSession</span>}
+          left={<span className="text-base font-semibold text-text">InSession</span>}
           right={
             <HStack gap="sm" align="center">
               <Button size="sm" variant="ghost">
@@ -43,7 +43,7 @@ export const Default: Story = {
       sidebar={
         <nav className="flex h-full w-56 flex-col gap-1 border-r border-solid border-border bg-bg-elevated p-3">
           {['ホーム', 'スペース', '通知', '設定'].map((label) => (
-            <span key={label} className="rounded-md px-3 py-2 text-smd text-text-dim">
+            <span key={label} className="rounded-md px-3 py-2 text-base text-text-dim">
               {label}
             </span>
           ))}
@@ -51,7 +51,7 @@ export const Default: Story = {
       }
       footer={
         <Footer padding="md">
-          <p className="text-2xs text-text-faint">© InSession Space</p>
+          <p className="text-xs text-text-faint">© InSession Space</p>
         </Footer>
       }
     >
@@ -63,12 +63,12 @@ export const Default: Story = {
         />
         <div className="mt-6 flex flex-col gap-4">
           <Card padding="lg">
-            <p className="text-smd text-text">
+            <p className="text-base text-text">
               scroll="body" では外枠が h-dvh、本文が min-h-0 + overflow-y-auto になる。
             </p>
           </Card>
           <Card padding="lg">
-            <p className="text-smd text-text">
+            <p className="text-base text-text">
               AppBar/Footer は画面に固定されたまま本文だけがスクロールする。
             </p>
           </Card>
