@@ -51,7 +51,7 @@ const TRACK =
   'inline-flex items-center gap-0.5 rounded-md border border-solid border-border bg-surface-2 p-0.5';
 
 const SEGMENT =
-  'inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 pointer-coarse:min-h-(--control-touch-size) rounded-[7px] border-none bg-transparent px-3 py-1.5 font-body text-sm font-semibold whitespace-nowrap transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50';
+  'inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 min-w-(--control-hit-size) pointer-coarse:min-h-(--control-touch-size) pointer-coarse:min-w-(--control-touch-size) rounded-[7px] border-none bg-transparent px-3 py-1.5 font-body text-sm font-semibold whitespace-nowrap transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50';
 
 export default function SegmentedControl({
   items,
