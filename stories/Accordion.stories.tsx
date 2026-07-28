@@ -82,7 +82,7 @@ export const WithAvatar: Story = {
       <Demo initial="a">
         <AccordionItem
           itemId="a"
-          leading={<Avatar name="Miko" size={40} color="var(--color-mint)" ring />}
+          leading={<Avatar name="Miko" size={40} color="var(--color-accent)" ring />}
           title={
             <>
               <span>Miko</span>
@@ -116,7 +116,7 @@ export const WithAvatar: Story = {
         </AccordionItem>
         <AccordionItem
           itemId="b"
-          leading={<Avatar name="Ren" size={40} color="var(--color-violet)" ring />}
+          leading={<Avatar name="Ren" size={40} color="var(--color-decor-1)" ring />}
           title={
             <>
               <span>Ren</span>

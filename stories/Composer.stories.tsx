@@ -17,7 +17,7 @@ export default meta;
 type Story = StoryObj<typeof Composer>;
 
 // 基本形。空文字のときは送信ボタンが disabled(text-text-dim)になり、入力すると
-// 有効(text-mint-soft)に変わる。size='compact' は狭い行内(コミュニティの返信欄等)向け。
+// 有効(text-accent-soft)に変わる。size='compact' は狭い行内(コミュニティの返信欄等)向け。
 function BasicComposerDemo({ size }: { size: 'default' | 'compact' }) {
   const [value, setValue] = useState('');
   const [sent, setSent] = useState<string[]>([]);
