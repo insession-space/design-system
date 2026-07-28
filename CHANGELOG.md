@@ -1,5 +1,49 @@
 # @insession/design-system
 
+## 6.1.0
+
+### Minor Changes
+
+- 7a49257: a11y: ライトテーマの色コントラスト・タッチ領域・リンクの色依存を是正する (#122)
+
+  **⚠ 見た目が変わる。** 消費側 2 リポジトリ（insession-app / loophub-app）は、publish 後にライトテーマの画面を確認すること。
+
+  **accent を「塗り」、accent-soft を「文字」に役割分離した。** コメント上はそう書かれていたが、実際には accent が塗り 12 箇所と文字 15 箇所を兼ねており、ライトの accent (#ff5a36) は bg 上 2.55:1 と WCAG 1.4.3 の 4.5:1 を大きく割っていた。accent 自体を 4.5:1 まで暗くするとライトの CTA・バッジ・枠がすべて暗い赤橙になるため、**塗りは明るいコーラルのまま (3:1)、文字は accent-soft (4.5:1)** に寄せた。`text-accent` を使っていた箇所は `text-accent-soft` へ移した。今後「アクセント色の文字」が要るときは accent ではなく accent-soft を使うこと。
+
+  **アクセント塗りの上の文字色を白からダークインクへ変えた。** 白抜きは dark 2.84:1 / light 3.10:1 しかない。コーラルは中明度の暖色なので白では届かず、「ブランド色を暗くする」か「ラベルを暗くする」かの二択で後者を採った（コーラルの見た目を一切動かさずに済むため）。結果 dark 6.39:1 / light 4.89:1。
+
+  **ライトテーマのセマンティック色と text-faint を濃くした。** text-faint 2.10 / warning 2.04 / success 2.60 / danger 3.55 / info 3.75 → いずれも 4.5:1 以上。判定は `--color-bg` だけでなく **DS の全背景面（bg / bg-elevated / surface / surface-hover / surface-3）と、その色自身のティント面（`*-surface` 12% / `*-surface-strong` 20%）**を含めた最悪ケースで行った。Lozenge / Badge / Chip は「同系色のティント面に同系色の文字」を載せる作りなので、bg 上だけで判定すると通ってもバッジ内で割る。ダークは text-faint と info のみ微調整。
+
+  **Checkbox / Radio の枠に `--color-control-border` を新設した。** off 状態は枠だけが「操作可能なコントロールがある」ことを伝えるため WCAG 1.4.11 の 3:1 が要るが、装飾用の `border-strong` は 1.2〜1.5:1 しかない。`border-strong` 自体を濃くすると全ての区切り線が硬くなり DS の意匠を壊すので、コントロール専用トークンを分けた。
+
+  **タッチ領域の下限を揃えた。** Checkbox / Radio / Toggle / Slider のつまみ / SegmentedControl / Chip が、ポインタ端末で 24×24 CSS px（WCAG 2.2 SC 2.5.8）、タッチ端末で 44×44（Apple HIG）以上になる。下限値は `--control-hit-size` / `--control-touch-size` に単一ソース化した。**見た目のサイズは変えず、見えない擬似要素で当たり判定だけを広げている**（Checkbox / Radio は行の最小高さも上げているため、広げた当たり判定が隣の行と重ならない）。
+
+  **本文中リンク（`variant="inline"`）に下線を戻した。** 色とウェイトだけでは地の文と区別できず WCAG 1.4.1 に触れるため。ベタ下線ではなく 1px + 4px オフセットの控えめな下線にして、DS の「下線を使わない」意匠からの逸脱を最小に留めた。他の variant は本文に埋め込まれないので下線を持たない。
+
+- 4ebdc88: a11y: キーボードフォーカスを可視化し、モーション抑制と強制カラーモードを DS 単体で完結させる (#121)
+
+  **フォーカスリングが実質不可視だったのを修正した。** `--shadow-focus` は α が 0.16 しかなく、背景へ合成した実効コントラストが 1.16〜1.25:1（WCAG 1.4.11 は 3:1 必須）しかない。それを 17 部品が `focus-visible:outline-none` と併記していたため、ブラウザ既定の可視アウトラインを消したうえで見えないリングに差し替える形になっており、キーボードユーザーはフォーカス位置を判別できなかった。
+
+  既に定義済みで基準を満たしていた `--color-focus-ring`（dark 5.71:1 / light 4.63:1）・`--focus-ring-width`・`--focus-ring-offset` をトークン参照のまま使うアウトラインへ置き換えた。値の単一ソースは `theme.css` のままで、部品側に `2px` 等の直書きはしない。フォーカスしていない通常表示のレンダリング結果は変わらない。
+
+  代替のフォーカス表現を持たず完全に不可視だった `Stepper` の数値入力と `Composer` にもフォーカス表示を追加した（Composer は器側に `focus-within` で出す。`Input` / `Textarea` / `SearchField` は従来どおり枠色の変化で示す）。
+
+  **`prefers-reduced-motion` の抑制を DS の配布物だけで完結させた。** Spinner の回転・RingTimer の脈動・各部品のトランジションは、ソースコメントに反して消費側アプリの `style.css` にしか抑制規則が無く、DS のプリビルド CSS だけを読む loophub・DS 単体利用・Storybook では止まっていなかった（RingTimer の脈動は無限アニメーション）。抑制を部品のクラス文字列側に持たせ、取り込み方（`@source` 方式 / プリビルド CSS 方式）に依らず届くようにした。実態と食い違っていたコメントも修正した。
+
+  **`forced-colors`（Windows ハイコントラスト）に対応した。** 強制カラーモードでは `background-color` と `box-shadow` が無効化されるため、面の色だけで状態を示していた SegmentedControl / ToggleGroup の選択中は判別不能だった。選択中・チェック済み・オン・ハイライト行をシステム色で示し、無効状態は `GrayText` へ寄せた。
+
+### Patch Changes
+
+- 3c10af6: 検証チャネルを `pnpm verify` / `pnpm verify:full` に一本化し、カタログ網羅と a11y を機械検査で守るようにした（#120）。
+
+  - `pnpm verify`（型検査・lint・タイポグラフィ・カタログ網羅・ビルド・配布 CSS・パッケージ内容）と `pnpm verify:full`（+ カタログのビルド + 全 story への axe）を追加。CI は個別チェックを列挙せずこの 2 つを呼ぶだけにしたので、手元の確認と CI が構造的にズレなくなった
+  - `pnpm check:stories` を追加。public export したコンポーネントが story で一度も描画されていなければ CI で落ちる
+  - `pnpm check:package` を追加。CI にインラインで埋まっていた tarball 検査をスクリプトへ切り出し、手元でも実行できるようにした。あわせて `exports` が指す先が実際に同梱されているかも見る
+  - Storybook に `@storybook/addon-a11y` + `@storybook/addon-vitest` を導入し、全 story（206 件）を実ブラウザで描画して axe を掛ける（違反があれば CI が落ちる）
+  - `RingTimer` に `ariaLabel` を追加。`role="progressbar"` にアクセシブルな名前が無く「何の進捗か」が支援技術へ伝わっていなかった（省略時は `caption`、それも無ければ「残り時間」）
+
+  `color-contrast` は一時的に抑制している（色トークンの再設計が要るため別 Issue）。それ以外の見た目・出荷物（`dist` / 配布 CSS / 型）は変更していない。
+
 ## 6.0.0
 
 ### Major Changes
