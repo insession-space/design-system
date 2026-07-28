@@ -162,7 +162,7 @@ export type ModalFooterProps = ComponentProps<'div'>;
 function Footer({ className = '', ...props }: ModalFooterProps) {
   return (
     <div
-      className={`flex justify-end gap-2.5 border-t border-solid border-border bg-surface-2 px-[18px] py-3.5 ${className}`.trim()}
+      className={`flex justify-end gap-2.5 border-x-0 border-b-0 border-t border-solid border-border bg-surface-2 px-[18px] py-3.5 ${className}`.trim()}
       {...props}
     />
   );

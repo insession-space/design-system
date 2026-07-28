@@ -166,7 +166,7 @@ export default function SplitModal({
   const list = (
     <div className="flex flex-1 min-h-0 flex-col">
       {(navTitle || closeButton) && (
-        <div className="flex shrink-0 items-center gap-2.5 border-b border-solid border-border bg-bg-elevated px-3.5 py-3">
+        <div className="flex shrink-0 items-center gap-2.5 border-x-0 border-t-0 border-b border-solid border-border bg-bg-elevated px-3.5 py-3">
           <span className="min-w-0 flex-1 text-sm font-extrabold text-text">{navTitle}</span>
           {closeButton}
         </div>
@@ -176,7 +176,7 @@ export default function SplitModal({
           <button
             key={it.id}
             type="button"
-            className="flex w-full cursor-pointer items-center gap-3 border-none border-b border-solid border-border bg-transparent px-4 py-3.5 text-left text-base font-semibold text-text"
+            className="flex w-full cursor-pointer items-center gap-3 border-x-0 border-t-0 border-b border-solid border-border bg-transparent px-4 py-3.5 text-left text-base font-semibold text-text"
             onClick={() => {
               onSelect(it.id);
               setDrilled(true);
@@ -200,7 +200,7 @@ export default function SplitModal({
   // 狭い画面: 選択したセクションの詳細（上部に戻る導線）
   const detail = (
     <div className="flex flex-1 min-h-0 flex-col">
-      <div className="flex shrink-0 items-center gap-2 border-b border-solid border-border bg-bg-elevated px-3.5 py-3">
+      <div className="flex shrink-0 items-center gap-2 border-x-0 border-t-0 border-b border-solid border-border bg-bg-elevated px-3.5 py-3">
         <button
           type="button"
           aria-label={backLabel}
@@ -218,7 +218,7 @@ export default function SplitModal({
         {children}
       </div>
       {footer && (
-        <div className="flex shrink-0 justify-end gap-2.5 border-t border-solid border-border bg-bg-elevated px-4 py-3">
+        <div className="flex shrink-0 justify-end gap-2.5 border-x-0 border-b-0 border-t border-solid border-border bg-bg-elevated px-4 py-3">
           {footer}
         </div>
       )}
@@ -229,7 +229,7 @@ export default function SplitModal({
   const wide = (
     <>
       <aside
-        className="flex shrink-0 flex-col gap-5 self-stretch border-r border-solid border-border bg-bg-elevated px-4 py-[22px]"
+        className="flex shrink-0 flex-col gap-5 self-stretch border-y-0 border-l-0 border-r border-solid border-border bg-bg-elevated px-4 py-[22px]"
         style={{ width: navWidth }}
       >
         {navTitle && <h3 className="m-0 px-1 text-base font-extrabold text-text">{navTitle}</h3>}
@@ -271,7 +271,7 @@ export default function SplitModal({
           {children}
         </div>
         {footer && (
-          <div className="flex shrink-0 justify-end gap-2.5 border-t border-solid border-border bg-bg-elevated px-[26px] py-3.5">
+          <div className="flex shrink-0 justify-end gap-2.5 border-x-0 border-b-0 border-t border-solid border-border bg-bg-elevated px-[26px] py-3.5">
             {footer}
           </div>
         )}

@@ -42,7 +42,7 @@ export function AppBar({
   const stickyClass = sticky ? 'sticky top-0 z-[var(--z-sticky)]' : '';
   return (
     <header
-      className={`${stickyClass} ${ELEVATION_BG[1]} border-b border-solid ${ELEVATION_BORDER_COLOR[1]} ${className}`.trim()}
+      className={`${stickyClass} ${ELEVATION_BG[1]} border-x-0 border-t-0 border-b border-solid ${ELEVATION_BORDER_COLOR[1]} ${className}`.trim()}
       {...rest}
     >
       <HStack align="center" gap="sm" className="px-4 py-3">
@@ -189,7 +189,7 @@ export type FooterProps = {
 export function Footer({ padding = 'md', className = '', ...rest }: FooterProps) {
   return (
     <footer
-      className={`border-t border-solid ${ELEVATION_BORDER_COLOR[1]} ${SURFACE_PADDING_CLASS[padding]} ${className}`.trim()}
+      className={`border-x-0 border-b-0 border-t border-solid ${ELEVATION_BORDER_COLOR[1]} ${SURFACE_PADDING_CLASS[padding]} ${className}`.trim()}
       {...rest}
     />
   );
