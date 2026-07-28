@@ -123,7 +123,12 @@ const MENU_ROW_BASE =
 // ので、disabled 行だけが「面色もアウトラインも無い」状態にならないよう、この shadow-focus は
 // 引き続き必要。PlainItem(<button>、移行前と同じ見た目を保つ対象)側にはハイライト概念自体が
 // 無いためこの追加はしない。
-const ROW = `${MENU_ROW_BASE} data-highlighted:forced-colors:text-[color:Highlight] data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-highlighted:data-disabled:shadow-focus`;
+// ⚠ 強制カラーモードのハイライト色は not-data-disabled: で **排他的に** 出す(#17 と同じ失敗モード)。
+// Base UI は disabled 行にも data-highlighted を立てるため、ガードが無いと [data-highlighted] と
+// [data-disabled] の2ルールが同じ詳細度で並び、配布 CSS の出力順(Highlight が後)で勝敗が決まる。
+// その結果、無効行にカーソルが来たときだけ GrayText ではなく Highlight で描かれ、
+// 「操作できないのに選択可能に見える」状態になる。
+const ROW = `${MENU_ROW_BASE} data-highlighted:not-data-disabled:forced-colors:text-[color:Highlight] data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-highlighted:data-disabled:shadow-focus`;
 
 // PlainItem は移行前と同じ <button> を描画するため、disabled/hover はネイティブ疑似クラス
 // (disabled:/enabled:)で表現できる。移行前の ROW と完全に同じ文字列になる。
