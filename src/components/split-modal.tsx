@@ -183,7 +183,7 @@ export default function SplitModal({
             }}
           >
             {it.icon && (
-              <span className="shrink-0 text-accent" aria-hidden="true">
+              <span className="shrink-0 text-accent-soft" aria-hidden="true">
                 <Icon name={it.icon} size={20} />
               </span>
             )}
@@ -250,7 +250,7 @@ export default function SplitModal({
               >
                 {it.icon && (
                   <span
-                    className={`shrink-0 ${active ? 'text-accent' : 'text-text-faint'}`}
+                    className={`shrink-0 ${active ? 'text-accent-soft' : 'text-text-faint'}`}
                     aria-hidden="true"
                   >
                     <Icon name={it.icon} size={17} />

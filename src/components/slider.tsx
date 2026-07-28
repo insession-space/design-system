@@ -48,7 +48,7 @@ const TRACK = 'relative h-1.5 w-full grow rounded-pill bg-border';
 // という誤読を招くので置かない。inset/width も Base UI が inline で入れる。
 const INDICATOR = 'rounded-pill bg-accent';
 const THUMB =
-  'size-4 rounded-pill bg-white shadow-[0_1px_3px_rgba(0,0,0,0.3)] transition-transform motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+  'relative size-4 rounded-pill bg-white before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] shadow-[0_1px_3px_rgba(0,0,0,0.3)] transition-transform motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 
 export default function Slider({
   label,

@@ -37,14 +37,24 @@ export type LinkVariant = 'inline' | 'subtle' | 'pill' | 'wrapper' | 'bare';
 // 下線は使わない（ボタンテキスト調）。色・ウェイトはトークン経由。arbitrary は 4/8px リズムに
 // 載らない値のみ（py-[7px] 等）。
 const VARIANT: Record<LinkVariant, string> = {
+  // ⚠ inline だけは下線を持つ(#122)。本文の途中に埋まるリンクなので、色を落として見る人には
+  // 「色 + ウェイト」だけだと周囲の本文と区別が付かず、WCAG 1.4.1(色だけに依存しない)に触れる。
+  // 下線はベタではなく **1px の控えめな下線 + 4px のオフセット**にして、DS の「下線を使わない」
+  // 意匠からの逸脱を最小に留める(ベタ下線ほど強く出ない)。hover で下線を濃くして反応も返す。
+  // 他の variant は本文に埋め込まれないので下線を持たない(下のコメント参照)。
   inline:
-    'text-link font-semibold no-underline cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:text-link-hover',
+    'text-link font-semibold underline decoration-1 underline-offset-4 decoration-link/60 cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:text-link-hover hover:decoration-link-hover',
   subtle:
     'text-link text-sm font-semibold no-underline cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:text-link-hover',
-  pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-pill uppercase no-underline cursor-pointer transition-[background,color,transform] motion-reduce:transition-none duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent hover:-translate-y-px',
+  pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-pill uppercase no-underline cursor-pointer transition-[background,color,transform] motion-reduce:transition-none duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent-soft hover:-translate-y-px',
   wrapper: 'text-inherit no-underline cursor-pointer',
   bare: 'no-underline cursor-pointer',
 };
+
+// ⚠ 下線を持つのは inline だけ(#122)。subtle はリスト脇の独立した誘導、pill は見出し脇の
+// 独立リンク、wrapper / bare はブロックや行そのものを包む器で、いずれも**本文の文章中に
+// 埋め込まれない**。周囲の地の文と紛れる状況が起きないため、色だけで区別しても
+// WCAG 1.4.1 の問題にならない。ここに下線を戻すと DS の意匠を壊すだけなので足さないこと。
 
 // variant のクラス文字列。react-router `Link`/`NavLink` の className にそのまま渡せる。
 export function linkClass(variant: LinkVariant = 'inline', className = ''): string {

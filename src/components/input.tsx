@@ -72,7 +72,7 @@ export const FIELD_CONTROL =
 
 // 状態の優先度: error > focused > default。
 export function fieldLabelColor(invalid: boolean, focused: boolean) {
-  if (invalid) return 'text-accent';
+  if (invalid) return 'text-accent-soft';
   return focused ? 'text-info' : 'text-text-dim';
 }
 export function fieldBoxState(invalid: boolean, focused: boolean) {
@@ -126,7 +126,7 @@ export default function Input({
           aria-describedby が張られない（表示はされるのに支援技術からエラーが入力欄に
           紐付かない）。invalid のときだけこの要素を描画しているので match={true} でよい。 */}
       {invalid && (
-        <Field.Error match className="text-xs text-accent">
+        <Field.Error match className="text-xs text-accent-soft">
           {error}
         </Field.Error>
       )}

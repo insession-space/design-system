@@ -45,9 +45,18 @@
      グリーンを返す状態で、`text-violet` と書いた人は緑が出ることを読めなかった。
      役割名にしておけば次にブランド色を変えても名前が崩れない。新しい色を足すときも
      「その色が何に使われるか」で名付けること(`--color-teal` のような色名を復活させない)。 */
-  --color-accent: #ff6a47; /* プライマリアクセント(コーラル)。ダーク(既定)値 */
-  --color-accent-soft: #ffb199; /* ダーク背景向けの淡いコーラル(テキスト/アイコン用) */
-  --color-accent-2: #5b8bf0; /* セカンダリアクセント(ブルー)。focus リング等。ダーク(既定)値 */
+  /* ⚠ **accent は「塗り」、accent-soft は「文字」**と役割を分ける(#122)。
+     もともとコメント上はそう書かれていたが、実際には accent が塗り(12箇所)と文字(15箇所)を
+     兼ねていた。ライトの accent(#ff5a36)は bg 上 2.55:1 しかなく、文字として使うと WCAG 1.4.3 の
+     4.5:1 を大きく割る。かといって accent 自体を 4.5:1 まで暗くすると、ライトの CTA・バッジ・枠が
+     すべて暗い赤橙になりブランドの印象が変わってしまう。
+     そこで **accent は塗り専用**(基準は 1.4.11 の 3:1)、**文字は accent-soft**(4.5:1)に寄せ、
+     text-accent を使っていた箇所を text-accent-soft へ移した。これでライトの塗りは明るい
+     コーラルのまま基準を満たせる。
+     新しく「アクセント色の文字」が要るときは accent ではなく **accent-soft** を使うこと。 */
+  --color-accent: #ff6a47; /* プライマリアクセント(コーラル)。**塗り専用**。ダーク(既定)値 */
+  --color-accent-soft: #ffb199; /* アクセント系の**文字/アイコン**用。ダーク(既定)値 */
+  --color-accent-2: #618ff1; /* セカンダリアクセント(ブルー)。focus リング等。ダーク(既定)値 */
   --color-decor-1: #31c47e; /* 装飾の色分け(グリーン)。アバター背景/バッジのローテーション等 */
   /* 旧 --color-maroon(#8a4a1f。深いアンバー)は DS でも消費側でも実使用がゼロだったため
      #109 で削除した。装飾の色数が足りなくなったら --color-decor-2 として足すこと。 */
@@ -64,23 +73,49 @@
   --color-border: #332f25;
   --color-border-strong: #403a2d;
 
+  /* カラー: コントロールの枠(#122)。**border-strong とは役割が違う**ので別トークンにする。
+     border / border-strong は区切り線・カードの縁といった「装飾的な境界」で、面との
+     コントラストは 1.2〜1.5:1 と低い。これは意図した控えめさなので変えない。
+
+     一方 Checkbox / Radio の off 状態は、枠**だけ**が「そこに操作可能なコントロールがある」
+     ことを伝えている。WCAG 1.4.11(非テキストのコントラスト)はこれを 3:1 以上と定めるため、
+     装飾用の border-strong を流用すると基準を満たせない(実測 dark 1.26:1 / light 1.22:1)。
+     border-strong 自体を濃くする手もあるが、それだと全ての区切り線が硬くなり
+     「控えめな境界」という DS の意匠を壊すので、コントロール専用の一段強い値を分けて持つ。
+
+     値は DS の全背景面(bg / bg-elevated / surface / surface-hover / surface-3)の上で
+     3:1 以上を満たす最も控えめな値(実測 dark 3.04:1 / light 3.01:1)。色相・彩度は
+     border-strong から動かしていない(明度だけを上げ下げした)。 */
+  --color-control-border: #7f7359;
+
   /* カラー: テキスト階層。ダーク(既定) */
   --color-text: #f3f0e7;
   --color-text-dim: #a7a395;
-  --color-text-faint: #726e62;
+  --color-text-faint: #969185;
 
   /* カラー: DS の fill(ボタン等の塗り)。fill=中立塗り(Primary。ダークでは明色)、
      on-fill=その上の文字色。on-accent=アクセント塗りの上の文字色。ダーク(既定)。
      ⚠ --color-accent 自体は上のブランドパレットが実体として持つ(#109 以前はここで
-     `var(--color-mint)` の別名として定義していたが、役割名を実体にして向きを逆転した)。 */
+     `var(--color-mint)` の別名として定義していたが、役割名を実体にして向きを逆転した)。
+
+     ⚠ on-accent は #122 で **白 → ダークインク**に変えた。白抜きだとアクセント塗りの上で
+     dark 2.84:1 / light 3.10:1 しかなく、WCAG 1.4.3 の 4.5:1 を満たさない。コーラルは中明度の
+     暖色なので、白を載せるとどうしても不足する。**ブランドのコーラルを暗くする**か
+     **ラベルを暗くする**かの二択で、後者を採った(コーラルの見た目を一切動かさずに済むため)。
+     結果 dark 6.39:1 / light 4.89:1。値は --color-on-fill と同じインクで、テーマ追従も不要
+     (アクセント塗りはライトでも暗くならないため)。 */
   --color-fill: #f1eee6;
   --color-on-fill: #17160f;
-  --color-on-accent: #ffffff;
+  --color-on-accent: #17160f;
 
   /* カラー: リンクのセマンティック別名(#633)。生 hex は増やさず既存アクセントトークンを参照する。
      リンクは下線を使わず「色 + ウェイト」で区別する。link=静止色(淡コーラル)、
      link-hover=hover/active(コーラル)。web 側では [data-theme] で light/dark に追従する。
-     全リンク共通の focus リングは --color-focus-ring。 */
+     全リンク共通の focus リングは --color-focus-ring。
+     ⚠ ライトの link-hover だけは var(--color-accent) を参照できない(#122)。accent は
+     **塗り専用**になり基準が 3:1 へ下がったので、文字として使うと 4.5:1 に届かない。
+     ライトオーバーレイ側で明示値を持つ(下のコメント参照)。ダークは accent が文字としても
+     5.0:1 あるので参照のままでよい。 */
   --color-link: var(--color-accent-soft);
   --color-link-hover: var(--color-accent);
 
@@ -126,7 +161,7 @@
   --color-danger: #ff6b6b;
   --color-danger-surface: color-mix(in srgb, rgb(255 107 107) 12%, var(--color-bg));
   --color-danger-border: rgba(255, 107, 107, 0.3);
-  --color-info: #5b8bf0;
+  --color-info: #618ff1;
   --color-info-surface: color-mix(in srgb, rgb(91 139 240) 12%, var(--color-bg));
   /* info-surface-strong: 同上(#765)。 */
   --color-info-surface-strong: color-mix(in srgb, rgb(91 139 240) 20%, var(--color-bg));
@@ -415,6 +450,21 @@
   /* 無効状態(disabled)の DS 標準の一組。部品ごとの ad hoc な opacity をこの一本に寄せる(#445)。
      ユーティリティでは opacity-(--disabled-opacity)、カーソルは disabled:cursor-not-allowed。 */
   --disabled-opacity: 0.4;
+
+  /* 当たり判定の下限(#122)。**部品ごとに 24 / 44 を直書きしない**ための単一ソース。
+       hit   = WCAG 2.2 SC 2.5.8(Target Size (Minimum))の 24x24 CSS px。ポインタ端末を含む全環境の下限。
+       touch = Apple HIG の 44x44pt。タッチ端末(pointer-coarse)での下限。
+     既存の IconButton は自前の --icon-button-touch-size を inline style で持つ(サイズが呼び出し側
+     指定のため)。そちらは据え置き、新しく下限を足す部品はこの2つを使う。
+
+     ⚠ 実装は「見えない擬似要素で当たり判定だけ広げる」方式と「行自体を広げる」方式を使い分ける。
+     Checkbox / Radio は前者を採ると**隣の行と当たり判定が重なる**(RadioGroup の gap は 10px しか
+     なく、22px のコントロールを 44px へ広げると上下に 11px ずつはみ出して隣に届く)。
+     これらはラベルを含む行全体が既にクリック対象なので、行の最小高さを上げる方が安全で、
+     「押したつもりが隣が反応する」事故も起きない。単独で置かれる Toggle / Slider のつまみは
+     隣接がないので擬似要素で広げる。 */
+  --control-hit-size: 24px;
+  --control-touch-size: 44px;
 }
 
 /* エレベーションの実値(#950)。上の @theme 内コメントのとおり、Tailwind v4 が --shadow-* を
@@ -475,11 +525,13 @@
   /* 境界。 */
   --color-border: #e2ded3;
   --color-border-strong: #d6d2c6;
+  /* コントロールの枠(#122)。ライトでも全背景面の上で 3:1 以上(実測 3.01:1)。 */
+  --color-control-border: #8e8466;
 
   /* テキスト階層。ダークと明暗を反転させる。 */
   --color-text: #17160f;
   --color-text-dim: #5c5b52;
-  --color-text-faint: #a3a197;
+  --color-text-faint: #6b685e;
 
   /* 中立塗り(Primary ボタン等)。ダークでは明色 + 暗い文字、ライトでは逆になる。 */
   --color-fill: #17160f;
@@ -490,17 +542,24 @@
      逆に濃いコーラルになる(テキスト/リンクの静止色に使うため)。
      ⚠ ダーク側にあった旧 --color-maroon はライトに再宣言が無く、ダーク値がそのまま流用される
      非対称だった(#109 で当該トークンごと削除済み)。 */
-  --color-accent: #ff5a36;
-  --color-accent-soft: #c8431f;
-  --color-accent-2: #3b6fe0;
-  --color-decor-1: #1fa463;
+  --color-accent: #ff2f02;
+  --color-accent-soft: #a13619;
+  --color-accent-2: #1f54c9;
+  --color-decor-1: #156e43;
+
+  /* リンクの hover 色(#122)。ここだけ var(--color-accent) の参照を切って明示値を持つ。
+     accent は塗り専用になり基準が 3:1 へ下がったため、文字として使うと 4.5:1 に届かないから。
+     静止色(link = accent-soft #b93e1d, 4.51:1)より一段濃くして、hover したことが色で分かる
+     ようにしている(実測 6.57:1)。ダークは accent がそのまま文字としても 5.0:1 あるので
+     オーバーレイを置かず、@theme 側の var(--color-accent) 参照のままでよい。 */
+  --color-link-hover: #8f2f15;
 
   /* セマンティック(状態表現)の地の色。白背景での可読性のため少し濃くする。
      対応する *-surface / *-border はこれらの var() 合成なので追従する。 */
-  --color-success: #1fa463;
-  --color-warning: #e0930f;
-  --color-danger: #d8433d;
-  --color-info: #3b6fe0;
+  --color-success: #156e43;
+  --color-warning: #885a0a;
+  --color-danger: #b12923;
+  --color-info: #1f54c9;
 
   /* 影の色。ダークは黒だが、ライトで黒を使うと濁るのでウォームグレーにする。 */
   --color-shadow: #b4afa0;
