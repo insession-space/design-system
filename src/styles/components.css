@@ -332,6 +332,32 @@
     }
   }
 
+  /* TypingIndicator の入場（#138）。 */
+  @keyframes typing-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* TypingIndicator のドット。3つを 0.15s ずつずらして波打たせる（遅延は各ドット側で指定）。 */
+  @keyframes typing-dot {
+    0%,
+    60%,
+    100% {
+      opacity: 0.4;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+
   /* ---- Accordion の展開部 ----
    * 高さのアニメーションは grid-template-rows 0fr → 1fr で行う。中身の高さを JS で実測しないので、
    * 画像やフォントの遅延読み込みで中身の高さが後から変わってもズレない（max-height に大きい値を
