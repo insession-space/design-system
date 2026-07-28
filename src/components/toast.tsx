@@ -86,7 +86,7 @@ const VIEWPORT =
 // 消えないので、キューが詰まったように見える）。ここでは opacity のトランジションを
 // 当てて、transitionend で unmount まで到達させている。
 const ROOT_MOTION =
-  'transition-opacity duration-(--dur-fast) data-starting-style:animate-[snackbar-in_var(--dur-slow)_var(--ease-spring)_both] data-ending-style:opacity-0';
+  'transition-opacity motion-reduce:transition-none duration-(--dur-fast) data-starting-style:animate-[snackbar-in_var(--dur-slow)_var(--ease-spring)_both] motion-reduce:data-starting-style:animate-none data-ending-style:opacity-0';
 
 const SNACKBAR_ROOT =
   'inline-flex items-center gap-[9px] rounded-pill border border-solid bg-snackbar-surface px-5 py-[11px] text-base text-text shadow-overlay';

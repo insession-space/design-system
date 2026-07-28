@@ -35,7 +35,7 @@ export type InputProps = {
 // Input / Textarea で共有する見た目。並べて置いたときに揃うのが要件なので、
 // 値を変えるときは必ず両方に効くこの定数を変えること。
 export const FIELD_LABEL =
-  'font-body text-xs font-semibold tracking-widest uppercase transition-colors';
+  'font-body text-xs font-semibold tracking-widest uppercase transition-colors motion-reduce:transition-none';
 // ⚠ **縦 padding はここに含めない。** Input / Textarea は py-3 だが SearchField は py-2.5 と
 // 一段浅く、共通側に py-3 を持たせると呼び出し側の py-2.5 では打ち消せない（同一プロパティの
 // ユーティリティは配布 CSS の出力順で勝敗が決まる。#21 と同じ構図で、実測でも py-3 が勝った）。
@@ -66,7 +66,7 @@ export const FIELD_LABEL =
 // 書き方で、実際に「配布 CSS にセレクタが0件＝ DOM にクラスは出るのに枠が描かれない」
 // 欠損が起きていた。欠損自体は scripts/check-styles.mjs の任意値クラス検査が回帰ネット。
 export const FIELD_BOX_BASE =
-  'flex w-full bg-surface-2 border border-solid rounded-md px-3.5 transition-[border-color,box-shadow] duration-(--dur-fast)';
+  'flex w-full bg-surface-2 border border-solid rounded-md px-3.5 transition-[border-color,box-shadow] motion-reduce:transition-none duration-(--dur-fast)';
 export const FIELD_CONTROL =
   'flex-1 min-w-0 border-none outline-none bg-transparent text-base text-text placeholder:text-text-faint';
 

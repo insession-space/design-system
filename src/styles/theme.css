@@ -313,7 +313,25 @@
   /* 新 DS(#463): focus は info ブルーの 3px リングのみ(外側の 24px ブルームは廃止)。
      shadow-soft/-popover/-overlay と違い theme 別オーバーライドを持たない(insession-app の apps/web/src/style.css
      の --shadow-focus も同様に literal のまま。#867 の問題はテーマ切替時の非追従なので、
-     テーマ差分を持たないこの値は @theme 直書きのままで実害が無い)ため --elev-* 化していない。 */
+     テーマ差分を持たないこの値は @theme 直書きのままで実害が無い)ため --elev-* 化していない。
+
+     ⚠ **この値は装飾（柔らかいブルーム）専用であり、フォーカスの可視性を担ってはいけない**(#121)。
+     α が 0.16 しかないため背景へ合成した実効色とのコントラストが極端に低く、単体では
+     WCAG 1.4.11 の 3:1 を満たさない(実測):
+
+       dark  --color-bg      #121211 → 実効 rgb(30,37,53)    1.22:1
+       dark  --color-surface #201f1d → 実効 rgb(41,48,63)    1.25:1
+       light --color-bg      #e9e9e6 → 実効 rgb(210,218,232) 1.16:1
+       light --color-surface #ffffff → 実効 rgb(229,236,253) 1.18:1
+
+     かつて全部品がこれを `focus-visible:outline-none` と併記していたため、ブラウザ既定の
+     可視アウトラインを消したうえで見えないリングに差し替える形になっており、キーボード
+     ユーザーがフォーカス位置を判別できなかった。**コントラストを担保するのは下の
+     --color-focus-ring を使った outline 側**で、部品はこの3つを併記する:
+       focus-visible:outline-(length:--focus-ring-width)
+       focus-visible:outline-offset-(--focus-ring-offset)
+       focus-visible:outline-focus-ring
+     新しい部品を足すときも同じ組み合わせを使うこと(shadow-focus 単独にしない)。 */
   --shadow-focus: 0 0 0 3px rgba(91, 139, 240, 0.16);
 
   /* モーション: イージング */
@@ -373,9 +391,23 @@
   --z-snackbar: 90; /* 操作完了フィードバック(Snackbar) */
   --z-modal: 100; /* モーダル(backdrop 含む) */
 
-  /* フォーカスリング: アウトライン(生 var で legacy の :focus-visible から参照)。色はブルー
-     (#457。セカンダリアクセント)。
-     グロー版(box-shadow)は @theme の --shadow-focus。新規部品/legacy とも同じ値に揃える(#445)。 */
+  /* フォーカスリング: アウトライン。**フォーカスの可視性はこの3つが担う**(#121)。
+     色はブルー(#457。セカンダリアクセント = --color-accent-2)。DS の全背景トークンの上で
+     WCAG 1.4.11 の 3:1 を満たすことを確認済み(実測):
+
+                        dark              light
+       --color-bg       5.71:1            3.81:1
+       --color-surface  5.02:1            4.63:1
+
+     部品側は Tailwind ユーティリティとしてこのトークンを直接参照する
+     (outline-(length:--focus-ring-width) / outline-offset-(--focus-ring-offset) /
+     outline-focus-ring)。**値の単一ソースはここ**で、部品に 2px 等を直書きしない。
+
+     ⚠ ユーティリティとして部品のクラス文字列に書くことが重要(#121)。消費側の取り込み方は
+     2通りあり(insession-app の lp / help は theme.css + `@source dist` だけで components.css を
+     読まない)、**両方に確実に届く経路がクラス文字列だけ**だから。components.css に
+     :focus-visible ルールを置くと lp / help に届かない。
+     グロー版(box-shadow)は @theme の --shadow-focus だが、あちらは装飾専用(上のコメント参照)。 */
   --color-focus-ring: var(--color-accent-2);
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;

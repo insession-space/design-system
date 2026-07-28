@@ -118,7 +118,7 @@ export const SURFACE_PADDING_CLASS: Record<SurfacePadding, string> = {
 // 参照)。ホバーの持ち上げがあるぶん、transition も interactive のときだけ付ける
 // (静止状態のカードにまで transition を持たせる理由が無いため)。
 const INTERACTIVE_CLASS =
-  'cursor-pointer transition-[transform,background,box-shadow] duration-(--dur-fast) hover:-translate-y-0.5 hover:bg-surface-hover focus-visible:shadow-focus focus-visible:outline-none';
+  'cursor-pointer transition-[transform,background,box-shadow] motion-reduce:transition-none duration-(--dur-fast) hover:-translate-y-0.5 hover:bg-surface-hover focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 
 // render で要素の実体を差し替えたときにだけ足す打ち消し(#56)。既定の <div> には当てない
 // —— `m-0` / `text-left` は同じプロパティのユーティリティ(`mt-4` / `text-center`)と強さが

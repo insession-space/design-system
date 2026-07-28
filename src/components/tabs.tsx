@@ -26,7 +26,7 @@ import { createContext, useContext } from 'react';
 // Tabs.Tab は選択中に data-active を出す(docs: tabs.md の Tab Data Attributes)ため、
 // data-active: バリアントで表現する(動的クラス生成は禁止のため文字列リテラルで書く)。
 const TAB_BASE =
-  "relative inline-flex items-center justify-center gap-1.5 border-none bg-transparent py-3 font-body text-base font-bold tracking-widest text-text-faint shadow-none transition-colors duration-(--dur-base) cursor-pointer hover:text-text-dim hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent after:absolute after:inset-x-[12%] after:-bottom-px after:h-0.5 after:origin-center after:scale-x-0 after:rounded-xs after:bg-accent after:transition-transform after:duration-(--dur-base) after:ease-spring after:content-[''] data-active:text-text data-active:after:scale-x-100";
+  "relative inline-flex items-center justify-center gap-1.5 border-none bg-transparent py-3 font-body text-base font-bold tracking-widest text-text-faint shadow-none transition-colors motion-reduce:transition-none duration-(--dur-base) cursor-pointer hover:text-text-dim hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent after:absolute after:inset-x-[12%] after:-bottom-px after:h-0.5 after:origin-center after:scale-x-0 after:rounded-xs after:bg-accent after:transition-transform motion-reduce:after:transition-none after:duration-(--dur-base) after:ease-spring after:content-[''] data-active:text-text data-active:after:scale-x-100";
 const TAB_WIDTH: Record<'default' | 'fill', string> = {
   default: 'flex-none px-3.5',
   fill: 'flex-1 px-1.5',

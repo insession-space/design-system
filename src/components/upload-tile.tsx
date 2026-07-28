@@ -38,7 +38,7 @@ export type UploadTileProps = {
 };
 
 const TILE =
-  'relative flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-card border border-dashed p-4 text-center transition-colors duration-(--dur-fast) focus-within:shadow-focus';
+  'relative flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-card border border-dashed p-4 text-center transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-within:shadow-focus';
 
 export default function UploadTile({
   label,

@@ -7,7 +7,8 @@ import type * as React from 'react';
 // off=left3 / on=left23 を transition。disabled は opacity 0.5 + not-allowed。
 // signature は移行前から変えていない（checked / onChange / label / disabled）。onChange は
 // 「引数なしトグル」のままで、Base UI の onCheckedChange から呼び直している。
-// prefers-reduced-motion は style.css 末尾の legacy 規則で尊重。
+// prefers-reduced-motion はクラス文字列に併記した抑制ユーティリティで尊重する。消費側アプリの
+// style.css には依存しない(#121。依存していた頃は loophub と DS 単体で抑制が効いていなかった)。
 //
 // Base UI へ委譲して得たもの: 隠しネイティブ input による form 連携（name / value / form）、
 // readOnly、Field との自動連携（Field.Root の中に置けば label / error が紐付く）、
@@ -39,9 +40,9 @@ export type ToggleProps = Omit<
 // （実測で opacity:1 / cursor:pointer のままだった）。menu.tsx の Item も同じ理由で
 // data-disabled: を使っている。
 const TRACK =
-  'relative inline-flex h-[26px] w-[46px] shrink-0 items-center rounded-pill border border-solid border-transparent p-0 transition-colors duration-(--dur-fast) cursor-pointer data-disabled:opacity-50 data-disabled:cursor-not-allowed focus-visible:shadow-focus focus-visible:outline-none';
+  'relative inline-flex h-[26px] w-[46px] shrink-0 items-center rounded-pill border border-solid border-transparent p-0 transition-colors motion-reduce:transition-none duration-(--dur-fast) cursor-pointer data-disabled:opacity-50 data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 const KNOB =
-  'absolute top-[3px] h-5 w-5 rounded-pill bg-white shadow-[0_1px_2px_rgba(0,0,0,0.25)] transition-[left] duration-(--dur-fast)';
+  'absolute top-[3px] h-5 w-5 rounded-pill bg-white shadow-[0_1px_2px_rgba(0,0,0,0.25)] transition-[left] motion-reduce:transition-none duration-(--dur-fast)';
 
 // ⚠ checked にデフォルト値（= false）を入れないこと。常に checked を渡すと Switch.Root が
 // 必ず controlled 扱いになり、継承した defaultChecked が無視される（`<Toggle defaultChecked />`
@@ -63,7 +64,7 @@ export default function Toggle({
       // 移行前の onClick={onChange}（引数なしトグル）と同じ呼び方を保つ。
       onCheckedChange={() => onChange?.()}
       className={(state) =>
-        `${TRACK} ${state.checked ? 'bg-success' : 'bg-border-strong'} ${className}`.trim()
+        `${TRACK} ${state.checked ? 'bg-success forced-colors:border-[Highlight]' : 'bg-border-strong'} ${className}`.trim()
       }
       {...rest}
     >

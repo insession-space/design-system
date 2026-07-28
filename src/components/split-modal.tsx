@@ -241,7 +241,7 @@ export default function SplitModal({
                 key={it.id}
                 type="button"
                 aria-selected={active}
-                className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-solid px-3 py-2.5 text-left text-base transition-colors ${
+                className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-solid px-3 py-2.5 text-left text-base transition-colors motion-reduce:transition-none ${
                   active
                     ? 'border-border bg-surface-3 font-bold text-text'
                     : 'border-transparent bg-transparent font-semibold text-text-dim hover:bg-surface-hover hover:text-text'

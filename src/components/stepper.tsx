@@ -43,14 +43,17 @@ export type StepperProps = {
 // が暗黙に埋めていたため長く露見しなかった（その基底を撤去した時点で露出した）。
 // data-disabled 側の cursor-not-allowed は `&[data-disabled]` で詳細度が一段高く、常に勝つ。
 const BTN =
-  'w-[30px] h-[30px] pointer-coarse:w-10 pointer-coarse:h-10 p-0 inline-flex items-center justify-center text-lg leading-none rounded-full bg-tint-7 border border-solid border-border text-text-dim cursor-pointer transition-[background,box-shadow] hover:not-data-disabled:bg-tint-13 hover:not-data-disabled:shadow-glow data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed';
+  'w-[30px] h-[30px] pointer-coarse:w-10 pointer-coarse:h-10 p-0 inline-flex items-center justify-center text-lg leading-none rounded-full bg-tint-7 border border-solid border-border text-text-dim cursor-pointer transition-[background,box-shadow] motion-reduce:transition-none hover:not-data-disabled:bg-tint-13 hover:not-data-disabled:shadow-glow data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText]';
 
 // 値の表示。移行前は span に min-w-[34px] / text-center / text-lg / font-bold / tabular-nums を
 // 当てていた。<input> になったが、枠・背景・アウトラインを消して同じ見た目に保つ。
 // （※ コメント中にクラス属性の例を書かないこと。check-styles.mjs はソースを正規表現で
 //   走査するため、コメント内の記述も実際のクラス名として拾い、存在しないクラスで検査が落ちる）
+// ⚠ 素の outline-none は置かない。ブラウザ既定のアウトラインを常時消したうえで、代わりに置いた
+// shadow-focus は α が低くコントラストを満たさないため、キーボードフォーカスが完全に不可視だった。
+// 他の部品と同じトークン参照のアウトラインを出す。
 const VALUE =
-  'text-center text-lg font-bold tabular-nums text-text bg-transparent border-none outline-none p-0 focus-visible:shadow-focus rounded-sm';
+  'text-center text-lg font-bold tabular-nums text-text bg-transparent border-none p-0 focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring rounded-sm';
 
 export default function Stepper({
   value,

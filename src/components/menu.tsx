@@ -98,16 +98,18 @@ function MenuPopup({ padding = true, scroll = true, className, ...props }: MenuP
 // bg-transparent を単に落とすだけにしないのは、DS が preflight を配っていないため
 // PlainItem(<button>)に UA 既定の buttonface 背景が残るから。排他で出せば両方満たせる。
 const MENU_ROW_BASE =
-  'flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-base shadow-none transition-colors duration-(--dur-fast) cursor-pointer';
+  'flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-base shadow-none transition-colors motion-reduce:transition-none duration-(--dur-fast) cursor-pointer';
 
 // Base UI の Item/RadioItem/CheckboxItem は <div> を描画するため、disabled は data-disabled
 // 属性で表現される(:disabled は button 等のフォーム要素にしか適用されないため効かない)。
 //
-// フォーカスリング: Base UI の Item は roving tabIndex で実際に DOM フォーカスを受けるため、
-// ブラウザ既定のアウトラインが data-highlighted の背景ハイライトに重なって出てしまう。
-// button.tsx / icon-button.tsx / toggle.tsx と同じ DS 共通パターン(focus-visible:shadow-focus
-// focus-visible:outline-none)に揃え、既定のアウトラインを消して背景色のハイライトだけで現在
-// 位置を示す(二重表現を避ける)。
+// フォーカスリング: Base UI の Item は roving tabIndex で実際に DOM フォーカスを受ける。
+// かつては「背景ハイライトと二重になる」ことを理由に既定のアウトラインを消し、背景色だけで現在位置を
+// 示していたが、**背景ハイライトだけでは焦点位置の指標として不十分**だった(#121)。ハイライト面と
+// メニュー面のコントラストは約 1.2:1 しかなく、WCAG 1.4.11 の 3:1 を満たさない。
+// button.tsx / icon-button.tsx / toggle.tsx と同じ DS 共通パターン(トークン参照のアウトライン)へ
+// 揃える。マウスホバーでも data-highlighted は立つが、アウトラインは focus-visible でのみ出るので
+// 「キーボード操作のときだけリングが出る」形になり、二重表現の懸念も実際には生じない。
 //
 // disabled(data-disabled)行の扱いには注意が必要。「Base UI は disabled 項目を矢印キーナビの
 // 対象から除外するのでフォーカスもハイライトも来ない」という当初の想定は誤りで、実機検証の
@@ -117,14 +119,20 @@ const MENU_ROW_BASE =
 // このままだと disabled 行に来た瞬間に現在位置を示すものが何も無くなり、キーボード操作者が
 // 迷子になる。そのため data-highlighted かつ data-disabled のときだけ、面色を付けずに
 // shadow-focus(既存のフォーカス表現トークン)で「ここにカーソルはあるが操作はできない」を
-// 示す。有効な行(data-disabled でない行)は現状どおり面色のみ・アウトラインなしを維持する
-// (二重表現にしない判断は変えない)。PlainItem(<button>、移行前と同じ見た目を保つ対象)側には
-// ハイライト概念自体が無いためこの追加はしない。
-const ROW = `${MENU_ROW_BASE} data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed focus-visible:shadow-focus focus-visible:outline-none data-highlighted:data-disabled:shadow-focus`;
+// 示す。なお #121 以降、有効な行にもキーボードフォーカス時はアウトラインが出る(上のコメント参照)
+// ので、disabled 行だけが「面色もアウトラインも無い」状態にならないよう、この shadow-focus は
+// 引き続き必要。PlainItem(<button>、移行前と同じ見た目を保つ対象)側にはハイライト概念自体が
+// 無いためこの追加はしない。
+// ⚠ 強制カラーモードのハイライト色は not-data-disabled: で **排他的に** 出す(#17 と同じ失敗モード)。
+// Base UI は disabled 行にも data-highlighted を立てるため、ガードが無いと [data-highlighted] と
+// [data-disabled] の2ルールが同じ詳細度で並び、配布 CSS の出力順(Highlight が後)で勝敗が決まる。
+// その結果、無効行にカーソルが来たときだけ GrayText ではなく Highlight で描かれ、
+// 「操作できないのに選択可能に見える」状態になる。
+const ROW = `${MENU_ROW_BASE} data-highlighted:not-data-disabled:forced-colors:text-[color:Highlight] data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-highlighted:data-disabled:shadow-focus`;
 
 // PlainItem は移行前と同じ <button> を描画するため、disabled/hover はネイティブ疑似クラス
 // (disabled:/enabled:)で表現できる。移行前の ROW と完全に同じ文字列になる。
-const PLAIN_ROW = `${MENU_ROW_BASE} disabled:opacity-(--disabled-opacity) disabled:cursor-not-allowed`;
+const PLAIN_ROW = `${MENU_ROW_BASE} disabled:opacity-(--disabled-opacity) disabled:cursor-not-allowed disabled:forced-colors:text-[color:GrayText]`;
 
 // active/danger の tint 表現。プレーンな Item でも RadioItem/CheckboxItem と同じ見た目が
 // 出せるよう、Base UI 自身の checked 状態(data-checked)には寄せず、旧実装と同じく呼び出し側が

@@ -45,7 +45,7 @@ const GROUP = 'inline-flex items-center gap-1';
 
 // 40x40 のアイコンボタン。押下時は accent 塗り、非押下時は透明で hover のみ面が出る。
 const TOOL =
-  'inline-flex size-10 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-solid p-0 font-body text-sm transition-colors duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-none data-disabled:cursor-not-allowed data-disabled:opacity-50';
+  'inline-flex size-10 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-solid p-0 font-body text-sm transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50';
 
 export function ToggleGroup({ ariaLabel, className = '', ...rest }: ToggleGroupProps) {
   return (
@@ -60,7 +60,7 @@ export function ToolButton({ icon, label, children, className = '', ...rest }: T
       className={(state) =>
         `${TOOL} ${
           state.pressed
-            ? 'border-transparent bg-accent text-on-accent'
+            ? 'border-transparent bg-accent text-on-accent forced-colors:text-[color:Highlight]'
             : 'border-transparent bg-transparent text-text-dim hover:bg-surface-hover hover:text-text'
         } ${children ? 'w-auto px-3' : ''} ${className}`.trim()
       }

@@ -44,7 +44,7 @@ export type IconButtonProps = {
 // これにより消費側は (a) `touchSize={44}` を渡す (b) `className="max-md:size-11"` のような
 // バリアント付きユーティリティを足す、のどちらでも「通常 30px / タッチ 44px」を表現できる。
 const BASE =
-  'inline-flex shrink-0 items-center justify-center rounded-md cursor-pointer transition-colors duration-(--dur-fast) size-(--icon-button-size) pointer-coarse:min-w-(--icon-button-touch-size) pointer-coarse:min-h-(--icon-button-touch-size) data-disabled:cursor-not-allowed data-disabled:opacity-(--disabled-opacity) focus-visible:shadow-focus focus-visible:outline-none';
+  'inline-flex shrink-0 items-center justify-center rounded-md cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) size-(--icon-button-size) pointer-coarse:min-w-(--icon-button-touch-size) pointer-coarse:min-h-(--icon-button-touch-size) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-(--disabled-opacity) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 
 const VARIANT: Record<IconButtonVariant, string> = {
   surface:
