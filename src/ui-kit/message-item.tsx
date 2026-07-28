@@ -390,11 +390,11 @@ export default function MessageItem({
               onClick={reaction.onClick}
               className={`${REACTION_BASE} ${reaction.reacted ? REACTION_SELECTED : REACTION_DEFAULT}`}
             >
-              <span aria-hidden="true" className="text-[15px] leading-none">
+              <span aria-hidden="true" className="text-base leading-none">
                 {reaction.emoji}
               </span>
               <span
-                className={`text-[11.5px] leading-none tabular-nums text-text ${
+                className={`text-xs leading-none tabular-nums text-text ${
                   reaction.reacted ? 'font-bold' : 'font-semibold'
                 }`}
               >

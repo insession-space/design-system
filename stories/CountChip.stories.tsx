@@ -46,7 +46,7 @@ export const OnIcon: Story = {
     >
       <span className="relative inline-flex">
         <span className="inline-flex h-11 w-11 items-center justify-center rounded-chip bg-surface-3 text-text-dim">
-          <span className="text-xl">♪</span>
+          <span className="text-lg">♪</span>
         </span>
         <CountChip className="absolute -top-1 -right-1">5</CountChip>
       </span>

@@ -25,7 +25,7 @@ export const VariantsBySizes: Story = {
       <div className="flex flex-col gap-6">
         {VARIANTS.map((variant) => (
           <div key={variant} className="flex items-center gap-6">
-            <span className="w-16 shrink-0 text-smd font-semibold text-text-dim">{variant}</span>
+            <span className="w-16 shrink-0 text-base font-semibold text-text-dim">{variant}</span>
             {SIZES.map((size) => (
               <LogoMark key={size} variant={variant} size={size} />
             ))}

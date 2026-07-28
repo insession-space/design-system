@@ -127,7 +127,7 @@ export const Gallery: Story = {
               className="flex flex-col items-center gap-2 rounded-card border border-solid border-border bg-tint-5 p-3"
             >
               <Icon name={name} size={24} className="text-text" />
-              <code className="text-2xs text-text-faint break-all text-center">{name}</code>
+              <code className="text-xs text-text-faint break-all text-center">{name}</code>
             </div>
           ))}
         </div>
@@ -139,11 +139,11 @@ export const Gallery: Story = {
         <div className="flex items-center gap-6">
           <div className="flex flex-col items-center gap-2">
             <GoogleIcon />
-            <code className="text-2xs text-text-faint">GoogleIcon</code>
+            <code className="text-xs text-text-faint">GoogleIcon</code>
           </div>
           <div className="flex flex-col items-center gap-2 text-text">
             <PersonIcon />
-            <code className="text-2xs text-text-faint">PersonIcon</code>
+            <code className="text-xs text-text-faint">PersonIcon</code>
           </div>
         </div>
       </Section>

@@ -14,7 +14,7 @@ type Story = StoryObj;
 
 function Box({ children = '1' }: { children?: string }) {
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-md border border-solid border-border bg-tint-8 text-smd font-semibold text-text">
+    <div className="flex h-12 w-12 items-center justify-center rounded-md border border-solid border-border bg-tint-8 text-base font-semibold text-text">
       {children}
     </div>
   );

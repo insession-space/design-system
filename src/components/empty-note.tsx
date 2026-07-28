@@ -19,6 +19,6 @@ const VARIANT: Record<NonNullable<EmptyNoteProps['variant']>, string> = {
 
 export default function EmptyNote({ children, variant = 'default' }: EmptyNoteProps) {
   return (
-    <p className={`${VARIANT[variant]} text-base leading-[1.7] text-text-faint`}>{children}</p>
+    <p className={`${VARIANT[variant]} text-base leading-relaxed text-text-faint`}>{children}</p>
   );
 }

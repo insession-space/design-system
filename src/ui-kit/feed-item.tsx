@@ -106,7 +106,7 @@ export function FeedItemAttachment({
       )}
       {/* min-w-0 が無いと、flex の既定(min-width: auto)により子の truncate が効かない。 */}
       <div className="min-w-0 flex-1">
-        <div className="truncate font-body text-smd font-bold text-text">{title}</div>
+        <div className="truncate font-body text-base font-bold text-text">{title}</div>
         {subtitle && <div className="truncate font-body text-xs text-text-dim">{subtitle}</div>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

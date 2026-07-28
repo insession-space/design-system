@@ -35,7 +35,7 @@ export type ChipProps = {
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & { className?: string };
 
 const BASE =
-  'inline-flex items-center gap-1.5 rounded-pill border border-solid text-[12.5px] cursor-pointer select-none transition-colors duration-(--dur-fast)';
+  'inline-flex items-center gap-1.5 rounded-pill border border-solid text-sm cursor-pointer select-none transition-colors duration-(--dur-fast)';
 // DS の3系統の pad。removable=6/10/6/14、avatar=5/13/5/5、既定=7/14。
 const PAD_DEFAULT = 'px-3.5 py-[7px]';
 const PAD_REMOVABLE = 'pl-[14px] pr-2.5 py-1.5';

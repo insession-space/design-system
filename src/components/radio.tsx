@@ -63,7 +63,7 @@ const ROW =
 
 // ラベルに cursor-[inherit] を当てる理由は checkbox.tsx のコメント参照
 // （<label> は行の cursor を継承しないため、明示しないと移行前の見た目から回帰する）。
-const LABEL = 'cursor-[inherit] text-md text-text';
+const LABEL = 'cursor-[inherit] text-base text-text';
 
 // 既定は縦積み（移行前は呼び出し側が並べていたが、グループが要るようになったので
 // レイアウトの既定をここで持つ）。横並びにしたいときは className で上書きする。

@@ -35,7 +35,7 @@ function DsDemo({ width }: { width?: string }) {
               </Modal.Close>
             </div>
             <Modal.Body>
-              <p className="m-0 text-smd leading-normal text-text-dim">
+              <p className="m-0 text-base leading-normal text-text-dim">
                 Modal.Title / Modal.Body / Modal.Footer を並べると DS 構造(border-bottom の見出し行
                 + body + surface-2 の footer 行)で描画される。
               </p>
@@ -62,7 +62,7 @@ function FormDemo() {
   return (
     <>
       <Button onClick={() => setOpen(true)}>フォームモーダルを開く</Button>
-      {submitted && <p className="mt-2 text-smd text-text-dim">送信内容: {submitted}</p>}
+      {submitted && <p className="mt-2 text-base text-text-dim">送信内容: {submitted}</p>}
       <Modal.Root open={open} onOpenChange={setOpen}>
         <Modal.Portal>
           <Modal.Backdrop />
@@ -126,7 +126,7 @@ function FocusTrapDemo() {
               </Modal.Close>
             </div>
             <Modal.Body>
-              <p className="m-0 mb-3 text-smd leading-normal text-text-dim">
+              <p className="m-0 mb-3 text-base leading-normal text-text-dim">
                 Tab キーでフォーカスがモーダル内を循環すること(外の「モーダル外の focusable
                 な要素」に 抜けないこと)を確認する。
               </p>
@@ -146,7 +146,7 @@ function FocusTrapDemo() {
       {/* 背後の長いスクロールコンテンツ。モーダル表示中はページ側がスクロールロックされることを確認する。 */}
       <div className="mt-4 flex flex-col gap-3">
         {Array.from({ length: 40 }, (_, i) => `dummy-row-${i + 1}`).map((rowKey, i) => (
-          <p key={rowKey} className="m-0 text-smd text-text-dim">
+          <p key={rowKey} className="m-0 text-base text-text-dim">
             背景のスクロール確認用ダミー行 {i + 1}
           </p>
         ))}

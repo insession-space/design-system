@@ -89,7 +89,7 @@ const ROOT_MOTION =
   'transition-opacity duration-(--dur-fast) data-starting-style:animate-[snackbar-in_var(--dur-slow)_var(--ease-spring)_both] data-ending-style:opacity-0';
 
 const SNACKBAR_ROOT =
-  'inline-flex items-center gap-[9px] rounded-pill border border-solid bg-snackbar-surface px-5 py-[11px] text-[14px] text-text shadow-overlay';
+  'inline-flex items-center gap-[9px] rounded-pill border border-solid bg-snackbar-surface px-5 py-[11px] text-base text-text shadow-overlay';
 const DS_ROOT =
   'inline-flex min-w-[280px] max-w-[420px] items-start gap-3 rounded-md border border-solid border-border border-l-[3px] bg-surface px-[15px] py-[13px] text-text shadow-popover';
 
@@ -124,7 +124,7 @@ function ToastItem({ toast }: { toast: ToastObject<ToastData> }) {
     return (
       <BaseToast.Root toast={toast} className={`${SNACKBAR_ROOT} ${t.border} ${ROOT_MOTION}`}>
         {icon && (
-          <span className={`${t.icon} text-[13px] font-extrabold`} aria-hidden="true">
+          <span className={`${t.icon} text-sm font-extrabold`} aria-hidden="true">
             {icon}
           </span>
         )}
@@ -143,12 +143,12 @@ function ToastItem({ toast }: { toast: ToastObject<ToastData> }) {
         </span>
       )}
       <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-        <BaseToast.Title className="text-[13.5px] font-bold text-text" />
-        <BaseToast.Description className="text-[12.5px] leading-[1.5] text-text-dim" />
+        <BaseToast.Title className="text-base font-bold text-text" />
+        <BaseToast.Description className="text-sm text-text-dim" />
       </div>
       {toast.actionProps && (
         <BaseToast.Action
-          className={`shrink-0 whitespace-nowrap border-none bg-transparent text-[12.5px] font-bold ${t.text} cursor-pointer`}
+          className={`shrink-0 whitespace-nowrap border-none bg-transparent text-sm font-bold ${t.text} cursor-pointer`}
         />
       )}
       <BaseToast.Close

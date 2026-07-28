@@ -15,7 +15,7 @@ export const Default: Story = {
   render: () => (
     <Section title="AppBar" note="left/center/right の3スロット。center だけが伸びる。">
       <AppBar
-        left={<span className="text-md font-semibold text-text">InSession</span>}
+        left={<span className="text-base font-semibold text-text">InSession</span>}
         center={<Toolbar align="center">{/* 検索欄などを想定 */}</Toolbar>}
         right={<Button size="sm">ログイン</Button>}
         sticky={false}

@@ -82,7 +82,7 @@ export function Badge({
   const shapeClass = isPill ? 'rounded-pill' : 'rounded-chip';
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 font-mono text-xs font-semibold ${TONE[legacyTone]} ${shapeClass}${
+      className={`inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 font-body text-xs font-semibold ${TONE[legacyTone]} ${shapeClass}${
         legacyNew ? ' uppercase tracking-tag' : ''
       } ${className}`.trim()}
     >

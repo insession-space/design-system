@@ -38,7 +38,7 @@ const spaceThumb = (
 const liveThumb = (
   <>
     {spaceThumb}
-    <span className="absolute left-1 top-1 inline-flex items-center gap-1 rounded-pill bg-bg/60 px-1.5 py-0.5 font-body text-2xs font-bold uppercase tracking-wider text-on-accent">
+    <span className="absolute left-1 top-1 inline-flex items-center gap-1 rounded-pill bg-bg/60 px-1.5 py-0.5 font-body text-xs font-bold uppercase tracking-wider text-on-accent">
       <span className="h-1 w-1 rounded-pill bg-on-accent" />
       live
     </span>

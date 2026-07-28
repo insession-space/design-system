@@ -148,8 +148,8 @@ export const Motion: Story = {
               >
                 hover me
               </Button>
-              <code className="text-2xs text-text-faint">{d.varName}</code>
-              <span className="text-2xs text-text-dim">{d.label}</span>
+              <code className="text-xs text-text-faint">{d.varName}</code>
+              <span className="text-xs text-text-dim">{d.label}</span>
             </div>
           ))}
         </div>

@@ -61,13 +61,13 @@ export const SideBySideWithRealMessageItem: Story = {
     >
       <div className="grid max-w-3xl grid-cols-2 gap-4">
         <div className="flex flex-col gap-1">
-          <p className="text-2xs text-text-faint">読み込み中(MessageItemSkeleton)</p>
+          <p className="text-xs text-text-faint">読み込み中(MessageItemSkeleton)</p>
           <div className="rounded-card border border-solid border-border bg-surface p-3">
             <MessageItemSkeleton avatar lines={2} reactions={2} />
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          <p className="text-2xs text-text-faint">実データ(MessageItem)</p>
+          <p className="text-xs text-text-faint">実データ(MessageItem)</p>
           <div className="rounded-card border border-solid border-border bg-surface p-3">
             <MessageItem
               authorName="川村静哉"

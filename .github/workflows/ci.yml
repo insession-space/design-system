@@ -32,6 +32,12 @@ jobs:
       - name: Lint & format check
         run: pnpm check
 
+      # タイポグラフィがスケールから逸脱していないこと。廃止した段・font-size の任意値・
+      # CSS への直書きは、型検査もビルドも lint も緑のまま通るため、ここでしか止まらない
+      # （詳細は scripts/check-typography.mjs）。ソースだけを見るのでビルド前に走らせる。
+      - name: Verify typography scale
+        run: pnpm check:typography
+
       # 配布物（js + d.ts + 配布 CSS）が生成できること。
       - name: Build dist
         run: pnpm build

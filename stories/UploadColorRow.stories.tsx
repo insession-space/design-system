@@ -55,7 +55,7 @@ export const Uploads: Story = {
           />
         </div>
         {picked.length > 0 && (
-          <p className="mt-4 font-mono text-sm text-text-dim">選択: {picked.join(' / ')}</p>
+          <p className="mt-4 font-body text-sm text-text-dim">選択: {picked.join(' / ')}</p>
         )}
       </Section>
     );
@@ -91,7 +91,7 @@ export const Colors: Story = {
               value={custom}
               onChange={(e) => setCustom(e.currentTarget.value)}
             />
-            <span className="font-mono text-sm text-text-dim">{custom}</span>
+            <span className="font-body text-sm text-text-dim">{custom}</span>
           </div>
           <div className="flex items-center gap-3">
             <ColorSwatchGroup
@@ -119,10 +119,10 @@ export const SignInIcons: Story = {
       note="AppleIcon は currentColor に従う(HIG が黒地=白 / 白地=黒 を要求するため)。GoogleIcon はブランド多色で固定。"
     >
       <div className="flex items-center gap-6">
-        <span className="inline-flex items-center gap-2 font-body text-md text-text">
+        <span className="inline-flex items-center gap-2 font-body text-base text-text">
           <AppleIcon /> Apple で続ける
         </span>
-        <span className="inline-flex items-center gap-2 font-body text-md text-text">
+        <span className="inline-flex items-center gap-2 font-body text-base text-text">
           <GoogleIcon /> Google で続ける
         </span>
       </div>

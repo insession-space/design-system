@@ -14,7 +14,7 @@ type Story = StoryObj;
 
 function Box({ children = '1' }: { children?: string }) {
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-md border border-solid border-border bg-tint-8 text-smd font-semibold text-text">
+    <div className="flex h-12 w-12 items-center justify-center rounded-md border border-solid border-border bg-tint-8 text-base font-semibold text-text">
       {children}
     </div>
   );
@@ -25,7 +25,7 @@ export const StackDirection: Story = {
     <Section title="Stack" note="direction で縦横を切替。既定は column。gap は DS の余白語彙。">
       <div className="flex flex-wrap items-start gap-8">
         <div>
-          <p className="mb-2 text-2xs text-text-faint">direction=&quot;column&quot;(既定)</p>
+          <p className="mb-2 text-xs text-text-faint">direction=&quot;column&quot;(既定)</p>
           <Stack gap="md">
             <Box>1</Box>
             <Box>2</Box>
@@ -33,7 +33,7 @@ export const StackDirection: Story = {
           </Stack>
         </div>
         <div>
-          <p className="mb-2 text-2xs text-text-faint">direction=&quot;row&quot;</p>
+          <p className="mb-2 text-xs text-text-faint">direction=&quot;row&quot;</p>
           <Stack direction="row" gap="md">
             <Box>1</Box>
             <Box>2</Box>
@@ -50,14 +50,14 @@ export const VHStackShortcuts: Story = {
     <Section title="VStack / HStack" note="Stack の direction 固定ラッパー。">
       <div className="flex flex-wrap items-start gap-8">
         <div>
-          <p className="mb-2 text-2xs text-text-faint">VStack</p>
+          <p className="mb-2 text-xs text-text-faint">VStack</p>
           <VStack gap="sm" align="center">
             <Box>1</Box>
             <Box>2</Box>
           </VStack>
         </div>
         <div>
-          <p className="mb-2 text-2xs text-text-faint">HStack</p>
+          <p className="mb-2 text-xs text-text-faint">HStack</p>
           <HStack gap="sm" align="center">
             <Box>1</Box>
             <Box>2</Box>
@@ -93,7 +93,7 @@ export const GapScale: Story = {
       <div className="flex flex-col gap-4">
         {(['none', 'xs', 'xs.5', 'sm', 'md', 'lg', 'xl', '2xl'] as const).map((gap) => (
           <div key={gap} className="flex items-center gap-4">
-            <span className="w-16 shrink-0 text-2xs text-text-faint">gap=&quot;{gap}&quot;</span>
+            <span className="w-16 shrink-0 text-xs text-text-faint">gap=&quot;{gap}&quot;</span>
             <HStack gap={gap} align="center" data-testid={`gap-${gap}`}>
               <Box>1</Box>
               <Box>2</Box>

@@ -58,7 +58,7 @@ export default function StepFlow({
             className={isRow ? 'inline-flex items-center gap-1.5' : 'contents'}
           >
             <span
-              className={`inline-flex items-center justify-center border border-solid px-2.5 py-1 text-smd font-bold ${isRow ? 'rounded-pill' : 'rounded-md'} ${PILL_TONE[tone]}`}
+              className={`inline-flex items-center justify-center border border-solid px-2.5 py-1 text-base font-bold ${isRow ? 'rounded-pill' : 'rounded-md'} ${PILL_TONE[tone]}`}
             >
               {step.label}
             </span>

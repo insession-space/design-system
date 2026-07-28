@@ -150,7 +150,7 @@ export default function SplitModal({
               // ための「文字数」基準の制約で、px/rem のスケールトークンに載せる性質の値ではない
               // (52ch は一般的な可読上限の目安。テキストコンテンツ量に応じた相対値なので
               // トークン化しても再利用の意味が薄い)。
-              <p className="mt-1.5 mb-0 max-w-[52ch] text-[13px] leading-relaxed text-text-dim">
+              <p className="mt-1.5 mb-0 max-w-[52ch] text-sm leading-relaxed text-text-dim">
                 {description}
               </p>
             )}
@@ -214,9 +214,7 @@ export default function SplitModal({
         {closeButton}
       </div>
       <div className="flex flex-1 min-w-0 min-h-0 flex-col gap-[18px] overflow-y-auto px-4 pt-4 pb-1">
-        {description && (
-          <p className="m-0 text-[13px] leading-relaxed text-text-dim">{description}</p>
-        )}
+        {description && <p className="m-0 text-sm leading-relaxed text-text-dim">{description}</p>}
         {children}
       </div>
       {footer && (
@@ -234,7 +232,7 @@ export default function SplitModal({
         className="flex shrink-0 flex-col gap-5 self-stretch border-r border-solid border-border bg-bg-elevated px-4 py-[22px]"
         style={{ width: navWidth }}
       >
-        {navTitle && <h3 className="m-0 px-1 text-[15px] font-extrabold text-text">{navTitle}</h3>}
+        {navTitle && <h3 className="m-0 px-1 text-base font-extrabold text-text">{navTitle}</h3>}
         <nav className="flex flex-col gap-1" aria-label={navLabel}>
           {items.map((it) => {
             const active = it.id === value;
@@ -243,7 +241,7 @@ export default function SplitModal({
                 key={it.id}
                 type="button"
                 aria-selected={active}
-                className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-solid px-3 py-2.5 text-left text-[13.5px] transition-colors ${
+                className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-solid px-3 py-2.5 text-left text-base transition-colors ${
                   active
                     ? 'border-border bg-surface-3 font-bold text-text'
                     : 'border-transparent bg-transparent font-semibold text-text-dim hover:bg-surface-hover hover:text-text'

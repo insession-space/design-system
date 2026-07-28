@@ -130,7 +130,9 @@ export default function SettingRow({
       {icon ? <span className="flex shrink-0 items-center text-text-dim">{icon}</span> : null}
       {/* min-w-0 が要点。これが無いと長いラベルが flex の縮小を拒否して行から溢れる。 */}
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className={`truncate text-md ${danger ? 'text-danger' : 'text-text'}`}>{label}</span>
+        <span className={`truncate text-base ${danger ? 'text-danger' : 'text-text'}`}>
+          {label}
+        </span>
         {description ? (
           <span
             className={`text-sm text-text-dim ${DESCRIPTION_LINES_CLASS[descriptionLines]}`.trim()}

@@ -43,7 +43,7 @@ export const Default: Story = {
     >
       <div className="flex items-center gap-2">
         <Demo />
-        <span className="text-smd text-text-dim">件</span>
+        <span className="text-base text-text-dim">件</span>
       </div>
     </Section>
   ),

@@ -35,7 +35,7 @@ export type InputProps = {
 // Input / Textarea で共有する見た目。並べて置いたときに揃うのが要件なので、
 // 値を変えるときは必ず両方に効くこの定数を変えること。
 export const FIELD_LABEL =
-  'font-mono text-xs font-semibold tracking-widest uppercase transition-colors';
+  'font-body text-xs font-semibold tracking-widest uppercase transition-colors';
 // ⚠ **縦 padding はここに含めない。** Input / Textarea は py-3 だが SearchField は py-2.5 と
 // 一段浅く、共通側に py-3 を持たせると呼び出し側の py-2.5 では打ち消せない（同一プロパティの
 // ユーティリティは配布 CSS の出力順で勝敗が決まる。#21 と同じ構図で、実測でも py-3 が勝った）。
@@ -68,7 +68,7 @@ export const FIELD_LABEL =
 export const FIELD_BOX_BASE =
   'flex w-full bg-surface-2 border border-solid rounded-md px-3.5 transition-[border-color,box-shadow] duration-(--dur-fast)';
 export const FIELD_CONTROL =
-  'flex-1 min-w-0 border-none outline-none bg-transparent text-md text-text placeholder:text-text-faint';
+  'flex-1 min-w-0 border-none outline-none bg-transparent text-base text-text placeholder:text-text-faint';
 
 // 状態の優先度: error > focused > default。
 export function fieldLabelColor(invalid: boolean, focused: boolean) {
@@ -105,7 +105,7 @@ export default function Input({
       )}
       <div className={`${FIELD_BOX_BASE} items-center py-3 ${fieldBoxState(invalid, focused)}`}>
         {prefix != null && (
-          <span className="mr-0.5 shrink-0 font-mono text-md text-text-dim">{prefix}</span>
+          <span className="mr-0.5 shrink-0 font-body text-base text-text-dim">{prefix}</span>
         )}
         <Field.Control
           className={FIELD_CONTROL}

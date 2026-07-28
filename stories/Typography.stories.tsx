@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Section } from './tokens';
 
-// タイポグラフィのカタログ。サイズスケール(px 実測由来)・フォント・ウェイトを一覧する。
+// タイポグラフィのカタログ。#117 でスケールをセマンティック1本に統一した。
+// 既定は「セマンティック階層」で、補助スケールは weight を自分で決めたい UI 細部だけに使う。
 const meta: Meta = {
   title: 'Foundations/Typography',
   parameters: { layout: 'padded' },
@@ -10,33 +11,63 @@ export default meta;
 
 type Story = StoryObj;
 
+// 正のスケール。size に加えて weight / line-height / letter-spacing を焼き込んであるので、
+// これを当てるだけで役割どおりの見た目になり、font-bold 等の併記が要らない。
+const ROLES = [
+  { cls: 'text-display', label: 'Display · 44 / 1.0 / 800', sample: 'InSession' },
+  { cls: 'text-h1', label: 'Heading 1 · 32 / 1.05 / 800', sample: 'Tune in. Catch the vibe.' },
+  { cls: 'text-h2', label: 'Heading 2 · 22 / 1.15 / 700', sample: 'アクティブなスペース' },
+  { cls: 'text-body', label: 'Body · 16 / 1.5 / 500', sample: '友達と同期して YouTube を観る。' },
+  {
+    cls: 'text-small',
+    label: 'Small · 14 / 1.45 / 500',
+    sample: '誰かの再生・一時停止が全員に届く。',
+  },
+];
+
+export const Roles: Story = {
+  render: () => (
+    <Section
+      title="セマンティック階層 — これが既定"
+      note="size に加え weight / line-height / letter-spacing を役割ごとに内包する。文章はすべてこちらを使う。"
+    >
+      <div className="flex flex-col gap-4">
+        {ROLES.map((r) => (
+          <div key={r.cls} className="flex items-baseline gap-4">
+            <code className="text-xs text-text-faint w-52 shrink-0">{r.label}</code>
+            <span className={`${r.cls} text-text`}>{r.sample}</span>
+          </div>
+        ))}
+        <div className="flex items-baseline gap-4">
+          <code className="text-xs text-text-faint w-52 shrink-0">
+            Label · 11 / 1.0 / 600 / 0.14em
+          </code>
+          <span className="text-label uppercase text-text-dim">Watch Party</span>
+        </div>
+      </div>
+    </Section>
+  ),
+};
+
+// 補助スケール。サイズだけを与える下位ユーティリティで、weight は利用側が決める。
 const SIZES = [
-  { cls: 'text-2xs', label: '2xs (10)' },
-  { cls: 'text-xs', label: 'xs (11)' },
-  { cls: 'text-sm', label: 'sm (12)' },
-  { cls: 'text-smd', label: 'smd (13)' },
-  { cls: 'text-base', label: 'base (14)' },
-  { cls: 'text-md', label: 'md (15)' },
-  { cls: 'text-lg', label: 'lg (16)' },
-  { cls: 'text-xl', label: 'xl (17)' },
-  { cls: 'text-2xl', label: '2xl (18)' },
-  { cls: 'text-3xl', label: '3xl (21)' },
-  { cls: 'text-4xl', label: '4xl (24)' },
-  { cls: 'text-5xl', label: '5xl (30)' },
-  { cls: 'text-6xl', label: '6xl (56)' },
+  { cls: 'text-lg', label: 'lg · 16 / 1.4', use: 'モーダルのタイトル' },
+  { cls: 'text-base', label: 'base · 14 / 1.45', use: 'ボタン・入力・設定行のラベル' },
+  { cls: 'text-sm', label: 'sm · 12 / 1.4', use: '補助テキスト・ヘルプ・カウンタ' },
+  { cls: 'text-xs', label: 'xs · 11 / 1.35', use: 'バッジ・タイムスタンプ・最小のメタ情報' },
 ];
 
 export const Scale: Story = {
   render: () => (
     <Section
-      title="サイズスケール"
-      note="px 実測から。行間は normal 固定、必要時 leading-* で上書き。"
+      title="補助スケール — サイズのみ"
+      note="weight を自分で決めたい UI 細部で使う。段は 4 つだけ。中間の値が欲しくなったら、セマンティック階層で表現すべき役割が隠れているサイン。"
     >
       <div className="flex flex-col gap-3">
         {SIZES.map((s) => (
           <div key={s.cls} className="flex items-baseline gap-4">
-            <code className="text-2xs text-text-faint w-24 shrink-0">{s.label}</code>
-            <span className={`${s.cls} text-text font-body`}>InSession — 友達と同期して観る</span>
+            <code className="text-xs text-text-faint w-36 shrink-0">{s.label}</code>
+            <span className={`${s.cls} text-text font-body`}>{s.use}</span>
           </div>
         ))}
       </div>
@@ -44,33 +75,37 @@ export const Scale: Story = {
   ),
 };
 
-// DS のセマンティックタイポ階層(#463)。サイズ+weight+tracking+line-height を焼き込んだ
-// text-display / text-h1 / text-h2 / text-body / text-small / text-label を当てるだけで
-// 役割どおりの見た目になる。label は uppercase + font-mono を併用する。
-const ROLES = [
-  { cls: 'text-display', label: 'Display 44 / 800', sample: 'InSession' },
-  { cls: 'text-h1', label: 'Heading 1 · 32 / 800', sample: 'Tune in. Catch the vibe.' },
-  { cls: 'text-h2', label: 'Heading 2 · 22 / 700', sample: 'アクティブなスペース' },
-  { cls: 'text-body', label: 'Body · 16 / 500', sample: '友達と同期して YouTube を観る。' },
-  { cls: 'text-small', label: 'Small · 14 / 500', sample: '誰かの再生・一時停止が全員に届く。' },
-];
-
-export const Roles: Story = {
+// text-base(14) と text-small(14)、text-lg(16) と text-body(16) はサイズが同値。
+// 違いは weight / line-height を持つかどうかで、その使い分けを実物で見せる。
+export const SemanticVsScale: Story = {
+  name: '使い分け（同じサイズの2つ）',
   render: () => (
     <Section
-      title="セマンティック階層 (DS)"
-      note="claude design 準拠(#463)。size に加え weight/tracking/line-height を役割ごとに内包。label は uppercase + font-mono。"
+      title="同じサイズでも役割が違う"
+      note="サイズが重なる段があるのは意図的。文章はセマンティック、weight を自分で決めたい UI 細部は補助スケール。"
     >
-      <div className="flex flex-col gap-4">
-        {ROLES.map((r) => (
-          <div key={r.cls} className="flex items-baseline gap-4">
-            <code className="text-2xs text-text-faint w-40 shrink-0">{r.label}</code>
-            <span className={`${r.cls} text-text`}>{r.sample}</span>
-          </div>
-        ))}
-        <div className="flex items-baseline gap-4">
-          <code className="text-2xs text-text-faint w-40 shrink-0">Label · 11 / 600 · mono</code>
-          <span className="text-label font-mono uppercase text-text-dim">Watch Party</span>
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-1">
+          <code className="text-xs text-text-faint">14px — text-small（weight 500 を内包）</code>
+          <span className="text-small text-text">
+            接続が不安定なときは自動で追従を止めて、復帰時に位置を合わせ直す。
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <code className="text-xs text-text-faint">
+            14px — text-base（weight は利用側が決める）
+          </code>
+          <span className="text-base font-bold text-text">スペースを作成</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <code className="text-xs text-text-faint">16px — text-body（weight 500 / 行間 1.5）</code>
+          <span className="text-body text-text">
+            同じ動画を、同じタイミングで。再生も一時停止もシークも全員に伝わる。
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <code className="text-xs text-text-faint">16px — text-lg（行間 1.4 のみ）</code>
+          <span className="text-lg font-bold text-text">通知の設定</span>
         </div>
       </div>
     </Section>
@@ -81,25 +116,28 @@ export const Fonts: Story = {
   render: () => (
     <Section
       title="フォント"
-      note="DS 役割: Archivo=見出し/UI/本文(font-display / font-body)、JetBrains Mono=code/meta/Label caps(font-mono)。"
+      note="JetBrains Mono を製品フォントとして UI・見出し・本文・ラベル・数値すべてに使う。コンポーネントは font-body だけを使い、font-display / font-mono は同値の別名として残している（#117）。"
     >
       <div className="flex flex-col gap-6">
         <div>
-          <code className="text-2xs text-text-faint">font-display / font-body (Archivo)</code>
-          <p className="font-display text-4xl font-extrabold text-text leading-normal">
-            InSession Watch Party
-          </p>
-          <p className="font-body text-lg text-text leading-normal mt-1">
+          <code className="text-xs text-text-faint">font-body — 見出しから本文まで</code>
+          <p className="font-body text-h2 text-text mt-1">InSession Watch Party</p>
+          <p className="font-body text-body text-text mt-1">
             友達と同期して YouTube を観る。誰かの再生・一時停止・シークが全員に届く。
           </p>
         </div>
         <div>
-          <code className="text-2xs text-text-faint">
-            font-mono (JetBrains Mono) — meta / 数値 / label
+          <code className="text-xs text-text-faint">
+            数値・メタ情報も同じフォント（tabular-nums で桁を揃える）
           </code>
-          <p className="font-mono text-md text-text-dim leading-normal tabular-nums">
+          <p className="font-body text-base text-text-dim tabular-nums mt-1">
             12:34 · 8 online · REC
           </p>
+        </div>
+        <div>
+          <code className="text-xs text-text-faint">
+            例外: ワードマークだけは font-display を使う（将来 Archivo に差し替える足場）
+          </code>
         </div>
       </div>
     </Section>
@@ -108,11 +146,14 @@ export const Fonts: Story = {
 
 export const Weights: Story = {
   render: () => (
-    <Section title="ウェイト" note="font-semibold(600) / font-bold(700) / font-extrabold(800)。">
+    <Section
+      title="ウェイト"
+      note="セマンティック階層は weight を内包するので併記しない。補助スケールと併用するときだけ使う。"
+    >
       <div className="flex flex-col gap-2">
-        <p className="text-3xl font-semibold text-text leading-normal">semibold — 600</p>
-        <p className="text-3xl font-bold text-text leading-normal">bold — 700</p>
-        <p className="text-3xl font-extrabold text-text leading-normal">extrabold — 800</p>
+        <p className="text-h2 font-semibold text-text">semibold — 600</p>
+        <p className="text-h2 font-bold text-text">bold — 700</p>
+        <p className="text-h2 font-extrabold text-text">extrabold — 800</p>
       </div>
     </Section>
   ),

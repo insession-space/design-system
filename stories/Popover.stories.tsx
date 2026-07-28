@@ -81,7 +81,7 @@ function EdgeFlipDemo() {
         <Popover.Portal>
           <Popover.Positioner side="bottom" align="end">
             <Popover.Popup aria-label="端寄せ確認" className="w-70">
-              <p className="text-smd text-text-dim">
+              <p className="text-base text-text-dim">
                 画面右端に寄せたトリガーから開く。ビューポート外へはみ出しそうな場合は Base UI
                 がフリップ/シフトして見切れを避ける。
               </p>
@@ -244,7 +244,7 @@ function MobileSheetDemo() {
       <Popover.Portal>
         <Popover.Positioner side="bottom" align="start" mobileSheet>
           <Popover.Popup aria-label="モバイルシート確認">
-            <p className="text-smd text-text-dim">
+            <p className="text-base text-text-dim">
               画面幅が sm(640px)未満だと左右対称 12px ガターの固定シート表示になる。sm 以上は
               通常のトリガー追従に戻る。
             </p>
@@ -283,12 +283,12 @@ function PanelOptionsDemo() {
         <Popover.Portal>
           <Popover.Positioner side="bottom" align="start">
             <Popover.Popup aria-label="既定" className="w-64">
-              <p className="text-smd text-text-dim">
+              <p className="text-base text-text-dim">
                 p-3 の内側 padding と max-h-80 + 内部スクロールが付く。下に長い中身を置くと
                 パネル自身がスクロールする。
               </p>
               {DEFAULT_ROWS.map((row) => (
-                <p key={row} className="text-smd text-text-faint">
+                <p key={row} className="text-base text-text-faint">
                   {row}
                 </p>
               ))}
@@ -307,7 +307,7 @@ function PanelOptionsDemo() {
               <div className="border-b border-solid border-border px-4 py-3 font-bold text-text">
                 固定ヘッダー
               </div>
-              <p className="px-4 py-3 text-smd text-text-dim">
+              <p className="px-4 py-3 text-base text-text-dim">
                 パネル自身の padding が無いので、ヘッダーの下線を端まで引ける。
               </p>
             </Popover.Popup>
@@ -332,7 +332,7 @@ function PanelOptionsDemo() {
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
                 {SCROLL_ROWS.map((row) => (
-                  <p key={row} className="text-smd text-text-faint">
+                  <p key={row} className="text-base text-text-faint">
                     {row}
                   </p>
                 ))}

@@ -21,10 +21,10 @@ export const Basic: Story = {
     >
       <div className="flex flex-wrap items-start gap-4">
         <Surface elevation={1} padding="md" radius="card" className="w-40">
-          <p className="text-smd text-text">elevation=1, radius=card</p>
+          <p className="text-base text-text">elevation=1, radius=card</p>
         </Surface>
         <Surface elevation={2} padding="lg" radius="panel" className="w-40">
-          <p className="text-smd text-text">elevation=2, radius=panel</p>
+          <p className="text-base text-text">elevation=2, radius=panel</p>
         </Surface>
       </div>
     </Section>
@@ -38,7 +38,7 @@ export const Interactive: Story = {
       note="hover で -translate-y-0.5 + bg-surface-hover の控えめな持ち上げ。フォーカスリングは focus-visible:shadow-focus。"
     >
       <Surface interactive tabIndex={0} elevation={2} padding="md" className="max-w-xs">
-        <p className="text-smd text-text">ホバー/フォーカスしてみる。</p>
+        <p className="text-base text-text">ホバー/フォーカスしてみる。</p>
       </Surface>
     </Section>
   ),
@@ -58,8 +58,8 @@ export const Clickable: Story = {
           onClick={() => {}}
           className="w-56"
         >
-          <p className="text-smd font-semibold text-text">クリックできるカード</p>
-          <p className="text-2xs text-text-dim">1要素(button)で面ごと描かれる。</p>
+          <p className="text-base font-semibold text-text">クリックできるカード</p>
+          <p className="text-xs text-text-dim">1要素(button)で面ごと描かれる。</p>
         </Card>
         <Surface
           render={<a href="#clickable" />}
@@ -69,8 +69,8 @@ export const Clickable: Story = {
           data-testid="card-link"
           className="w-56 no-underline"
         >
-          <p className="text-smd font-semibold text-text">リンクのカード</p>
-          <p className="text-2xs text-text-dim">render は button 以外にも使える。</p>
+          <p className="text-base font-semibold text-text">リンクのカード</p>
+          <p className="text-xs text-text-dim">render は button 以外にも使える。</p>
         </Surface>
       </div>
     </Section>
@@ -85,8 +85,8 @@ export const ToneAndShadow: Story = {
     >
       <div className="flex flex-wrap items-start gap-4">
         <Surface elevation={2} padding="md" data-testid="surface-default" className="w-44">
-          <p className="text-smd text-text">既定</p>
-          <p className="text-2xs text-text-dim">elevation=2</p>
+          <p className="text-base text-text">既定</p>
+          <p className="text-xs text-text-dim">elevation=2</p>
         </Surface>
         <Surface
           elevation={2}
@@ -95,12 +95,12 @@ export const ToneAndShadow: Story = {
           data-testid="surface-shadow-none"
           className="w-44"
         >
-          <p className="text-smd text-text">面あり・影なし</p>
-          <p className="text-2xs text-text-dim">elevation=2 shadow=&quot;none&quot;</p>
+          <p className="text-base text-text">面あり・影なし</p>
+          <p className="text-xs text-text-dim">elevation=2 shadow=&quot;none&quot;</p>
         </Surface>
         <Surface elevation={1} tone="tint" padding="md" data-testid="surface-tint" className="w-44">
-          <p className="text-smd text-text">tint 面</p>
-          <p className="text-2xs text-text-dim">elevation=1 tone=&quot;tint&quot;</p>
+          <p className="text-base text-text">tint 面</p>
+          <p className="text-xs text-text-dim">elevation=1 tone=&quot;tint&quot;</p>
         </Surface>
       </div>
     </Section>

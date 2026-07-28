@@ -94,7 +94,7 @@ export function MediaCard({
       {/* min-w-0 は不要(Card は flex コンテナではない)。truncate 自体は block 要素にも
           効くが、幅の基準を親(Card の padding 内側)に持たせるため w-full を明示する。 */}
       <div className="mt-3 w-full">
-        <div className="truncate font-display text-md font-bold text-text">{title}</div>
+        <div className="truncate font-body text-base font-bold text-text">{title}</div>
         {meta && <div className="truncate font-body text-xs text-text-dim">{meta}</div>}
       </div>
       {footer && <div className="mt-3">{footer}</div>}
