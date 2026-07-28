@@ -51,14 +51,15 @@
     "check:typography": "node scripts/check-typography.mjs",
     "check:stories": "node scripts/check-stories.mjs",
     "check:package": "node scripts/check-package.mjs",
-    "verify": "pnpm typecheck && pnpm check && pnpm check:typography && pnpm check:stories && pnpm build && pnpm check:styles && pnpm check:package",
+    "verify": "pnpm typecheck && pnpm check && pnpm check:typography && pnpm check:stories && pnpm check:border-width && pnpm build && pnpm check:styles && pnpm check:package",
     "verify:full": "pnpm verify && pnpm build-storybook && pnpm test:a11y",
     "test:a11y": "pnpm build:css && vitest run --project=storybook",
     "format": "biome format --write .",
     "storybook": "pnpm build:css && storybook dev -p 6006",
     "build-storybook": "pnpm build:css && storybook build -o storybook-static",
     "changeset": "changeset",
-    "changeset:version": "changeset version"
+    "changeset:version": "changeset version",
+    "check:border-width": "node scripts/check-border-width.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",
