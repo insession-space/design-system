@@ -262,6 +262,10 @@ export {
   ToolButton,
   type ToolButtonProps,
 } from './components/toggle-group.tsx';
+export {
+  default as TypingIndicator,
+  type TypingIndicatorProps,
+} from './components/typing-indicator.tsx';
 export { default as UploadTile, type UploadTileProps } from './components/upload-tile.tsx';
 export { default as AppleIcon } from './icons/apple-icon.tsx';
 export { default as GoogleIcon } from './icons/google-icon.tsx';

@@ -120,7 +120,9 @@ export default function Composer({
   const canSubmit = !disabled && value.trim().length > 0;
   const textareaPad = size === 'compact' ? 'px-3.5 pt-2 pb-0.5' : 'px-4.5 pt-2.5 pb-1';
   const actionsPad = size === 'compact' ? 'px-2 py-1.5' : 'px-2 py-2.5';
-  const iconSize = size === 'compact' ? 14 : 16;
+  // #138: 送信アイコンが小さくて視認性が悪かったので 16→18（compact は 14→16）へ上げた。
+  // ボタンの外寸（btnSize）は据え置きなので、アクション行の高さやレイアウトは変わらない。
+  const iconSize = size === 'compact' ? 16 : 18;
   const btnSize = size === 'compact' ? 'h-6.5 w-6.5' : 'h-7.5 w-7.5';
 
   return (
