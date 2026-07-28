@@ -1,11 +1,9 @@
 {
-  "//": "リポジトリ分割でパッケージが単独リポジトリのルートになったため、entry / buildCmd / extraEntries / extraFonts のパスを新構成へ追随させた。projectId は claude.ai/design 側のプロジェクト識別子で、失うと復元できないので絶対に変えない。",
   "projectId": "b683a5a6-eea2-4cf5-af15-f848f9415a4f",
   "shape": "storybook",
   "readmeHeader": ".design-sync/conventions.md",
   "pkg": "@insession/design-system",
   "entry": "src/index.ts",
-  "//buildCmd": "d.ts は tsup が生成する（旧: tsc の emitDeclarationOnly を直接叩いていた）。dist/index.d.ts が dts 抽出のエントリになる。",
   "buildCmd": "pnpm build",
   "storybookStatic": ".design-sync/sb-reference",
   "storybookConfigDir": ".storybook",
@@ -17,11 +15,16 @@
   ],
   "overrides": {
     "Avatar": { "cardMode": "column" },
-    "Icon": { "viewport": "900x1400" }
+    "Icon": { "viewport": "900x2000" },
+    "PageLayout": { "cardMode": "single" },
+    "RingTimer": { "cardMode": "single", "primaryStory": "Normal" },
+    "Tabs": { "cardMode": "column" }
   },
-  "//titleMap": "ChatLog は insession 固有部品のため insession-app 側に残した（このリポジトリの stories には無い）。null は DS へ登録しないストーリー。",
   "titleMap": {
     "Navigation": null,
+    "Elevation": null,
+    "Segmented&Slider": "SegmentedControl",
+    "Upload&Color": "UploadTile",
     "Status": "StatusBadge",
     "Icons": "Icon",
     "Controls": "Checkbox",

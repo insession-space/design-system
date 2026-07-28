@@ -1,45 +1,60 @@
 # design-sync NOTES — InSession Design System (@insession/design-system)
 
-> **⚠ リポジトリ分割（2026-07-25）で前提が2つ変わった。以下の初回同期メモを読む前に必ず確認すること。**
->
-> 1. **配布形態が「ソース直配布」→「dist ビルド配布」に変わった。** `exports['.']` は
->    `./dist/index.js`（型は `./dist/index.d.ts`）で、生成は `tsup`（`pnpm build`）が担う。
->    旧 `buildCmd` の `tsc --emitDeclarationOnly` + `sed` による `.tsx'`→`.js'` 書き換えは
->    **不要になった**（tsup が正しい指定子で d.ts を出す）。`config.json` の `buildCmd` は
->    `pnpm build` に更新済み。
-> 2. **パッケージが単独リポジトリのルートになった。** 旧 `foundation/ui/…` は全て
->    リポジトリ直下（`index.ts` / `theme.css` / `*.tsx`）。`stories/` も直下に移動した。
->
-> 下記メモ中の `foundation/ui/…` や `apps/web/…` というパスは旧モノレポ時代の記述として
-> 読むこと（当時の経緯を残すためあえて書き換えていない）。
+claude.ai/design プロジェクト: **InSession UI** (`b683a5a6-eea2-4cf5-af15-f848f9415a4f`)。
+`projectId` は失うと復元できないので `config.json` から絶対に消さない。
 
-## セットアップの学び（初回同期 2026-07-22）
+## 現在の構成（2026-07-28 の再同期時点）
 
-- [GENERAL] `@insession/design-system` は**ビルドなしのソース直配布**（`exports['.']` = `./index.ts`、dist なし）。converter へは `--entry foundation/ui/index.ts` を渡す（esbuild が .tsx を直接バンドル、bundle 90KB）。
-- [GENERAL] コンポーネント発見は `.d.ts` の PascalCase export 基準なので、`buildCmd`（config 記載）で `tsc --emitDeclarationOnly --outDir dist` を**同期前に必ず実行**する。さらに2点必要:
-  1. 生成された d.ts の re-export 指定子が `./avatar.tsx` のままだと ts-morph が解決できず 0 symbols になる → `sed` で `.tsx'`→`.js'` に書き換える（buildCmd に含めた）。`--rewriteRelativeImportExtensions` は宣言ファイルには効かなかった。
-  2. `foundation/ui/package.json` に `"types": "dist/index.d.ts"` を追加した（dts 抽出のエントリ解決が `pj.types || 'index.d.ts'` のため。コミット済み想定）。
-- [GENERAL] CSS は `[CSS_FROM_STORYBOOK]` に任せる（Tailwind v4 の @theme トークンは storybook ビルドの compiled CSS が唯一の静的成果物。cssEntry 指定不要。174KB）。
-- [GENERAL] フォント: アプリは `@fontsource/jetbrains-mono` の 400/700 を `apps/web/src/main.tsx` で import する。**Storybook 自体はフォントを import していない**（リファレンスもフォールバック描画）ため、(1) `cfg.extraFonts` で fontsource の 400.css/700.css を同梱し、(2) `.design-sync/sb-reference/iframe.html` に同じ @font-face（latin/latin-ext 400/700、`fonts-jbm/`）を手動注入した。**sb-reference を再ビルドしたら注入をやり直すこと**。日本語グリフは JetBrains Mono に無く Hiragino Sans / Noto Sans JP フォールバック（アプリ本番と同じ挙動なので許容）。
-- `[TOKENS_MISSING] --drift / --rot / --danmaku-lane / --accent` は**予期される未定義**: 前3つはリアクション弾幕がランタイムに inline style で設定する変数、`--accent` は emoji-picker-react 上書きが参照する legacy 変数（style.css に定義なし）。DS トークンではない。対処不要。
-- ストーリー題名の除外/マッピング: `ChatLog(EventBubble)`（@in-session/space-core 依存・DS 外）と `Navigation`（apps/web の SideNav・DS 外）、`Foundations/*`（Colors/Tokens/Typography のトークンカタログ・component export に対応なし）は titleMap null で除外。`Status`→`StatusBadge`、`Icons`→`Icon`、`Controls`→`Checkbox`、`Primitives`→`Avatar` にマップ。
-- `[GRID_OVERFLOW]` Avatar（Modal ストーリーが幅超過）→ `overrides.Avatar.cardMode: "column"`。
+- 配布は **dist ビルド配布**（`exports['.']` = `./dist/index.js`、型は `./dist/index.d.ts`）。生成は `tsup` + Tailwind CLI（`buildCmd` = `pnpm build`）。
+- パッケージは単独リポジトリのルート。`stories/` も直下。
+- **同期対象 57 コンポーネント**、11 グループ（`actions` `data-display` `feedback` `foundations` `inputs` `layout` `navigation` `overlays` `page` `patterns` `surfaces`）。前回同期（22件・単一 `components` グループ）から大きく育ち、グループも再編された。
+- グローバル名は **`InsessionDesignSystem`**（`pkg` から自動導出）。`InSessionUi` は旧モノレポ時代（`@in-session/ui`）の名前で**もう存在しない**。
+- ビルド前提: Node 22.18 / pnpm 10 / esbuild は `.ds-sync` にローカル install。
 
-## 検証キャンペーンの学び（fan-out 3バッチ・2026-07-22）
+## この再同期（2026-07-28）で直したこと
 
-- 全18バッチ対象コンポーネントで生成プレビューがそのまま一致（owned preview 作成ゼロ）。
-- BottomSheet/ConfirmModal/Popover/SplitModal/Modal: ストーリーは**閉状態（クリックで開くトリガー）**を描画するため [PORTAL?] は発火せず cardMode single 不要。開いたオーバーレイの中身は両側とも未検証（storybook 側の制約）。
-- IconButton の ghost variant は暗背景で透明＝シート上「空」に見えるが両側同一で正常。
-- Icon(Gallery) はストーリーが縦長(1175px)でキャプチャ viewport(900x700) を超過 → `overrides.Icon.viewport: "900x1400"` を設定（viewport 変更は grade contract に含まれるため要フルビルド+再採点）。
+- **[GENERAL] `config.json` の `//` コメントキーが弾かれるようになった。** 新しいコンバータは未知キーで即エラー（`✗ config: unknown key "//"`）になり、何もビルドしない。コメントは config に書かず、この NOTES に書く。
+- **[GENERAL] `.design-sync/ds-surface.tsx` が `var(--bg)` / `var(--text)` を参照していて背景が当たっていなかった。** Tailwind v4 の `@theme` が出すのは `--color-*` 系で、`--bg` / `--text` は**存在しない**。未定義 `var()` は透明にフォールバックするため、白地に暗テーマ配色＝ラッパー無しと同じ状態になっていた（全コンポーネントに影響）。`--color-bg` / `--color-text` へ修正済み。**トークン名を変えたらこのファイルも追随させること。**
+- **[GENERAL] `conventions.md` の記述が実ビルドと乖離していた**（詳細は下記「conventions.md の検証」）。
+- `[TITLE_UNMAPPED]` 3件を解消: `Foundations/Elevation` はトークンカタログなので `null`、`Inputs/Segmented & Slider` → `SegmentedControl`、`Inputs/Upload & Color` → `UploadTile`。**titleMap のキーは build ログが出す正規化名**（空白なしの `Segmented&Slider` 形式）。
+- `[GRID_OVERFLOW]` 2件: `RingTimer` → `cardMode: "single"` + `primaryStory: "Normal"`（fixed 配置がセル外に出る）、`Tabs` → `cardMode: "column"`（セル幅超過）。
+- `Icon` の `viewport` を `900x1400` → `900x2000` に拡大。プレビュー側は DsSurface の padding のぶん本文幅が狭く、storybook が 8 列のところ 7 列になって縦に伸び、ギャラリー下端（「専用アイコン」節）が切れていた。**アイコンを増やしたらまた超過しうる。**
+- `PageLayout` に `cardMode: "single"`（下記 close 参照）。
+- **手動シードの残骸を削除した。** 前回 #974 で手書き登録した `components/components/{RingTimer,StepFlow}/` は、**アンカーが記録していないため差分の deletePaths に出ない**。今回は正規の `components/feedback/RingTimer` / `components/navigation/StepFlow` が生成されたので、リモートを `list_files` して手で消した。**アップロード後は必ず `list_files` で孤児を確認すること。**
+
+## 既知の正常（新しい警告と区別するため）
+
+- **ストーリーのカタログ見出し・説明文だけ両側で書体が違う。** `stories/tokens.tsx` の `Section` が `font-body` / `text-text-dim` という **Tailwind ユーティリティ**を使っており、これらは storybook ビルドの `@source "../stories"` でのみ生成される（配布 `dist/styles.css` には無い）。**部品本体は両側とも DS の CSS で描画されているので問題ない。** スキル規定どおり「ストーリー側の装飾」として許容。
+- **`[ASSETS_BLOCKED] example.invalid`**: `Avatar` / `UserLabel` のストーリーが**意図的に壊れた画像 URL** でフォールバック（頭文字表示）を見せている。サンドボックスの問題ではなく、両側とも意図どおりの描画。
+- **`IconButton` の ghost variant は暗背景で透明**＝シート上「空」に見えるが両側同一で正常。
+- オーバーレイ系（`Modal` / `BottomSheet` / `ConfirmModal` / `Popover` / `SplitModal`）のストーリーは**閉状態（クリックで開くトリガー）**を描画する。開いたオーバーレイの中身は storybook 側も未検証。**オーバーレイの見た目を変えたら手動確認が要る。**
+- `[STORY_CAP]`: `MessageItem`(17) / `UserLabel`(10) は既定 cap 6 で採点。tail のストーリーは個別採点されていない。
+
+## `close` で受理した1件
+
+- **`PageLayout`（Default）** — 内容・構成・スタイルは storybook と完全一致だが、**プレビュー側のみ下端の Footer が欠ける**。`PageLayout` は `h-dvh` 前提で、カードラッパー `DsSurface` が上下 16px の padding を足すぶん必ずビューポートを超過する（`viewport` を広げても `h-dvh` が追随するので解消しない）。ラッパーの padding を外すと全コンポーネントのカードが窮屈になるため、出荷カード側のみ `cardMode: "single"` で封じ込めた。
+
+## conventions.md の検証（2026-07-28 に全面書き直し）
+
+前回の記述はリポジトリ分割前の前提が残っており、**生成されるデザインを確実に壊す**内容だった。実ビルドに対して機械検証して修正済み:
+
+| 旧記述 | 実態 |
+| --- | --- |
+| `window.InSessionUi.*` | **`window.InsessionDesignSystem.*`**。これだけで design agent のコードが全て `undefined` になる |
+| 「`styles.css` の `body` ルールが暗背景を当てる」 | **`body` / `html` ルールは配布 CSS に存在しない**（`:root` のトークン定義のみ）。地色・文字色・フォントは生成側で当てる必要がある |
+| `<Tabs tabs={[...]} value onChange>` | Tabs は **compound namespace**（`Tabs.Root/.List/.Tab/.Panel`）。`Modal` `Popover` `SideNav` `Toast` も同様 |
+| `--bg` `--text` `--color-mint` `--color-cyan` `--color-scrim` `--radius-lg` | いずれも**実在しない** |
+| 「ダークが唯一のテーマ」 | `<html data-theme="light">` でライトのオーバーレイが効く |
+| `components/components/<Name>/` | **`components/<group>/<Name>/`**（11グループ） |
+
+**DS の API・トークン名・グループ構成を変えたら conventions.md を再検証すること。** 検証は `ds-bundle/_ds_bundle.css` の `:root` に対するトークン名 grep と、`ds-bundle/components/<group>/<Name>/<Name>.d.ts` の props 確認で機械的にできる。
 
 ## Re-sync risks（次回同期の監視リスト）
 
-- **RingTimer / StepFlow は手動シード済み（#974・2026-07-23）**: DS プロジェクトの `components/components/{RingTimer,StepFlow}/` と `_preview/{RingTimer,StepFlow}.js` は、コンバータ不在の環境から手書きで先行登録した（bundle 未収載のため preview は自己完結実装）。ソース正は `foundation/ui/{ring-timer,step-flow}.tsx` + `apps/web/src/stories/{RingTimer,StepFlow}.stories.tsx`。**次回のフル同期でコンバータ生成物に置き換えること**（置き換われば preview も bundle 参照になる）。
-
-- **sb-reference 再ビルドでフォント注入が消える**: `.design-sync/sb-reference/iframe.html` への JetBrains Mono @font-face 注入（`fonts-jbm/`）は手動。sb-reference を作り直したら再注入しないと比較が両側フォールバックになり、フォント欠落が見えなくなる。
-- **buildCmd の d.ts 生成 + sed 書き換えは必須前提**: `foundation/ui/dist/` が無い/古いと発見0件または古い Props で同期される。config の buildCmd（tsc emit + `.tsx'`→`.js'` sed）を必ず先に実行。
-- **オーバーレイ系（Modal/BottomSheet/ConfirmModal/Popover/SplitModal）は閉状態のみ検証済み**: 開いたオーバーレイの中身は storybook 側もクリック起動のため両側未検証。オーバーレイの見た目を変えた場合は手動確認が要る。
-- **Avatar(Primitives) は 10 ストーリーを --max-stories 10 で全採点済み**。既定 cap(6) のままの再キャプチャでは tail 4 本のシートが撮られない点に注意。
-- **[TOKENS_MISSING] の 4 変数と IconButton ghost の「空」見えは既知の正常**（本文参照）。新しい警告が出たらそれは新規。
-- **conventions.md の語彙は 2026-07-22 のビルドで実在検証済み**: トークン名/クラス名/props（Tabs.tabs/value、StatusBadge.tone に live 無し等）。DS の API 変更時は再検証。
-- **ビルドの前提**: Node 22.18 / pnpm 10 / esbuild は .ds-sync ローカル install。`window.InSessionUi`。
+- **`conventions.md` は `readmeHeader` として README 先頭に入り、design agent のシステムプロンプトに載る。** ここに実在しない名前を書くと agent はそれを信じて壊れたコードを吐き、しかも静かに失敗する。**必ず実ビルドに対して grep で検証する。**
+- **`ds-surface.tsx` はトークン名に依存する。** `--color-*` の改名で無言で効かなくなる（背景が透明になるだけでエラーは出ない）。プレビューが白地になっていたら真っ先にここを疑う。
+- **アップロード後の `list_files` で孤児を確認する。** アンカー外のファイル（過去の手動シード、グループ再編前のパス）は差分に出ない。
+- **`Toggle` は同期対象から外れた。** `Toggle` / `ToggleGroup` / `Slider` / `ColorInput` / `ColorSwatchGroup` / `ToolButton` / `AppleIcon` / `GoogleIcon` は**バンドルには入っているがカード・`.d.ts` は出ない** — storybook shape は「1ストーリー題名 = 1コンポーネント」なので、`Controls` / `Segmented & Slider` / `Upload & Color` のように複数部品を1題名に同居させると代表1つしか登録されない。個別カードが要るならリポジトリ側でストーリーを分割する。
+- **`.gitignore` が `.design-sync/previews/` を無視している。** スキルの前提では owned preview は**コミットされる durable set**。現状 owned preview は1つも無いので実害は出ていないが、将来 owned preview を作るなら `.gitignore` からこの行を外さないと新しいクローンで消える。
+- **sb-reference のフォント手動注入はもう不要**（解消済み）。`.storybook/preview.tsx` が `@fontsource/jetbrains-mono` を直接 import するようになったため、旧 NOTES にあった `iframe.html` への `@font-face` 手動注入は要らない。
+- **RingTimer / StepFlow の手動シード問題は解消済み**（コンバータ生成物に置き換わり、旧パスも削除した）。
