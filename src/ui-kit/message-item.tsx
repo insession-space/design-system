@@ -167,6 +167,18 @@ function resolveTargetUrls(urls: string[], max: number): string[] {
 const ACTIONS_VISIBILITY =
   'opacity-0 transition-opacity motion-reduce:transition-none duration-(--dur-fast) group-hover:opacity-100 group-focus-within:opacity-100';
 
+// ── actions のアイコンボタン寸法(#142) ──────────────────────
+// 28px は押しづらかったので、IconButton の既定と同じ 36px へ上げた。ただしヘッダー行の
+// 高さは UserLabel(size="sm")側の strut(実測 21.3px)ではなく**このボタンの高さ**が決めて
+// おり、素で上げるとヘッダー行が 28px → 36px に伸びてメッセージ1件ごとの縦リズムが変わる
+// (実測)。そこで actions のコンテナに上下 -4px のネガティブマージンを当て、行の高さを
+// 従来どおり 28px に保ったままボタンだけを大きくする。ghost なので普段は面を持たず、
+// はみ出す 4px が隣接要素の見た目に触ることはない(ホバー時の面が上下 4px ぶん広がるだけで、
+// 本文の1行目にはかからないことを実測で確認済み)。
+// ⚠ ネガティブマージンは actions にだけ当てる。actionsSlot は消費側のノードなので触らない。
+const ACTION_BUTTON_SIZE = 36;
+const ACTIONS_ROW_HEIGHT_COMPENSATION = '-my-1';
+
 // ── リアクションピル(#103) ─────────────────────────────
 // Chip ではなく専用の button で描く。Chip の既定は「クイック返信/フィルター/タグ」向けの
 // 12.5px + px-3.5 py-[7px] で、主役が絵文字1文字+数字しかないリアクションピルには余白が
@@ -345,14 +357,17 @@ export default function MessageItem({
         {hasHeaderTrailing && (
           <HStack gap="xs" className="shrink-0">
             {actions != null && actions.length > 0 && (
-              <HStack gap="xs" className={ACTIONS_VISIBILITY}>
+              <HStack
+                gap="xs"
+                className={`${ACTIONS_VISIBILITY} ${ACTIONS_ROW_HEIGHT_COMPENSATION}`}
+              >
                 {actions.map((action) => (
                   <IconButton
                     key={action.label}
                     label={action.label}
-                    icon={<Icon name={action.icon} size={16} />}
+                    icon={<Icon name={action.icon} size={20} />}
                     variant="ghost"
-                    size={28}
+                    size={ACTION_BUTTON_SIZE}
                     onClick={action.onClick}
                   />
                 ))}
