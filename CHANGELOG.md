@@ -1,5 +1,15 @@
 # @insession/design-system
 
+## 7.1.0
+
+### Minor Changes
+
+- 475b4a9: TypingIndicator（入力中インジケーター）を追加し、Composer の送信アイコンを一回り大きくした（#138）
+
+  - `TypingIndicator`: ドット 3 つ + 短い文言の 1 行。文言は props 注入、`reserveSpace`（既定 true）で非表示時も行の高さを確保するのでレイアウトが飛ばない。`aria-live="polite"` 付き
+  - ドットの `@keyframes typing-in` / `typing-dot` を `components.css` に定義。従来この定義は消費側アプリの CSS にしかなく、DS 単体ではアニメーションが静かに死んでいた
+  - `Composer` の送信アイコンを 16→18px（compact は 14→16px）へ。ボタンの外寸は据え置きなのでレイアウトは変わらない
+
 ## 7.0.2
 
 ### Patch Changes
