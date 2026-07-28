@@ -41,7 +41,7 @@ export type CheckboxProps = Omit<
 // 描画するのは `<span role="checkbox">` で、CSS の :disabled 疑似クラスはフォーム要素にしか
 // 適用されないため効かない（toggle.tsx / menu.tsx と同じ理由）。
 const BOX =
-  'grid h-[22px] w-[22px] place-items-center rounded-chip border-2 border-solid p-0 transition-colors motion-reduce:transition-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+  'relative grid h-[22px] w-[22px] place-items-center rounded-chip before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] border-2 border-solid p-0 transition-colors motion-reduce:transition-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 
 // disabled の見た目（薄く + not-allowed）は box だけでなく **ラベルを含む行全体** に効かせる。
 // has-[[data-disabled]] にしているのは、disabled が親から降ってくる経路があるため
@@ -50,7 +50,7 @@ const BOX =
 // 有効に見える」行が残る。子孫に data-disabled が立っていれば当たる形にしておく。
 // cursor は行全体で1箇所に決める（子に cursor-pointer を置くと親の not-allowed に勝つ）。
 const ROW =
-  'inline-flex select-none items-center gap-3 cursor-pointer has-[>[data-disabled]]:cursor-not-allowed has-[>[data-disabled]]:opacity-50';
+  'inline-flex select-none items-center gap-3 min-h-(--control-hit-size) pointer-coarse:min-h-(--control-touch-size) pointer-coarse:min-w-(--control-touch-size) cursor-pointer has-[>[data-disabled]]:cursor-not-allowed has-[>[data-disabled]]:opacity-50';
 
 // ⚠ ラベル(Field.Label = <label>)には cursor-[inherit] を当てる。cursor は継承プロパティだが
 // 実測すると <label> だけ default のままで（行が pointer でも継承されない）、移行前の
@@ -70,7 +70,7 @@ export default function Checkbox({ label, className = '', disabled, ...rest }: C
           `${BOX} ${
             state.checked
               ? 'border-fill bg-fill text-on-fill forced-colors:border-[Highlight] forced-colors:text-[color:Highlight]'
-              : 'border-border-strong bg-transparent text-transparent'
+              : 'border-control-border bg-transparent text-transparent'
           }`
         }
         {...rest}

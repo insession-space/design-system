@@ -94,7 +94,7 @@ export default function Textarea({
       {/* match の明示が要る理由は input.tsx のコメント参照（既定はネイティブの
           ValidityState を見るため、props 由来の error では aria-describedby が張られない）。 */}
       {invalid && (
-        <Field.Error match className="text-xs text-accent">
+        <Field.Error match className="text-xs text-accent-soft">
           {error}
         </Field.Error>
       )}

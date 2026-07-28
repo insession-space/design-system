@@ -10,7 +10,7 @@ export type LozengeTone = 'success' | 'warning' | 'accent' | 'info' | 'neutral';
 const TONE: Record<LozengeTone, string> = {
   success: 'text-success bg-success-surface-strong',
   warning: 'text-warning bg-warning-surface-strong',
-  accent: 'text-accent bg-tint-22',
+  accent: 'text-accent-soft bg-tint-22',
   info: 'text-info bg-info-surface-strong',
   // neutral は tint(accent 色相)ではなく中立の面を使う。tint を濃くすると accent tone と
   // 見分けが付かなくなるため、面は surface-3・文字は text-text で濃度を確保する(#765)。

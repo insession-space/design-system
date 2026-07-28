@@ -35,7 +35,7 @@ export type ChipProps = {
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & { className?: string };
 
 const BASE =
-  'inline-flex items-center gap-1.5 rounded-pill border border-solid text-sm cursor-pointer select-none transition-colors motion-reduce:transition-none duration-(--dur-fast)';
+  'inline-flex items-center gap-1.5 min-h-(--control-hit-size) pointer-coarse:min-h-(--control-touch-size) rounded-pill border border-solid text-sm cursor-pointer select-none transition-colors motion-reduce:transition-none duration-(--dur-fast)';
 // DS の3系統の pad。removable=6/10/6/14、avatar=5/13/5/5、既定=7/14。
 const PAD_DEFAULT = 'px-3.5 py-[7px]';
 const PAD_REMOVABLE = 'pl-[14px] pr-2.5 py-1.5';
@@ -46,7 +46,7 @@ const DEFAULT =
   'bg-surface-2 border-border-strong text-text font-semibold enabled:hover:bg-surface-hover';
 // selected 枠は DS の accent 55%。tint は視認性確保のため bg-tint-22 に強化(#765)。
 const SELECTED =
-  'bg-tint-22 border-[color-mix(in_srgb,var(--color-accent)_55%,transparent)] text-accent font-bold';
+  'bg-tint-22 border-[color-mix(in_srgb,var(--color-accent)_55%,transparent)] text-accent-soft font-bold';
 
 export default function Chip({
   selected = false,

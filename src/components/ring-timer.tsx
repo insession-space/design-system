@@ -88,7 +88,7 @@ export default function RingTimer({
       <div className="absolute inset-0 rounded-pill" style={maskStyle} aria-hidden="true" />
       <div className="relative flex flex-col items-center justify-center">
         <span
-          className={`font-bold leading-none tabular-nums ${urgent ? 'text-accent' : 'text-text'}`}
+          className={`font-bold leading-none tabular-nums ${urgent ? 'text-accent-soft' : 'text-text'}`}
           style={{ fontSize: Math.round(size * 0.28) }}
         >
           {Math.max(0, Math.round(secondsLeft))}
