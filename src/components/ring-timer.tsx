@@ -30,7 +30,13 @@ export default function RingTimer({
 }: RingTimerProps) {
   const urgent = secondsLeft <= urgentThreshold;
   const pct = totalSeconds > 0 ? Math.min(100, Math.max(0, (secondsLeft / totalSeconds) * 100)) : 0;
-  const ringColor = urgent ? 'var(--color-accent)' : 'var(--color-mint)';
+  // ⚠ リングの色は urgent でも変わらない。#109 以前は旧トークン名で
+  // `urgent ? 'var(--color-accent)' : 'var(--color-mint)'` と書かれていたが、当時の
+  // --color-accent は --color-mint の別名だったので**両者は同じ色**で、この分岐は一度も
+  // 効いていなかった。トークンを役割名へ寄せた時点で同語反復が露呈したため三項を畳んだ
+  // (見た目は従来と同一)。urgent を色でも示したいなら、どの色にするかはデザイン判断が要る
+  // ので別途決めること。現状 urgent は脈動アニメーションと数字の色(下の urgent 分岐)で表現している。
+  const ringColor = 'var(--color-accent)';
   const maskStyle: CSSProperties = {
     background: `conic-gradient(${ringColor} ${pct}%, var(--color-border) 0)`,
     WebkitMask: 'radial-gradient(closest-side, transparent 72%, #000 73%)',

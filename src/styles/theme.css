@@ -36,13 +36,21 @@
  */
 
 @theme {
-  /* カラー: ブランドパレット(旧名を保持。値は新4色パレットへ。Claude Design の
-     「INSESSION Design System」本文の実値に合わせる) */
-  --color-mint: #ff6a47; /* 旧ミント→コーラル(アクセント)。ダーク(既定)値 */
-  --color-mint-soft: #ffb199; /* ダーク背景向けの淡いコーラル(テキスト/アイコン用) */
-  --color-cyan: #5b8bf0; /* 旧シアン→ブルー(セカンダリアクセント)。ダーク(既定)値 */
-  --color-violet: #31c47e; /* 新パレットに無いため落ち着いたグリーン系へ振替(装飾のみ) */
-  --color-maroon: #8a4a1f; /* 同上。深いアンバー系(装飾のみ) */
+  /* カラー: ブランドパレット。値は新4色パレット(Claude Design の「INSESSION Design System」
+     本文の実値)。
+     ⚠ **トークン名は「色名」ではなく「役割」で付ける(#109)。** かつては mint / mint-soft /
+     cyan / violet / maroon という色名だったが、ブランドを4色パレットへ刷新したときに値だけ
+     差し替えて名前を据え置いたため、**全色で名前と実値が食い違っていた** —
+     `--color-mint` がコーラル、`--color-cyan` がブルー、`--color-violet` に至っては
+     グリーンを返す状態で、`text-violet` と書いた人は緑が出ることを読めなかった。
+     役割名にしておけば次にブランド色を変えても名前が崩れない。新しい色を足すときも
+     「その色が何に使われるか」で名付けること(`--color-teal` のような色名を復活させない)。 */
+  --color-accent: #ff6a47; /* プライマリアクセント(コーラル)。ダーク(既定)値 */
+  --color-accent-soft: #ffb199; /* ダーク背景向けの淡いコーラル(テキスト/アイコン用) */
+  --color-accent-2: #5b8bf0; /* セカンダリアクセント(ブルー)。focus リング等。ダーク(既定)値 */
+  --color-decor-1: #31c47e; /* 装飾の色分け(グリーン)。アバター背景/バッジのローテーション等 */
+  /* 旧 --color-maroon(#8a4a1f。深いアンバー)は DS でも消費側でも実使用がゼロだったため
+     #109 で削除した。装飾の色数が足りなくなったら --color-decor-2 として足すこと。 */
 
   /* カラー: 背景面(奥 → 手前)。ダーク(既定)。DSの bg/surface-2/surface を3段ランプに割当 */
   --color-bg: #121211;
@@ -61,26 +69,32 @@
   --color-text-dim: #a7a395;
   --color-text-faint: #726e62;
 
-  /* カラー: DS の fill/accent(ボタン等の塗り)。fill=中立塗り(Primary。ダークでは明色)、
-     on-fill=その上の文字色。accent=コーラル(=mint 別名)、on-accent=その上の文字色。ダーク(既定) */
+  /* カラー: DS の fill(ボタン等の塗り)。fill=中立塗り(Primary。ダークでは明色)、
+     on-fill=その上の文字色。on-accent=アクセント塗りの上の文字色。ダーク(既定)。
+     ⚠ --color-accent 自体は上のブランドパレットが実体として持つ(#109 以前はここで
+     `var(--color-mint)` の別名として定義していたが、役割名を実体にして向きを逆転した)。 */
   --color-fill: #f1eee6;
   --color-on-fill: #17160f;
-  --color-accent: var(--color-mint);
   --color-on-accent: #ffffff;
 
   /* カラー: リンクのセマンティック別名(#633)。生 hex は増やさず既存アクセントトークンを参照する。
      リンクは下線を使わず「色 + ウェイト」で区別する。link=静止色(淡コーラル)、
      link-hover=hover/active(コーラル)。web 側では [data-theme] で light/dark に追従する。
      全リンク共通の focus リングは --color-focus-ring。 */
-  --color-link: var(--color-mint-soft);
-  --color-link-hover: var(--color-mint);
+  --color-link: var(--color-accent-soft);
+  --color-link-hover: var(--color-accent);
 
   /* カラー: アクセント(コーラル)ティント面。段階トークン化(数値=元 rgba の α×100)。
      tinted surface + 細ボーダーの控えめな面表現に使う。塗りは不透過(下が透けない)。
      テーマ背景(--color-bg)へ同率で合成した値なので、既定背景上の見え方は旧 rgba 版と
      同一のまま、consumer 側の --color-bg 上書き(ライトテーマ等)にも自動追従する。
      透明のまま使いたい装飾(グラデーション/グロー)はトークンではなく
-     color-mix(in srgb, var(--color-accent) N%, transparent) をその場で使うこと。 */
+     color-mix(in srgb, var(--color-accent) N%, transparent) をその場で使うこと。
+     ⚠ 合成元が `var(--color-accent)` ではなく生値 `rgb(255 90 54)` なのは意図ではなく経緯。
+     この値は**ライト側の accent (#ff5a36)** であってダーク既定の #ff6a47 ではないため、
+     `var(--color-accent)` へ置き換えると**ダークでのティント面の色が変わる**(= 見た目が動く)。
+     #109 は「名前だけを直し値は1つも変えない」変更なので、ここは据え置いた。
+     ティント面をアクセントに追従させるかどうかは、見た目の変更を伴う別の判断として扱うこと。 */
   --color-tint-3: color-mix(in srgb, rgb(255 90 54) 3%, var(--color-bg));
   --color-tint-5: color-mix(in srgb, rgb(255 90 54) 5%, var(--color-bg));
   --color-tint-7: color-mix(in srgb, rgb(255 90 54) 7%, var(--color-bg));
@@ -342,9 +356,10 @@
   --z-snackbar: 90; /* 操作完了フィードバック(Snackbar) */
   --z-modal: 100; /* モーダル(backdrop 含む) */
 
-  /* フォーカスリング: アウトライン(生 var で legacy の :focus-visible から参照)。色はブルー(#457。旧シアン)。
+  /* フォーカスリング: アウトライン(生 var で legacy の :focus-visible から参照)。色はブルー
+     (#457。セカンダリアクセント)。
      グロー版(box-shadow)は @theme の --shadow-focus。新規部品/legacy とも同じ値に揃える(#445)。 */
-  --color-focus-ring: var(--color-cyan);
+  --color-focus-ring: var(--color-accent-2);
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
 
@@ -381,8 +396,9 @@
  * ── 上書きしなくてよいトークン ──────────────────────────
  * ティント面(--color-tint-*)とセマンティック面(--color-*-surface / *-surface-strong)は
  * `color-mix(… , var(--color-bg))` の合成で定義してあるので、ここで --color-bg が
- * 変わればそのまま追従する。リンク色(--color-link / --color-link-hover)と
- * --color-accent も --color-mint / --color-mint-soft の var() 参照なので追従する。
+ * 変わればそのまま追従する。リンク色(--color-link / --color-link-hover)は
+ * --color-accent / --color-accent-soft の var() 参照、--color-focus-ring は
+ * --color-accent-2 の var() 参照なので追従する。
  * したがってここに書くのは**参照元の生値だけ**。
  *
  * ── 値の出自 ──────────────────────────────────────
@@ -421,12 +437,14 @@
   --color-on-fill: #f1eee6;
 
   /* ブランドパレット。白背景でのコントラスト確保のため、ダークより濃い値にする。
-     mint-soft はダークでは「淡いコーラル」だが、ライトでは白地に載るため
-     逆に濃いコーラルになる(テキスト/リンクの静止色に使うため)。 */
-  --color-mint: #ff5a36;
-  --color-mint-soft: #c8431f;
-  --color-cyan: #3b6fe0;
-  --color-violet: #1fa463;
+     accent-soft はダークでは「淡いコーラル」だが、ライトでは白地に載るため
+     逆に濃いコーラルになる(テキスト/リンクの静止色に使うため)。
+     ⚠ ダーク側にあった旧 --color-maroon はライトに再宣言が無く、ダーク値がそのまま流用される
+     非対称だった(#109 で当該トークンごと削除済み)。 */
+  --color-accent: #ff5a36;
+  --color-accent-soft: #c8431f;
+  --color-accent-2: #3b6fe0;
+  --color-decor-1: #1fa463;
 
   /* セマンティック(状態表現)の地の色。白背景での可読性のため少し濃くする。
      対応する *-surface / *-border はこれらの var() 合成なので追従する。 */

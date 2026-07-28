@@ -89,9 +89,9 @@ import { chrome } from '../.storybook/ds-theme';
   </thead>
   <tbody>
     {[
-      ['--color-mint', 'コーラル #ff6a47', '#ff6a47', '主アクセント'],
-      ['--color-cyan', 'ブルー #5b8bf0', '#5b8bf0', '副アクセント'],
-      ['--color-violet', 'グリーン #31c47e', '#31c47e', '装飾のみ'],
+      ['--color-accent', 'コーラル #ff6a47', '#ff6a47', '主アクセント'],
+      ['--color-accent-2', 'ブルー #5b8bf0', '#5b8bf0', '副アクセント'],
+      ['--color-decor-1', 'グリーン #31c47e', '#31c47e', '装飾のみ'],
     ].map(([token, label, swatch, role]) => (
       <tr key={token}>
         <td style={{ padding: '.5rem .7rem', borderBottom: `1px solid ${chrome.border}` }}>

@@ -13,13 +13,15 @@ type Story = StoryObj;
 
 export const Palette: Story = {
   render: () => (
-    <Section title="パレット" note="ロゴ由来。アクセントは text-mint-soft を基本にする。">
+    <Section
+      title="パレット"
+      note="トークン名は色名ではなく役割で付ける(#109)。文字色は text-accent-soft を基本にする。"
+    >
       <Grid>
-        <ColorSwatch varName="--color-mint" label="mint" />
-        <ColorSwatch varName="--color-mint-soft" label="mint-soft" />
-        <ColorSwatch varName="--color-cyan" label="cyan" />
-        <ColorSwatch varName="--color-violet" label="violet" />
-        <ColorSwatch varName="--color-maroon" label="maroon" />
+        <ColorSwatch varName="--color-accent" label="accent" />
+        <ColorSwatch varName="--color-accent-soft" label="accent-soft" />
+        <ColorSwatch varName="--color-accent-2" label="accent-2" />
+        <ColorSwatch varName="--color-decor-1" label="decor-1" />
       </Grid>
     </Section>
   ),
@@ -39,7 +41,10 @@ export const Surfaces: Story = {
 
 export const Tints: Story = {
   render: () => (
-    <Section title="ティント面" note="rgba(mint, α) の面。数値=不透明度×100。bg-tint-* で使う。">
+    <Section
+      title="ティント面"
+      note="アクセントを地の背景へ合成した面。数値=不透明度×100。bg-tint-* で使う。"
+    >
       <Grid>
         <ColorSwatch varName="--color-tint-3" label="tint-3" />
         <ColorSwatch varName="--color-tint-5" label="tint-5" />

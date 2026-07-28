@@ -52,7 +52,7 @@ const GROUP_SECONDARY = `${GROUP} mt-auto border-0 border-t border-solid border-
 
 // inactive=text-dim / hover=surface-hover / active=surface-3 面 + 細ボーダー + text。
 // active は state から出る data-active で表現する（クラスの動的生成はしない）。
-// `group` はアイコンが data-active を親から読むため（group-data-active:text-mint）。
+// `group` はアイコンが data-active を親から読むため（group-data-active:text-accent）。
 // active:scale-100 / hover:shadow-none は、プリフライトを配らない DS で <button> に露出する
 // 消費側の legacy な button:hover/:active（glow + scale）を打ち消すため（Tabs と同じ手当て）。
 const ITEM =
@@ -65,7 +65,7 @@ const ITEM_VARIANT = {
 } as const;
 
 const ITEM_TEXT = 'min-w-0 flex-1';
-const ITEM_ICON = 'inline-flex shrink-0 group-data-active:text-mint';
+const ITEM_ICON = 'inline-flex shrink-0 group-data-active:text-accent';
 
 const PRIMARY_ICON_SIZE = 19;
 const EXTERNAL_ICON_SIZE = 15;

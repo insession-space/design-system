@@ -89,7 +89,7 @@ export const Snackbar: Story = {
     <Toast.Provider>
       <Section
         title="snackbar バリアント"
-        note="feature の操作フィードバック(旧 .snackbar)互換パレット。success=border-strong+mint、error=soft pink。pill 形状で description だけを出す（title は使わない）。"
+        note="feature の操作フィードバック(旧 .snackbar)互換パレット。success=border-strong+accent、error=soft pink。pill 形状で description だけを出す（title は使わない）。"
       >
         <div className="flex flex-wrap gap-3">
           <AddButton
