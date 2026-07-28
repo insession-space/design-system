@@ -1,6 +1,7 @@
 import { Button as BaseButton } from '@base-ui/react/button';
 import type { ReactNode } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import Spinner from './spinner.tsx';
 
 // DS のボタン（純粋 leaf UI）。claude design "INSESSION Design System" のボタン仕様に準拠（#463 / #663）。
@@ -54,6 +55,10 @@ export type ButtonProps = {
 // 排他的に1つだけ出す**。ここでは border-color を VARIANT 側だけが持つ契約にしている。
 // → 新しい variant を足すときは **必ず border-* を1つ書くこと**（書き忘れると枠色が
 //   ブラウザ既定の currentColor になり、意図しない枠が出る）。
+// ※ #137 で最終的な class 文字列は twMerge を通すようになり、同一プロパティの重複は
+//   後勝ちで畳まれるようになった。ただし **この契約は緩めない** — twMerge が知っているのは
+//   「ユーティリティの分類」だけで、どちらを残すべきかは並び順でしか表現できない。
+//   BASE と VARIANT が同じプロパティを持てば、また「どちらが正か」を読み手が追う羽目になる。
 // data-disabled: の border-transparent は `&[data-disabled]` で詳細度が一段高く、
 // variant 側の素の border-* に常に勝つので BASE に残してよい（順序に依存しない）。
 // ⚠ disabled 系は `disabled:` / `enabled:` ではなく **`data-disabled:` / `not-data-disabled:`**
@@ -103,7 +108,23 @@ const SIZE: Record<ButtonSize, string> = {
   md: 'text-base px-[22px] py-3',
   lg: 'text-base px-7 py-3.5',
 };
-const GHOST_PAD = 'px-3.5';
+// ghost の横詰め。
+// ⚠ **値は「従来の配布 CSS で実際に勝っていた側」をそのまま固定したもの**であって、設計意図
+// そのものではない。従来は `${SIZE[size]} px-3.5` と px-* を2つ並べて出しており、どちらが効くかは
+// 配布 CSS の出力順で決まっていた（#58 と同じ失敗）。実測すると dist/styles.css の並びは
+// `.px-3` → `.px-3\.5` → `.px-4` → `.px-7` → `.px-\[22px\]` で、後勝ちの結果
+// **xs だけ px-3.5 が効き、sm/md/lg は SIZE 側（16/22/28px）が効いていた**。
+// #137 で twMerge を通すと「後に書いたほうが勝つ」に確定するため、`px-3.5` を素直に足すと
+// ghost の sm/md/lg が一律 14px へ縮んで**出荷済みの見た目が動く**。#137 は「消費側が className で
+// 上書きできるようにする」変更であって見た目を動かす変更ではないので、ここは実測値を固定して
+// 描画を 1px も変えない。
+// → ghost を本来の意図（全サイズで横を詰める）へ揃えるかは、見た目の変更を伴う別 Issue で扱うこと。
+const GHOST_PAD: Record<ButtonSize, string> = {
+  xs: 'px-3.5',
+  sm: 'px-4',
+  md: 'px-[22px]',
+  lg: 'px-7',
+};
 
 const SPINNER_SIZE: Record<ButtonSize, number> = { xs: 12, sm: 13, md: 15, lg: 16 };
 // DS: Icon は fontSize+2。size ごとの実 px(11/12/15/16 → +2)。
@@ -129,7 +150,7 @@ export default function Button({
   className = '',
   ...rest
 }: ButtonProps) {
-  const pad = variant === 'ghost' ? `${SIZE[size]} ${GHOST_PAD}` : SIZE[size];
+  const pad = variant === 'ghost' ? `${SIZE[size]} ${GHOST_PAD[size]}` : SIZE[size];
   const isLive = variant === 'live' || variant === 'join';
   // live/join は歴史的に常に pill 形状。それ以外は pill prop に従う。
   const radius = pill || isLive ? 'rounded-pill' : 'rounded-md';
@@ -140,7 +161,14 @@ export default function Button({
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={`${BASE} ${radius} ${VARIANT[variant]} ${pad} ${className}`.trim()}
+      // ⚠ **単純連結ではなく twMerge を通す（#137）。** 連結は class 属性の並びを変えるだけで、
+      // どちらが効くかは配布 CSS の生成順で決まるため、消費側が `className="text-accent"` と
+      // 書いても variant 側の `text-info` に負けていた（消費側は毎回 `text-accent!` で回避していた）。
+      // twMerge は同じ CSS プロパティのユーティリティを後勝ちで1つに畳むので、
+      // **後ろに置いた className が必ず勝つ**。並び順がそのまま優先順位になる:
+      //   BASE（最弱） < radius < VARIANT < pad < className（最強）。
+      // 設定と経緯は ../lib/tw-merge.ts。
+      className={twMerge(BASE, radius, VARIANT[variant], pad, className)}
       {...rest}
     >
       {showDot && <span className="h-2 w-2 rounded-pill bg-white" aria-hidden="true" />}

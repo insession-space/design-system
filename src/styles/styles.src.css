@@ -54,3 +54,13 @@
 @source "../components/*.tsx";
 @source "../icons/*.tsx";
 @source "../ui-kit/*.tsx";
+
+/* ⚠ **明示した @source だけでは走査対象は閉じない。** Tailwind CLI はリポジトリ配下を自動でも
+ * 走査するため、上の3つ以外のファイル（stories/ .storybook/ scripts/ …）に書かれた
+ * 「クラス名に見える文字列」まで拾って配布 CSS に載る。実測では `@source not` で
+ * stories/ scripts/ .storybook/ を閉じると dist/styles.css が 85KB → 75KB まで減った
+ * （= 約 10KB は DS のコンポーネントが使っていないクラス）。
+ * ⚠ **ここを閉じるのは別 Issue で扱うこと。** loophub はこの1枚を読むだけで Tailwind を
+ * 持たないので、**DS が配ったクラスしか使えない**。偶然載っていたクラス（mb-4 / max-w-md …）に
+ * 消費側が依存している可能性があり、閉じると「ビルドは緑のままスタイルだけが消える」。
+ * 消費側の実使用を数えてからでないと安全に閉じられない。 */

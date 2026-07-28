@@ -39,7 +39,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org"
   },
-  "//scripts": "build は js/d.ts(tsup) と配布 CSS(Tailwind CLI) の2本立て。build:css は minify しない — dist を @source で走査する従来方式の消費側がまだ居るため、クラス名の文字列リテラルを壊さない。check:styles は「DOM に出るのに CSS が無い」欠損を検出する回帰ネット。",
+  "//scripts": "build は js/d.ts(tsup) と配布 CSS(Tailwind CLI) の2本立て。build:css は minify しない — dist を @source で走査する従来方式の消費側がまだ居るため、クラス名の文字列リテラルを壊さない。check:styles は「DOM に出るのに CSS が無い」欠損を検出する回帰ネット。check:tw-merge は DS のカスタムトークンが tailwind-merge にどう分類されるかを実測する（誤分類は型検査もビルドも緑のまま消費側の見た目だけを壊す）。",
   "//verify": "verify / verify:full が『CI と同じ判定』の単一ソース。CI(.github/workflows/ci.yml)はこの2つを呼ぶだけで、個別チェックを列挙しない — 列挙すると package.json 側と静かに乖離するため。verify は手元の反復用に速い決定論チェックだけ(数十秒)、verify:full は verify + カタログのビルド + 全 story への axe。PR 前は verify:full を通す。",
   "scripts": {
     "build": "pnpm build:js && pnpm build:css",
@@ -48,10 +48,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "check": "biome check .",
     "check:styles": "node scripts/check-styles.mjs",
+    "check:tw-merge": "node scripts/check-tw-merge.mjs",
     "check:typography": "node scripts/check-typography.mjs",
     "check:stories": "node scripts/check-stories.mjs",
     "check:package": "node scripts/check-package.mjs",
-    "verify": "pnpm typecheck && pnpm check && pnpm check:typography && pnpm check:stories && pnpm check:border-width && pnpm build && pnpm check:styles && pnpm check:package",
+    "verify": "pnpm typecheck && pnpm check && pnpm check:typography && pnpm check:stories && pnpm check:border-width && pnpm check:tw-merge && pnpm build && pnpm check:styles && pnpm check:package",
     "verify:full": "pnpm verify && pnpm build-storybook && pnpm test:a11y",
     "test:a11y": "pnpm build:css && vitest run --project=storybook",
     "format": "biome format --write .",
@@ -95,6 +96,7 @@
   },
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
-    "@base-ui/react": "1.6.0"
+    "@base-ui/react": "1.6.0",
+    "tailwind-merge": "^3.6.0"
   }
 }
