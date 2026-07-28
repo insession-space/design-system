@@ -53,7 +53,7 @@
     "check:package": "node scripts/check-package.mjs",
     "verify": "pnpm typecheck && pnpm check && pnpm check:typography && pnpm check:stories && pnpm build && pnpm check:styles && pnpm check:package",
     "verify:full": "pnpm verify && pnpm build-storybook && pnpm test:a11y",
-    "test:a11y": "vitest run --project=storybook",
+    "test:a11y": "pnpm build:css && vitest run --project=storybook",
     "format": "biome format --write .",
     "storybook": "pnpm build:css && storybook dev -p 6006",
     "build-storybook": "pnpm build:css && storybook build -o storybook-static",

@@ -1,7 +1,12 @@
 name: CI
 
 # 決定論的な検証チャネル（モデルのトークンを使わずに壊れを検出する）。
-# 優先度は 型検査(tsc) > バグ検出 lint > フォーマット。加えて配布物が壊れていないかを見る。
+#
+# ⚠ ここに個別のチェックを列挙しないこと。検査の中身は package.json の `verify` /
+# `verify:full` が単一ソースで、この workflow はそれを呼ぶだけにしてある。列挙すると
+# 「CI では走るが手元の pnpm verify では走らない」チェックが静かに生まれ、PR 前の確認が
+# CI と一致しなくなる（横断ルールが `pnpm verify` を CI と同じチャネルと定めている理由）。
+# 検査を足したいときは package.json 側の verify / verify:full に足す。
 on:
   push:
     branches: [main]
@@ -26,55 +31,12 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: pnpm typecheck
+      # 全 story への axe は実ブラウザ（Playwright の Chromium）で走る。
+      # --with-deps は ubuntu-latest に足りない共有ライブラリを入れるために必要。
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
 
-      - name: Lint & format check
-        run: pnpm check
-
-      # タイポグラフィがスケールから逸脱していないこと。廃止した段・font-size の任意値・
-      # CSS への直書きは、型検査もビルドも lint も緑のまま通るため、ここでしか止まらない
-      # （詳細は scripts/check-typography.mjs）。ソースだけを見るのでビルド前に走らせる。
-      - name: Verify typography scale
-        run: pnpm check:typography
-
-      # 配布物（js + d.ts + 配布 CSS）が生成できること。
-      - name: Build dist
-        run: pnpm build
-
-      # 配布 CSS がコンポーネントの参照を満たしていること。
-      # 「クラス名は DOM に出るのに CSS が無い」という、型検査もビルドも lint も緑のまま
-      # 通ってしまう欠損を検出する唯一のチャネル（詳細は scripts/check-styles.mjs）。
-      - name: Verify distributed CSS
-        run: pnpm check:styles
-
-      # publish される中身が意図どおりか（dist と CSS 群が入っているか）を検証する。
-      # ここが崩れると「publish は成功したのに消費側で解決できない」が起きる。
-      - name: Verify package contents
-        run: |
-          npm pack --dry-run --json > /tmp/pack.json
-          node -e '
-            const files = require("/tmp/pack.json")[0].files.map((f) => f.path);
-            const required = [
-              "dist/index.js",
-              "dist/index.d.ts",
-              "dist/styles.css",
-              "src/styles/theme.css",
-              "src/styles/base.css",
-              "src/styles/components.css",
-              "package.json",
-              // 公開パッケージなのでライセンス本文の同梱は必須。
-              "LICENSE",
-            ];
-            const missing = required.filter((f) => !files.includes(f));
-            if (missing.length) {
-              console.error("同梱されていないファイル:", missing.join(", "));
-              console.error("実際の中身:\n" + files.join("\n"));
-              process.exit(1);
-            }
-            console.log("package contents OK (" + files.length + " files)");
-          '
-
-      # カタログがビルドできること（stories がプリミティブと乖離していないかの検出も兼ねる）。
-      - name: Build Storybook
-        run: pnpm build-storybook
+      # 型検査 / lint / タイポグラフィ / ビルド / 配布 CSS / パッケージ内容 /
+      # カタログ網羅 / カタログのビルド / 全 story への axe。中身は package.json を見ること。
+      - name: Verify
+        run: pnpm verify:full

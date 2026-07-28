@@ -12,27 +12,45 @@ import { defineConfig } from 'vitest/config';
 //
 // story 側に手を入れずに全件へ axe が掛かるのは .storybook/preview.tsx の
 // `a11y: { test: 'error' }` による。個別抑制はその story の parameters で行う。
+//
+// ⚠ storybookTest は **test.projects の中** で使うこと。ルート直下の test に browser 設定を
+// 直接書くと、setupFiles がルート相対ではなく絶対パスの URL として配られ、全 story が
+// "Failed to fetch dynamically imported module" で落ちる。
 export default defineConfig({
-  plugins: [
-    tailwindcss(),
-    storybookTest({ configDir: fileURLToPath(new URL('.storybook', import.meta.url)) }),
-  ],
-  resolve: {
-    // stories は消費側と同じくパッケージ名で import する。dist ではなくソースへ向ける
-    // （.storybook/main.ts の viteFinal と同じ対応。二重管理だが、vitest はそちらを通らない）。
-    alias: {
-      '@insession/design-system': fileURLToPath(new URL('src/index.ts', import.meta.url)),
-    },
-  },
   test: {
-    name: 'storybook',
-    browser: {
-      enabled: true,
-      headless: true,
-      provider: playwright(),
-      instances: [{ browser: 'chromium' }],
-    },
-    // preview.tsx の注釈を story に適用する。addon の自動適用はこの構成では動かない
-    // （理由は .storybook/vitest.setup.ts の冒頭コメント）。
+    projects: [
+      {
+        extends: true,
+        plugins: [
+          tailwindcss(),
+          storybookTest({ configDir: fileURLToPath(new URL('.storybook', import.meta.url)) }),
+        ],
+        // 事前バンドルの対象に入れておかないと、最初の story が読み込んだ時点で
+        // 「optimized dependencies changed. reloading」が起きてテストが落ちる。
+        // 手元はキャッシュが温まると再現しなくなるが、CI は毎回キャッシュが空なので必ず踏む。
+        optimizeDeps: { include: ['@storybook/addon-a11y/preview'] },
+        resolve: {
+          // stories は消費側と同じくパッケージ名で import する。dist は開発中に存在しない
+          // ため自己参照をソースへ向ける（.storybook/main.ts の viteFinal と同じ対応。
+          // vitest はそちらを通らないので、ここにも要る）。
+          alias: {
+            '@insession/design-system': fileURLToPath(new URL('src/index.ts', import.meta.url)),
+          },
+        },
+        test: {
+          name: 'storybook',
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+          // preview.tsx の注釈（テーマ decorator・a11y: test:'error'）を story に適用する。
+          // このファイルは configDir 直下に置き "setProjectAnnotations" を含む必要がある
+          // — addon はその2条件で自前の setup ファイルの自動注入をやめる判定をする。
+          setupFiles: ['.storybook/vitest.setup.ts'],
+        },
+      },
+    ],
   },
 });

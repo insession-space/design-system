@@ -17,6 +17,11 @@ export type RingTimerProps = {
   urgentThreshold?: number;
   // 数字の下に出す小さい説明文言(i18n は持たないため注入。例「のこり秒」)。
   caption?: string;
+  // progressbar のアクセシブルな名前。role="progressbar" は名前が無いと
+  // 「何の進捗なのか」が支援技術に伝わらない(axe: aria-progressbar-name)。
+  // 省略時は caption を名前として使い、caption も無ければ既定の日本語を当てる
+  // — aria-valuetext が既に同じ理由で日本語を持っているので、それに揃える。
+  ariaLabel?: string;
   className?: string;
 };
 
@@ -26,6 +31,7 @@ export default function RingTimer({
   size = 118,
   urgentThreshold = 10,
   caption,
+  ariaLabel,
   className = '',
 }: RingTimerProps) {
   const urgent = secondsLeft <= urgentThreshold;
@@ -63,6 +69,7 @@ export default function RingTimer({
       value={Math.max(0, Math.round(secondsLeft))}
       min={0}
       max={Math.max(0, Math.round(totalSeconds))}
+      aria-label={ariaLabel ?? caption ?? '残り時間'}
       aria-valuetext={
         caption
           ? `${Math.max(0, Math.round(secondsLeft))} ${caption}`

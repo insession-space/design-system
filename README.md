@@ -458,7 +458,21 @@ pnpm typecheck
 pnpm check          # Biome lint + format
 pnpm check:styles   # 配布 CSS がコンポーネントの参照を満たしているか（要 pnpm build）
 pnpm check:typography  # タイポグラフィがスケールから逸脱していないか（ソースだけを見るのでビルド不要）
+pnpm check:stories  # public export したコンポーネントがカタログに載っているか
+pnpm check:package  # publish される tarball の中身が意図どおりか（要 pnpm build）
+pnpm test:a11y      # 全 story を実ブラウザで描画して axe を掛ける
 ```
+
+### `pnpm verify` — PR 前に緑にするコマンド
+
+**PR を出す前に `pnpm verify:full` を通すこと。これが CI と同じ判定**で、CI（`.github/workflows/ci.yml`）は個別のチェックを列挙せずこのスクリプトを呼ぶだけにしてある。列挙すると「CI では走るが手元では走らない」チェックが静かに生まれ、手元の確認が CI と一致しなくなるため。検査を足すときは `package.json` の `verify` / `verify:full` に足す。
+
+| コマンド | 中身 | 用途 |
+| --- | --- | --- |
+| `pnpm verify` | typecheck → check → check:typography → check:stories → build → check:styles → check:package | 手元の反復用。実ブラウザを起動しないので速い |
+| `pnpm verify:full` | `verify` + build-storybook + test:a11y | **CI と同一**。PR 前とマージ前はこちら |
+
+`test:a11y` は Playwright の Chromium を使う。初回だけ `pnpm exec playwright install chromium` が要る。
 
 ### `pnpm check:styles` が守っているもの
 
