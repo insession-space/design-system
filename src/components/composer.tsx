@@ -127,7 +127,7 @@ export default function Composer({
     <form
       onSubmit={handleFormSubmit}
       className={`flex flex-col rounded-card border border-solid bg-surface transition-[border-color,box-shadow] duration-(--dur-fast) ${
-        flash ? 'border-mint shadow-focus' : 'border-border'
+        flash ? 'border-accent shadow-focus' : 'border-border'
       } ${className}`.trim()}
     >
       <textarea
@@ -150,8 +150,8 @@ export default function Composer({
           title={sendLabel}
           disabled={!canSubmit}
           className={`inline-flex shrink-0 cursor-pointer items-center justify-center rounded-pill border-none bg-transparent p-0 transition-colors duration-(--dur-fast) ${btnSize} ${
-            canSubmit ? 'text-mint-soft' : 'text-text-dim'
-          } enabled:hover:bg-tint-5 enabled:hover:text-mint-soft disabled:cursor-not-allowed disabled:opacity-35`}
+            canSubmit ? 'text-accent-soft' : 'text-text-dim'
+          } enabled:hover:bg-tint-5 enabled:hover:text-accent-soft disabled:cursor-not-allowed disabled:opacity-35`}
         >
           <Icon name="send" size={iconSize} />
         </button>

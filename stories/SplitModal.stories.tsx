@@ -53,7 +53,7 @@ function SplitModalDemo({ openLabel, asSheet }: { openLabel: string; asSheet?: b
         >
           <div className="flex items-center justify-between rounded-card border border-solid border-border bg-tint-5 px-4 py-3">
             <span className="text-base font-semibold text-text">有効にする</span>
-            <span className="rounded-pill bg-tint-8 border border-solid border-border px-3 py-1 text-sm text-mint-soft">
+            <span className="rounded-pill bg-tint-8 border border-solid border-border px-3 py-1 text-sm text-accent-soft">
               ON
             </span>
           </div>

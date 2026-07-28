@@ -25,7 +25,7 @@ export default function Spinner({ size = 16, thickness, label, className = '' }:
         width: size,
         height: size,
         borderWidth: border,
-        borderTopColor: 'var(--color-mint)',
+        borderTopColor: 'var(--color-accent)',
       }}
     />
   );
