@@ -165,7 +165,7 @@ function resolveTargetUrls(urls: string[], max: number): string[] {
 // アクション群は既定で隠し、ホバー/フォーカス時だけ見せる。group-focus-within を必ず
 // 併記することで、キーボードで tab 移動してきたときも見える(#83 受け入れ条件)。
 const ACTIONS_VISIBILITY =
-  'opacity-0 transition-opacity duration-(--dur-fast) group-hover:opacity-100 group-focus-within:opacity-100';
+  'opacity-0 transition-opacity motion-reduce:transition-none duration-(--dur-fast) group-hover:opacity-100 group-focus-within:opacity-100';
 
 // ── リアクションピル(#103) ─────────────────────────────
 // Chip ではなく専用の button で描く。Chip の既定は「クイック返信/フィルター/タグ」向けの
@@ -177,7 +177,7 @@ const ACTIONS_VISIBILITY =
 // 「生成CSSで後に来た方」が勝つため、上書きが効くかがビルド順に依存してしまう。Chip 本体
 // (＝フィルター/タグ/入力トークンとしての見た目)は変えられないので、ここで閉じる。
 const REACTION_BASE =
-  'inline-flex items-center gap-1 rounded-pill border border-solid px-2 py-1 cursor-pointer select-none transition-colors duration-(--dur-fast)';
+  'inline-flex items-center gap-1 rounded-pill border border-solid px-2 py-1 cursor-pointer select-none transition-colors motion-reduce:transition-none duration-(--dur-fast)';
 const REACTION_DEFAULT = 'bg-surface-2 border-border-strong enabled:hover:bg-surface-hover';
 // 押している状態は「面」ではなく accent の枠で示す。tint の面を敷くと、その上に載る数字が
 // どの色でも同系色に寄って読みづらくなるため(#103)。数字は常に text 色なのでコントラストは

@@ -81,7 +81,7 @@ const ROW =
 // 押せるときだけ足す（表示専用の行に cursor / hover を出すと押せると誤解させる。
 // user-label.tsx の INTERACTIVE と同じ考え方）。
 const ROW_INTERACTIVE =
-  'cursor-pointer transition-colors duration-(--dur-fast) hover:bg-surface-hover hover:shadow-none active:scale-100 focus-visible:shadow-focus focus-visible:outline-none';
+  'cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:bg-surface-hover hover:shadow-none active:scale-100 focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 
 const AFFORDANCE = 'shrink-0 text-text-faint';
 const AFFORDANCE_ICON_SIZE = 16;

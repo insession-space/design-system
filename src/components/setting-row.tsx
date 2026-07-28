@@ -70,7 +70,7 @@ const ROW = 'flex w-full items-center gap-3 py-2 font-body';
 // 対話的にしたときだけ左側へ当てる打ち消し + 状態表現。素の `<button>` / `<a>` の既定
 // （塗り・padding・下線・中央揃え）を消し、面はホバーでだけ出す。
 const INTERACTIVE =
-  'min-w-0 flex-1 rounded-md border-none bg-transparent p-0 text-left no-underline transition-colors duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-none';
+  'min-w-0 flex-1 rounded-md border-none bg-transparent p-0 text-left no-underline transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 // ⚠ hover の面は disabled のときに出さない。薄いのに反応する見た目は押せると誤解させる。
 const INTERACTIVE_ENABLED = 'cursor-pointer hover:bg-surface-hover';
 const INTERACTIVE_DISABLED = 'cursor-not-allowed opacity-(--disabled-opacity)';

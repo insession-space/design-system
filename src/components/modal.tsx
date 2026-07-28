@@ -73,7 +73,7 @@ function Backdrop({ className = '', ...props }: ModalBackdropProps) {
 const LEGACY_POPUP_CLASS = 'modal';
 // DS 構造の本体クラス。旧 modal.tsx の DS ブランチのクラス文字列をそのまま流用。
 const DS_POPUP_CLASS =
-  'relative flex w-full flex-col overflow-hidden rounded-card border border-solid border-border bg-surface shadow-overlay animate-[card-in_0.4s_var(--ease-spring)_both]';
+  'relative flex w-full flex-col overflow-hidden rounded-card border border-solid border-border bg-surface shadow-overlay animate-[card-in_0.4s_var(--ease-spring)_both] motion-reduce:animate-none';
 // Popup を中央寄せする位置決めコンテナ。旧実装は .modal-backdrop 自身が
 // display:flex;align-items:center;justify-content:center;padding:20px で Popup(子要素) を中央に
 // 置いていたが、Base UI では Backdrop と Popup が兄弟になるため、その役目は Dialog.Viewport が担う

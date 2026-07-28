@@ -124,9 +124,14 @@ export default function Composer({
   const btnSize = size === 'compact' ? 'h-6.5 w-6.5' : 'h-7.5 w-7.5';
 
   return (
+    // フォーカスリングは **器（form）側** に出す。中の textarea は枠も背景も持たない素の入力なので、
+    // そこへリングを出すと入力欄の内側に矩形が浮いて見た目が壊れる（Input / Textarea が枠色の変化を
+    // 器側に出しているのと同じ考え方）。
+    // ⚠ focus-within は疑似クラスのぶん詳細度が一段高いので、flash 側の枠色指定に勝つ。フラッシュ中に
+    // フォーカスが来た場合はフォーカス表示が優先される（意図どおり）。
     <form
       onSubmit={handleFormSubmit}
-      className={`flex flex-col rounded-card border border-solid bg-surface transition-[border-color,box-shadow] duration-(--dur-fast) ${
+      className={`flex flex-col rounded-card border border-solid bg-surface transition-[border-color,box-shadow] motion-reduce:transition-none duration-(--dur-fast) focus-within:outline-(length:--focus-ring-width) focus-within:outline-offset-(--focus-ring-offset) focus-within:outline-focus-ring ${
         flash ? 'border-accent shadow-focus' : 'border-border'
       } ${className}`.trim()}
     >
@@ -149,9 +154,9 @@ export default function Composer({
           aria-label={sendLabel}
           title={sendLabel}
           disabled={!canSubmit}
-          className={`inline-flex shrink-0 cursor-pointer items-center justify-center rounded-pill border-none bg-transparent p-0 transition-colors duration-(--dur-fast) ${btnSize} ${
+          className={`inline-flex shrink-0 cursor-pointer items-center justify-center rounded-pill border-none bg-transparent p-0 transition-colors motion-reduce:transition-none duration-(--dur-fast) ${btnSize} ${
             canSubmit ? 'text-accent-soft' : 'text-text-dim'
-          } enabled:hover:bg-tint-5 enabled:hover:text-accent-soft disabled:cursor-not-allowed disabled:opacity-35`}
+          } enabled:hover:bg-tint-5 enabled:hover:text-accent-soft disabled:cursor-not-allowed disabled:forced-colors:text-[color:GrayText] disabled:opacity-35 focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring`}
         >
           <Icon name="send" size={iconSize} />
         </button>

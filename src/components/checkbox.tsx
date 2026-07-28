@@ -41,7 +41,7 @@ export type CheckboxProps = Omit<
 // 描画するのは `<span role="checkbox">` で、CSS の :disabled 疑似クラスはフォーム要素にしか
 // 適用されないため効かない（toggle.tsx / menu.tsx と同じ理由）。
 const BOX =
-  'grid h-[22px] w-[22px] place-items-center rounded-chip border-2 border-solid p-0 transition-colors focus-visible:shadow-focus focus-visible:outline-none';
+  'grid h-[22px] w-[22px] place-items-center rounded-chip border-2 border-solid p-0 transition-colors motion-reduce:transition-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 
 // disabled の見た目（薄く + not-allowed）は box だけでなく **ラベルを含む行全体** に効かせる。
 // has-[[data-disabled]] にしているのは、disabled が親から降ってくる経路があるため
@@ -69,7 +69,7 @@ export default function Checkbox({ label, className = '', disabled, ...rest }: C
         className={(state) =>
           `${BOX} ${
             state.checked
-              ? 'border-fill bg-fill text-on-fill'
+              ? 'border-fill bg-fill text-on-fill forced-colors:border-[Highlight] forced-colors:text-[color:Highlight]'
               : 'border-border-strong bg-transparent text-transparent'
           }`
         }

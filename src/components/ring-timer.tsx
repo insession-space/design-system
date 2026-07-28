@@ -5,9 +5,14 @@ import type { CSSProperties } from 'react';
 // secondsLeft/totalSeconds を毎フレーム渡すだけの純粋表示部品(リレーゲーム等の残り時間表示 #974)。
 // conic-gradient + mask でリングを描き(mask の #000 はアルファ用のクリップ指定でありトークン違反ではない)、
 // 中央に残り秒数 + caption(i18n は持たないため注入)を重ねる。urgent(secondsLeft <= urgentThreshold)
-// では accent 色へ切り替え、ゆっくり脈動させる。脈動の keyframes は insession-app の apps/web/src/style.css に定義
-// (このパッケージ自体は keyframes を持たない既存流儀。badge.tsx の pop-in / modal.tsx の card-in と同じ)。
-// prefers-reduced-motion は同ファイル末尾のグローバルルールで自動的に止まる(spinner.tsx と同じ扱い)。
+// では accent 色へ切り替え、ゆっくり脈動させる。脈動の keyframes は components.css が持つ
+// (badge.tsx の pop-in / modal.tsx の card-in と同じ。かつては insession-app 側にしか定義が無く
+// パッケージ単体で完成しなかったが、移植済み)。
+//
+// ⚠ prefers-reduced-motion の抑制はクラス文字列に併記する(#121)。以前ここには「消費側 style.css
+// 末尾のグローバルルールで自動的に止まる」と書かれていたが、その規則は DS の配布 CSS に無く、
+// **無限に脈動し続ける**状態が loophub と DS 単体で残っていた。しかも urgent は残り時間が
+// 少ないときの表示なので、止まらないことの影響が大きい。
 export type RingTimerProps = {
   secondsLeft: number;
   totalSeconds: number;
@@ -45,7 +50,9 @@ export default function RingTimer({
 
   const wrapperClass = [
     'relative inline-flex shrink-0 items-center justify-center rounded-pill',
-    urgent ? 'animate-[ring-timer-urgent-pulse_1s_ease-in-out_infinite]' : '',
+    urgent
+      ? 'animate-[ring-timer-urgent-pulse_1s_ease-in-out_infinite] motion-reduce:animate-none'
+      : '',
     className,
   ]
     .filter(Boolean)

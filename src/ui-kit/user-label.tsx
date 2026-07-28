@@ -111,7 +111,7 @@ export type UserLabelProps = {
 // (塗り・padding・下線・色)を消し、面はホバーでだけ出す。行そのものが押せることを
 // 示すため cursor と focus リングをここで持つ(消費側で毎回書かせない)。
 const INTERACTIVE =
-  'w-full rounded-md border-none bg-transparent p-0 text-left no-underline transition-colors duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-none';
+  'w-full rounded-md border-none bg-transparent p-0 text-left no-underline transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 const INTERACTIVE_ENABLED = 'cursor-pointer hover:bg-surface-hover';
 // ⚠ hover の面は disabled のときに出さない。薄いのに反応する見た目は押せると誤解させる
 // (list-row.tsx が持っていた注意点をここへ引き継ぐ)。

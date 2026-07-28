@@ -56,7 +56,7 @@ const GROUP_SECONDARY = `${GROUP} mt-auto border-0 border-t border-solid border-
 // active:scale-100 / hover:shadow-none は、プリフライトを配らない DS で <button> に露出する
 // 消費側の legacy な button:hover/:active（glow + scale）を打ち消すため（Tabs と同じ手当て）。
 const ITEM =
-  'group flex w-full cursor-pointer items-center gap-[11px] rounded-md border border-solid border-transparent bg-transparent px-[13px] py-[11px] text-left text-base no-underline shadow-none transition-[background-color,border-color,color] duration-(--dur-fast) hover:bg-surface-hover hover:text-text hover:shadow-none active:scale-100 data-active:border-border data-active:bg-surface-3 data-active:font-bold data-active:text-text';
+  'group flex w-full cursor-pointer items-center gap-[11px] rounded-md border border-solid border-transparent bg-transparent px-[13px] py-[11px] text-left text-base no-underline shadow-none transition-[background-color,border-color,color] motion-reduce:transition-none duration-(--dur-fast) hover:bg-surface-hover hover:text-text hover:shadow-none active:scale-100 data-active:border-border data-active:bg-surface-3 data-active:font-bold data-active:text-text';
 // 主導線は text-dim、副次リンク（ガイド / ヘルプ / リリースノート等）は一段弱い text-faint。
 // Group の secondary から Context 越しに継ぐので、Item 1つ1つに指定させない。
 const ITEM_VARIANT = {

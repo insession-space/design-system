@@ -46,8 +46,9 @@ export type RadioItemProps = Omit<
 };
 
 const CIRCLE =
-  'grid h-[22px] w-[22px] place-items-center rounded-pill border-2 border-solid bg-transparent p-0 transition-colors focus-visible:shadow-focus focus-visible:outline-none';
-const DOT = 'h-2.5 w-2.5 rounded-pill bg-accent transition-transform duration-(--dur-fast)';
+  'grid h-[22px] w-[22px] place-items-center rounded-pill border-2 border-solid bg-transparent p-0 transition-colors motion-reduce:transition-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const DOT =
+  'h-2.5 w-2.5 rounded-pill bg-accent forced-colors:bg-[Highlight] transition-transform motion-reduce:transition-none duration-(--dur-fast)';
 
 // disabled の見た目は行全体（円 + ラベル）に効かせる。checkbox.tsx と同じ理由・同じ形。
 // ⚠ has-[[data-disabled]] にしているのが要点で、`<Radio.Group disabled>` のように
@@ -86,7 +87,7 @@ function RadioItem({ label, disabled, className = '', ...rest }: RadioItemProps)
         {/* Indicator は checked のときだけ描画される。移行前は常にドットを置いて
             scale-0 / scale-100 で出し入れしていたが、ドットは 22x22 の円の中央に
             absolute 相当（place-items-center）で載るだけなのでレイアウトは変わらない。
-            transition-transform は「出現時に scale が付く」表現を維持するために残す。 */}
+            transition-transform motion-reduce:transition-none は「出現時に scale が付く」表現を維持するために残す。 */}
         <BaseRadio.Indicator className={DOT} />
       </BaseRadio.Root>
       {label != null && <Field.Label className={LABEL}>{label}</Field.Label>}

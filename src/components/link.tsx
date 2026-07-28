@@ -38,10 +38,10 @@ export type LinkVariant = 'inline' | 'subtle' | 'pill' | 'wrapper' | 'bare';
 // 載らない値のみ（py-[7px] 等）。
 const VARIANT: Record<LinkVariant, string> = {
   inline:
-    'text-link font-semibold no-underline cursor-pointer transition-colors duration-(--dur-fast) hover:text-link-hover',
+    'text-link font-semibold no-underline cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:text-link-hover',
   subtle:
-    'text-link text-sm font-semibold no-underline cursor-pointer transition-colors duration-(--dur-fast) hover:text-link-hover',
-  pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-pill uppercase no-underline cursor-pointer transition-[background,color,transform] duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent hover:-translate-y-px',
+    'text-link text-sm font-semibold no-underline cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:text-link-hover',
+  pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-pill uppercase no-underline cursor-pointer transition-[background,color,transform] motion-reduce:transition-none duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent hover:-translate-y-px',
   wrapper: 'text-inherit no-underline cursor-pointer',
   bare: 'no-underline cursor-pointer',
 };

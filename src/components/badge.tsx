@@ -23,7 +23,7 @@ export function CountChip({ children, animated = false, className = '' }: CountC
   return (
     <span
       className={`inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 rounded-pill bg-success-surface-strong text-success text-xs font-extrabold tracking-normal${
-        animated ? ' animate-[pop-in_0.3s_var(--ease-spring)]' : ''
+        animated ? ' animate-[pop-in_0.3s_var(--ease-spring)] motion-reduce:animate-none' : ''
       } ${className}`.trim()}
     >
       {children}
