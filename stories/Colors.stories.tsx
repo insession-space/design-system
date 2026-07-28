@@ -19,7 +19,6 @@ export const Palette: Story = {
     >
       <Grid>
         <ColorSwatch varName="--color-accent" label="accent" />
-        <ColorSwatch varName="--color-accent-fill" label="accent-fill" />
         <ColorSwatch varName="--color-accent-soft" label="accent-soft" />
         <ColorSwatch varName="--color-accent-2" label="accent-2" />
         <ColorSwatch varName="--color-decor-1" label="decor-1" />
