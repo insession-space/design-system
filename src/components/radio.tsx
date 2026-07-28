@@ -46,7 +46,7 @@ export type RadioItemProps = Omit<
 };
 
 const CIRCLE =
-  'grid h-[22px] w-[22px] place-items-center rounded-pill border-2 border-solid bg-transparent p-0 transition-colors motion-reduce:transition-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+  'relative grid h-[22px] w-[22px] place-items-center rounded-pill before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] border-2 border-solid bg-transparent p-0 transition-colors motion-reduce:transition-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 const DOT =
   'h-2.5 w-2.5 rounded-pill bg-accent forced-colors:bg-[Highlight] transition-transform motion-reduce:transition-none duration-(--dur-fast)';
 
@@ -60,7 +60,7 @@ const DOT =
 // 描画するのは `<span role="radio">` で、CSS の :disabled 疑似クラスはフォーム要素にしか
 // 適用されないため効かない（toggle.tsx / checkbox.tsx と同じ）。
 const ROW =
-  'inline-flex select-none items-center gap-3 cursor-pointer has-[>[data-disabled]]:cursor-not-allowed has-[>[data-disabled]]:opacity-50';
+  'inline-flex select-none items-center gap-3 min-h-(--control-hit-size) pointer-coarse:min-h-(--control-touch-size) pointer-coarse:min-w-(--control-touch-size) cursor-pointer has-[>[data-disabled]]:cursor-not-allowed has-[>[data-disabled]]:opacity-50';
 
 // ラベルに cursor-[inherit] を当てる理由は checkbox.tsx のコメント参照
 // （<label> は行の cursor を継承しないため、明示しないと移行前の見た目から回帰する）。
@@ -81,7 +81,9 @@ function RadioItem({ label, disabled, className = '', ...rest }: RadioItemProps)
     <Field.Root disabled={disabled} className={`${ROW} ${className}`.trim()}>
       <BaseRadio.Root
         disabled={disabled}
-        className={(state) => `${CIRCLE} ${state.checked ? 'border-text' : 'border-border-strong'}`}
+        className={(state) =>
+          `${CIRCLE} ${state.checked ? 'border-text' : 'border-control-border'}`
+        }
         {...rest}
       >
         {/* Indicator は checked のときだけ描画される。移行前は常にドットを置いて

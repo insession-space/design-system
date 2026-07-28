@@ -34,7 +34,7 @@ export function CountChip({ children, animated = false, className = '' }: CountC
 const TONE: Record<BadgeTone, string> = {
   live: 'text-success bg-success-surface',
   warn: 'text-warning bg-warning-surface',
-  danger: 'text-accent bg-tint-12',
+  danger: 'text-accent-soft bg-tint-12',
   info: 'text-info bg-info-surface',
   neutral: 'text-text-dim bg-surface-3',
   pro: 'text-on-fill bg-fill',

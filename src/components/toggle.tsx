@@ -40,7 +40,7 @@ export type ToggleProps = Omit<
 // （実測で opacity:1 / cursor:pointer のままだった）。menu.tsx の Item も同じ理由で
 // data-disabled: を使っている。
 const TRACK =
-  'relative inline-flex h-[26px] w-[46px] shrink-0 items-center rounded-pill border border-solid border-transparent p-0 transition-colors motion-reduce:transition-none duration-(--dur-fast) cursor-pointer data-disabled:opacity-50 data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+  'relative inline-flex h-[26px] w-[46px] shrink-0 items-center rounded-pill before:absolute before:inset-x-0 before:top-1/2 before:-translate-y-1/2 before:h-(--control-hit-size) pointer-coarse:before:h-(--control-touch-size) before:content-[""] border border-solid border-transparent p-0 transition-colors motion-reduce:transition-none duration-(--dur-fast) cursor-pointer data-disabled:opacity-50 data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 const KNOB =
   'absolute top-[3px] h-5 w-5 rounded-pill bg-white shadow-[0_1px_2px_rgba(0,0,0,0.25)] transition-[left] motion-reduce:transition-none duration-(--dur-fast)';
 
