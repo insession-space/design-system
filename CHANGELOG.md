@@ -1,5 +1,11 @@
 # @insession/design-system
 
+## 7.1.2
+
+### Patch Changes
+
+- 12e5d06: SideNav: アクティブ行のアイコン色を `accent-soft` から `accent` へ揃える。常時表示されるナビだけ淡いサーモン（`#ffb199`）で、アプリ内の他のアクセント（`#ff6a47`）と食い違って見えていた。
+
 ## 7.1.1
 
 ### Patch Changes
