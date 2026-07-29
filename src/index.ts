@@ -49,6 +49,11 @@ export {
   type ConfirmTone,
   default as ConfirmModal,
 } from './components/confirm-modal.tsx';
+export {
+  type DrawerProps,
+  type DrawerSide,
+  default as Drawer,
+} from './components/drawer.tsx';
 export { default as EmptyNote, type EmptyNoteProps } from './components/empty-note.tsx';
 export {
   default as IconButton,
