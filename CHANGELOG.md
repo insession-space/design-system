@@ -1,5 +1,11 @@
 # @insession/design-system
 
+## 7.2.1
+
+### Patch Changes
+
+- daf5202: PageHeader の見出し(title)を text-h1(32px) から text-h2(22px) へ 1 段下げる。実画面で主張が強すぎたため。`--text-h1` のトークン値自体は変更していないので、`text-h1` を直接使っている箇所の見た目は変わらない。
+
 ## 7.2.0
 
 ### Minor Changes
