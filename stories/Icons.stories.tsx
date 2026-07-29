@@ -41,6 +41,8 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   account_circle: true,
   pause: true,
   fast_forward: true,
+  shuffle: true,
+  skip_next: true,
   videocam: true,
   videocam_off: true,
   mic: true,
