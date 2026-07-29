@@ -79,9 +79,14 @@ export type PageHeaderProps = {
 } & Omit<ComponentProps<'div'>, 'className' | 'title'>;
 
 // PageHeader: 画面見出しブロック。title/description は theme.css のセマンティック
-// タイポグラフィトークン(text-h1 = 見出し階層のうち画面タイトル相当、text-text-dim = 補足文の
+// タイポグラフィトークン(text-h2 = 見出し階層のうち画面タイトル相当、text-text-dim = 補足文の
 // 色)を当てるだけで DS の見た目になる。actions がある場合だけ右側に確保する
 // (無ければ HStack の justify="between" が効かず title 側が幅いっぱいを使う)。
+//
+// ⚠ title は h1 要素だが当てるトークンは text-h1 ではなく text-h2(22px)。text-h1(32px)は
+// 実画面では主張が強すぎたため、スケール上で1段下げている(#152)。要素の階層(h1)と
+// サイズトークンの段(h2)は独立しており、一致させる必要はない。--text-h1 の値自体は
+// 変えていない(消費側が text-h1 を直接使っている見出しを巻き添えにしないため)。
 export function PageHeader({
   title,
   description,
@@ -98,7 +103,7 @@ export function PageHeader({
       {...rest}
     >
       <VStack gap="xs" className="min-w-0">
-        <h1 className="text-h1 text-text">{title}</h1>
+        <h1 className="text-h2 text-text">{title}</h1>
         {description && <p className="text-body text-text-dim">{description}</p>}
       </VStack>
       {actions && <div className="shrink-0">{actions}</div>}
