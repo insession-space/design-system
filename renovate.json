@@ -1,0 +1,74 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "timezone": "Asia/Tokyo",
+  "schedule": ["before 9am on monday"],
+  "labels": ["dependencies"],
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 4,
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": ["before 9am on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "peerDependencies は Renovate に触らせない。これは『開発で入れる版』ではなく『消費側として受け入れ可能な幅』で、devDependencies 側の実バージョンに合わせて狭めると利用側の React 版を不必要に縛る",
+      "matchDepTypes": ["peerDependencies"],
+      "enabled": false
+    },
+    {
+      "description": "devDependencies の patch/minor は CI 緑なら自動マージ（dist に入らないので配布物に影響しない）",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true
+    },
+    {
+      "description": "ビルドツールは devDependency でも dist の中身を変えるので自動マージしない（消費側へそのまま出荷される）",
+      "matchPackageNames": [
+        "vite",
+        "tsup",
+        "typescript",
+        "tailwindcss",
+        "@tailwindcss/cli",
+        "@tailwindcss/vite"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "publish される dependencies は種類を問わず手動レビュー（automerge しない）",
+      "matchDepTypes": ["dependencies"],
+      "automerge": false
+    },
+    {
+      "description": "型定義 (@types/*) はまとめて更新（後続のより具体的なグループが上書きする）",
+      "groupName": "type definitions",
+      "matchPackageNames": ["@types/**"]
+    },
+    {
+      "description": "React 関連はまとめて更新（対応する @types も含む）。peerDependencies 側は上のルールで無効化してあるので devDependencies の実バージョンだけが動く",
+      "groupName": "react",
+      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"]
+    },
+    {
+      "description": "Storybook 本体とアドオンはバージョンを揃える必要があるのでまとめて更新",
+      "groupName": "storybook",
+      "matchPackageNames": ["storybook", "@storybook/**"]
+    },
+    {
+      "description": "Vite / Tailwind 関連はまとめて更新",
+      "groupName": "vite & tailwind",
+      "matchPackageNames": ["vite", "tailwindcss", "@tailwindcss/cli", "@tailwindcss/vite"]
+    },
+    {
+      "description": "lint / 静的解析ツールはまとめて更新",
+      "groupName": "lint & static analysis",
+      "matchPackageNames": ["@biomejs/biome"]
+    },
+    {
+      "description": "GitHub Actions はまとめて更新",
+      "groupName": "github-actions",
+      "matchManagers": ["github-actions"]
+    }
+  ]
+}
