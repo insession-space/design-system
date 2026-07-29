@@ -91,6 +91,8 @@ export type DrawerProps = {
   // 板の幅。CSS の length ならなんでも渡せる。既定は min(320px, 86vw)。
   // ⚠ 中身が自分で幅を持つ場合(DS の SideNav は w-[232px] 固定)は 'auto' を渡すこと。
   // 既定のままだと中身より板が広く、右側に空いた面が残る。
+  // ⚠ この値は inline style として当たるので、className に w-* ユーティリティを足しても
+  // **勝てない**。幅を変えたいときは className ではなくこの prop を使うこと。
   width?: string;
   // ダイアログの aria-label。中身に見出しが無い場合はこれが accessible name になる。
   ariaLabel?: string;
