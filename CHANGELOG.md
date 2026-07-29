@@ -1,5 +1,13 @@
 # @insession/design-system
 
+## 7.2.0
+
+### Minor Changes
+
+- 0bf9dff: Icon に `shuffle` / `skip_next` を追加した。
+
+  音楽プレーヤー風のトランスポート操作（ランダム再生・次を再生）をアイコンのみの丸ボタンで組めるようにするため（insession-app #1355）。既存の `play_arrow` / `pause` / `fast_forward` と同じ Material Symbols 由来の 24px path。
+
 ## 7.1.2
 
 ### Patch Changes
