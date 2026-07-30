@@ -122,6 +122,22 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   route: true,
   search_off: true,
   verified: true,
+  // 2 陣目(loophub-app #23)
+  code: true,
+  content_copy: true,
+  dark_mode: true,
+  error_outline: true,
+  folder: true,
+  groups: true,
+  how_to_vote: true,
+  hub: true,
+  light_mode: true,
+  menu_book: true,
+  publish: true,
+  rocket_launch: true,
+  sync: true,
+  tune: true,
+  visibility: true,
 };
 
 const ICON_NAMES = Object.keys(ICON_NAME_MAP) as IconName[];
