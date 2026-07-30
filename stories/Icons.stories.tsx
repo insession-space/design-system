@@ -111,6 +111,17 @@ const ICON_NAME_MAP: Record<IconName, true> = {
   save: true,
   push_pin: true,
   public: true,
+  // loophub の .mi(Material Symbols webfont)から引き取った 10 種(loophub-app #23)
+  arrow_back: true,
+  bolt: true,
+  build: true,
+  cloud_off: true,
+  error: true,
+  mail: true,
+  refresh: true,
+  route: true,
+  search_off: true,
+  verified: true,
 };
 
 const ICON_NAMES = Object.keys(ICON_NAME_MAP) as IconName[];
