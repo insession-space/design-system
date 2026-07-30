@@ -55,6 +55,7 @@ export {
   default as Drawer,
 } from './components/drawer.tsx';
 export { default as EmptyNote, type EmptyNoteProps } from './components/empty-note.tsx';
+export { default as EmptyState, type EmptyStateProps } from './components/empty-state.tsx';
 export {
   default as IconButton,
   type IconButtonProps,
