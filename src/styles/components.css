@@ -173,11 +173,15 @@
     height: 94dvh;
   }
 
+  /* ハンドル行。padding は 38px の行高（10+5+6=21px → 16+5+17=38px）を作るための値で、
+     ここに閉じるボタン（30px）が収まる。⚠ 21px のままだと 30px の × が行を突き抜けて
+     本文の上に浮き、シートの角丸コーナーと消費側のヘッダー行に重なる（実測で
+     top:8px..44px と、21px の行を 23px 超過していた）。 */
   .bottom-sheet-handle-area {
     display: flex;
     justify-content: center;
     flex-shrink: 0;
-    padding: 10px 0 6px;
+    padding: 16px 0 17px;
     cursor: grab;
     touch-action: none;
   }
@@ -194,30 +198,46 @@
      padding: 0 の 36px 角丸ボックスに flex 指定が無く、グリフが左上に寄っていた（モバイル
      専用の導線なので露見しにくい状態だった）。既存の消費側 insession-app は自分の legacy CSS で
      描画を続けるため、この修正の影響を受けるのは新しい消費側だけ。 */
+  /* ハンドル行(38px)の中に収める。面は surface-3 + 細ボーダーにして、シートの地から
+     1段だけ持ち上げる（控えめ・洗練の方針。派手な塗りにはしない）。
+     ⚠ 見た目は 30px だが、当たり判定は下の ::after で 44px へ広げてある。 */
   .bottom-sheet-close {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 36px;
-    height: 36px;
+    top: 4px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    border: 1px solid transparent;
+    border: 1px solid var(--color-border);
     border-radius: 50%;
-    background: var(--color-surface);
+    background: var(--color-surface-3);
     color: var(--color-text-dim);
     font-family: var(--font-body);
     /* typography-scale-exempt: 上の .modal-close と同じ理由(#117)。「×」グリフの寸法。 */
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 500;
     line-height: 1;
     cursor: pointer;
     box-shadow: none;
     transition:
       background 0.18s ease,
       color 0.18s ease;
+  }
+
+  /* 当たり判定を 44px 角へ広げる（見た目は 30px のまま）。モバイル専用の導線なので
+     指で押せる大きさが要る。ハンドルは行の中央・幅38pxなので、右端 10px のこの領域とは
+     重ならず、Drawer.SwipeArea のスワイプ検出を奪わない。 */
+  .bottom-sheet-close::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
   }
 
   .bottom-sheet-close:hover {
