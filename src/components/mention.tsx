@@ -320,7 +320,18 @@ export default function Mention({
         {/* anchor は入力欄そのもの。キャレット位置に厳密に合わせる方式（mirror div で
             文字位置を実測する）は採らない — textarea のスタイルを完全に複製する必要があり
             壊れやすいうえ、実際のチャット UI は入力欄の上端に固定で出す方が視線移動が少ない。 */}
-        <Popover.Positioner anchor={anchor ?? inputRef} side={side} align={align} mobileSheet>
+        {/* ⚠ z-index は **inline style** で当てる。Positioner の className には
+            POPOVER_POSITIONER_BASE の z-[var(--z-popover-portal)] が既に入っており、同一
+            プロパティのユーティリティは className の並び順ではなく配布 CSS の出力順で勝敗が
+            決まるため、クラスで上書きしても効かない(popover.tsx の #21 のコメント参照)。
+            modal.tsx / bottom-sheet.tsx が同じ理由で inline style を使っている。 */}
+        <Popover.Positioner
+          anchor={anchor ?? inputRef}
+          side={side}
+          align={align}
+          mobileSheet
+          style={{ zIndex: 'var(--z-mention, 110)' }}
+        >
           <Popover.Popup
             // 既定の p-3 は行の左右 padding と二重になるので出さず、行の外周だけ p-1 にする。
             padding={false}
