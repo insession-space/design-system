@@ -123,19 +123,26 @@ export default function SplitModal({
 
   const current = items.find((it) => it.id === value);
 
-  const closeButton = closeLabel ? (
-    <button
-      type="button"
-      aria-label={closeLabel}
-      title={closeLabel}
-      onClick={onClose}
-      // legacy の button ベーススタイルが左右 padding を持つため p-0 で潰す。潰さないと
-      // ボタンが横に広がったうえ、フレックス収縮でアイコンの svg が幅0になり見えなくなる。
-      className="inline-flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-chip border-none bg-transparent p-0 text-text-dim cursor-pointer [&>svg]:shrink-0 enabled:hover:bg-surface-hover enabled:hover:text-text"
-    >
-      <Icon name="close" size={19} />
-    </button>
-  ) : null;
+  // ⚠ asSheet のときは自前の × を描かない。外殻の BottomSheet が同じ closeLabel を受け取って
+  // 自分の閉じるボタン（.bottom-sheet-close）を出すため、両方描くと **× が2つ並ぶ**
+  // （実測: シート右上に 36px の × が浮き、その 25px 下のヘッダー行に 30px の × が出る）。
+  // closeLabel はシート側へ渡す前提だという意図が下の asSheet 分岐のコメントにあるが、
+  // ここで closeButton を止めていなかったため狭幅ヘッダー(list / detail)と paneHead に
+  // 二重に出ていた。閉じる手段はシート側の × ・下スワイプ・背景タップとして残る。
+  const closeButton =
+    closeLabel && !asSheet ? (
+      <button
+        type="button"
+        aria-label={closeLabel}
+        title={closeLabel}
+        onClick={onClose}
+        // legacy の button ベーススタイルが左右 padding を持つため p-0 で潰す。潰さないと
+        // ボタンが横に広がったうえ、フレックス収縮でアイコンの svg が幅0になり見えなくなる。
+        className="inline-flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-chip border-none bg-transparent p-0 text-text-dim cursor-pointer [&>svg]:shrink-0 enabled:hover:bg-surface-hover enabled:hover:text-text"
+      >
+        <Icon name="close" size={19} />
+      </button>
+    ) : null;
 
   // 右ペインの見出し行（DS の sm-head）。title を渡さない消費側でも × は要るので、
   // その場合は×だけの右寄せ行として描画する。
