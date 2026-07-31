@@ -97,7 +97,10 @@ function MenuPopup({ padding = true, scroll = true, className, ...props }: MenuP
 // 状態になっていた(data-highlighted: / hover: のバリアント付きルールは出力順が後で勝つため)。
 // bg-transparent を単に落とすだけにしないのは、DS が preflight を配っていないため
 // PlainItem(<button>)に UA 既定の buttonface 背景が残るから。排他で出せば両方満たせる。
-const MENU_ROW_BASE =
+// ⚠ mention.tsx が同じ行の見た目を再利用するため export しているが、**src/index.ts の公開
+// API には出さない**（パッケージ内部の共有に留める）。消費側に生のクラス文字列を配ると
+// 行の見た目が DS の外へ流出し、あとから変えられなくなる。
+export const MENU_ROW_BASE =
   'flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-base shadow-none transition-colors motion-reduce:transition-none duration-(--dur-fast) cursor-pointer';
 
 // Base UI の Item/RadioItem/CheckboxItem は <div> を描画するため、disabled は data-disabled
