@@ -119,6 +119,13 @@ export {
 } from './components/logo-mark.tsx';
 export { default as Lozenge, type LozengeProps, type LozengeTone } from './components/lozenge.tsx';
 export {
+  default as Mention,
+  MENTION_TRIGGERS,
+  type MentionItem,
+  type MentionProps,
+  type MentionRange,
+} from './components/mention.tsx';
+export {
   Menu,
   type MenuCheckboxItemProps,
   type MenuGroupLabelProps,
