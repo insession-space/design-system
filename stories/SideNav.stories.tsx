@@ -167,6 +167,58 @@ export const WithAccount: Story = {
   },
 };
 
+// side / align / sideOffset でメニューの配置を上書きする（#169）。既定は上方向だが、レール内の
+// 他のポップオーバー（ヘルプ・通知など）がレールの右側へ出る消費側は、向きを揃えるために
+// side="right" を渡す。アカウント行はレール最下部なので align="end" で上方向へ伸ばす。
+// sideOffset は既定（約7px）だとパネルがレールに被る — アンカーは「行」であってレールでは
+// なく、レールの右 padding のぶんズレるため。消費側がその padding を足した値を渡す。
+export const AccountMenuSideRight: Story = {
+  render: () => {
+    const [picked, setPicked] = useState<string | null>(null);
+
+    return (
+      <Section
+        title="アカウントメニューをレールの右側へ出す"
+        note='side="right" align="end" sideOffset={24}。レール内の他のポップオーバーと向きを揃えたいとき。幅はトリガー行に合わせず、コンテンツ幅になる。'
+      >
+        <Frame>
+          {/* 行がレール最下部にある状態で見せる（align="end" は「行の下端に揃えて上へ伸ばす」
+              なので、行が上寄りだと衝突回避で下へずれて意図が読み取れない）。 */}
+          <SideNav.Root aria-label="メインナビゲーション" fullHeight={false}>
+            <SideNav.Group>
+              <SideNav.Item href="#" icon="home" active>
+                ホーム
+              </SideNav.Item>
+              <SideNav.Item href="#" icon="search">
+                探索
+              </SideNav.Item>
+            </SideNav.Group>
+            <SideNav.Group secondary>
+              <SideNav.Item href="#" external>
+                ヘルプ
+              </SideNav.Item>
+            </SideNav.Group>
+            <SideNav.Account
+              name="Cameron Yang"
+              subtitle="cam@untitledui.com"
+              status="live"
+              side="right"
+              align="end"
+              sideOffset={24}
+              menuLabel="アカウントメニュー"
+              items={[...ACCOUNT_ITEMS]}
+              onSelect={setPicked}
+            />
+          </SideNav.Root>
+          <div className="flex-1 p-6 text-text-dim">
+            選択した項目: {picked ?? '（まだ選んでいない）'}
+          </div>
+        </Frame>
+      </Section>
+    );
+  },
+};
+
 // items を渡さない＝表示専用。押せる見た目（cursor / hover）を出さない。
 // 長い名前・メールはレール幅（232px）を破らずに省略される。
 export const AccountVariants: Story = {
