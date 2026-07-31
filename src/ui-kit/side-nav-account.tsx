@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from 'react';
 import type { AvatarStatus } from '../components/avatar.tsx';
 import Link from '../components/link.tsx';
-import { Menu } from '../components/menu.tsx';
+import { Menu, type MenuPositionerProps } from '../components/menu.tsx';
 import Icon, { type IconName } from '../icons/icon.tsx';
 import UserLabel from './user-label.tsx';
 
@@ -14,7 +14,8 @@ import UserLabel from './user-label.tsx';
 //
 // ── 何を DS が持ち、何を持たないか ─────────────────────────
 // 持つ: 行の見た目（枠 + 面 + hover/focus）、アバター寸法と文字サイズの連動（UserLabel へ委譲）、
-//       メニューの配置（上方向・トリガー幅に合わせる）、キーボード操作（Base UI の Menu へ委譲）。
+//       メニューの配置の既定値（上方向・トリガー幅に合わせる。side / align / sideOffset で
+//       消費側が上書きできる）、キーボード操作（Base UI の Menu へ委譲）。
 // 持たない: 項目の意味（プロフィール / 設定 / サインアウト）とラベル文言。全て props で注入する
 //           （i18n・ルーター・認証に依存しない）。
 //
@@ -63,6 +64,15 @@ export type SideNavAccountProps = {
   // 232px で「アバター + 名前 + 開閉アイコン」が省略されずに収まる唯一の段。レールを広げて
   // いる消費側だけ 'md'（アバター40px / 名前16px）にする。
   size?: 'sm' | 'md';
+  // メニューの出る向き。既定 'top'（レール最下部にあるので上方向へ開く）。レールの「横」へ
+  // 出したい消費側は 'right' を渡す（同じレール内の他のポップオーバーと向きを揃える等）。
+  side?: MenuPositionerProps['side'];
+  // 出る向きに対する寄せ。既定 'start'。'top' のまま使うなら触る必要はない。
+  align?: MenuPositionerProps['align'];
+  // トリガー行とメニューの間隔。既定は Menu.Positioner の既定値。⚠ 行はレールの内側にあり
+  // レールの右端とは padding のぶんズレるので、side='right' で出すときは既定だとパネルが
+  // レールに被る。消費側がレールの padding を足した値を渡すこと。
+  sideOffset?: MenuPositionerProps['sideOffset'];
   // メニューの読み上げラベル。items を渡すときは指定する。
   menuLabel?: string;
   // トリガー行の読み上げラベル。省略時は中身（名前 + subtitle）がそのまま読まれる。
@@ -94,10 +104,17 @@ function linkProps(item: SideNavAccountItem) {
   return item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 }
 
-// レール最下部にあるので上方向へ開く（下に開くと画面外に出る）。幅はトリガー行に合わせて
-// 揃える（Base UI の Positioner が --anchor-width を出す）。
+// レール最下部にあるので既定では上方向へ開く（下に開くと画面外に出る）。そのとき幅は
+// トリガー行に合わせて揃える（Base UI の Positioner が --anchor-width を出す）。
+// ⚠ 縦方向（top / bottom）に開くときだけの見た目調整。レールの横（left / right）へ出す
+//   ときに適用すると、メニュー幅がレール幅に固定されて不自然に細くなる。
 const POSITIONER_WIDTH = 'min-w-[var(--anchor-width)]';
 const SEPARATOR = 'mx-1 my-1 h-px bg-border';
+
+// 縦方向に開くか（= トリガー幅に合わせるか）。side 未指定の既定 'top' も縦方向。
+function isVertical(side: MenuPositionerProps['side']) {
+  return side === 'top' || side === 'bottom';
+}
 
 function AccountRowContent({
   name,
@@ -147,6 +164,9 @@ export default function SideNavAccount({
   items,
   onSelect,
   size = 'sm',
+  side = 'top',
+  align = 'start',
+  sideOffset,
   menuLabel,
   ariaLabel,
   className = '',
@@ -183,7 +203,12 @@ export default function SideNavAccount({
         {content}
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner side="top" align="start" className={POSITIONER_WIDTH}>
+        <Menu.Positioner
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          className={isVertical(side) ? POSITIONER_WIDTH : undefined}
+        >
           <Menu.Popup aria-label={menuLabel}>
             {items.map((item) => (
               <Fragment key={item.key}>
