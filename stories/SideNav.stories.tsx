@@ -182,10 +182,20 @@ export const AccountMenuSideRight: Story = {
         note='side="right" align="end" sideOffset={24}。レール内の他のポップオーバーと向きを揃えたいとき。幅はトリガー行に合わせず、コンテンツ幅になる。'
       >
         <Frame>
+          {/* 行がレール最下部にある状態で見せる（align="end" は「行の下端に揃えて上へ伸ばす」
+              なので、行が上寄りだと衝突回避で下へずれて意図が読み取れない）。 */}
           <SideNav.Root aria-label="メインナビゲーション" fullHeight={false}>
             <SideNav.Group>
               <SideNav.Item href="#" icon="home" active>
                 ホーム
+              </SideNav.Item>
+              <SideNav.Item href="#" icon="search">
+                探索
+              </SideNav.Item>
+            </SideNav.Group>
+            <SideNav.Group secondary>
+              <SideNav.Item href="#" external>
+                ヘルプ
               </SideNav.Item>
             </SideNav.Group>
             <SideNav.Account
