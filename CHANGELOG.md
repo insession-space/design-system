@@ -1,5 +1,11 @@
 # @insession/design-system
 
+## 7.11.0
+
+### Minor Changes
+
+- 719c37e: MessageItem を Slack のメッセージ行と同じ 2 カラムレイアウトにした（#180）。`avatarSrc` を渡したときはアバターを左カラムに 36px・上端揃えで置き、名前 + 時刻・本文・リンクプレビュー・リアクションを右カラムで名前の左端に揃える（従来は本文以下がコンテナ左端から始まり、アバターの下に潜っていた）。`avatarSrc` 省略時は従来どおりアバター無しのコンパクト表示で見た目は変わらない。`MessageItemSkeleton` も同じ骨格に追随させた。
+
 ## 7.10.0
 
 ### Minor Changes
