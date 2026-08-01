@@ -34,8 +34,10 @@ export type MessageItemSkeletonProps = {
   className?: string;
 };
 
-// UserLabel(size="sm")の avatar 寸法(24px)に合わせる。
-const AVATAR_SIZE = 24;
+// message-item.tsx の左カラムのアバター寸法(36px)に合わせる(#180)。ここだけ古い 24px
+// (UserLabel size="sm" が内包していた寸法)に残すと、実データに差し替わった瞬間に左カラムの
+// 幅が 24px → 36px に広がって本文の左端が横滑りする。
+const AVATAR_SIZE = 36;
 // 表示名プレースホルダのおおよその幅(px)。実際の名前の長さは様々なので固定の目安幅にする
 // (高さには影響しない — 高さは外側の span の text-small strut が決める)。
 const NAME_WIDTH = 88;
@@ -47,42 +49,29 @@ export default function MessageItemSkeleton({
   reactions = 0,
   className = '',
 }: MessageItemSkeletonProps) {
-  return (
-    // ルートの w-full min-w-0 は message-item.tsx と同じ理由(#97)。行方向 flex の子として
-    // 置かれても与えられた幅を使い切る。
-    <VStack gap="xs" className={`w-full min-w-0 ${className}`.trim()}>
-      {/* ヘッダー行。message-item.tsx と同じく外側 HStack(justify="between")の直下に
-          UserLabel 相当の HStack(align="center")を置く構造にする(#97 で時刻を UserLabel
-          の trailing 内へ移したため、時刻用の外側ラッパー HStack は無くなった)。actions は
-          出さないため外側 HStack には子が1つしか無いが、justify="between" 自体は
-          message-item.tsx と揃えておく(actions が現れても崩れない)。 */}
+  // message-item.tsx と同じく、アバターの有無で分岐するのは"外枠"だけにして中身は一度だけ
+  // 組む(#180)。
+  const stack = (
+    <>
+      {/* ヘッダー行。message-item.tsx と同じく HStack(align="center" justify="between")。
+          actions は出さないため子が1つしか無いが、justify="between" 自体は message-item.tsx と
+          揃えておく(actions が現れても崩れない)。#180 でアバターが左カラムへ出たので、
+          ここは UserLabel 相当の「名前 + 時刻」だけを持つ。 */}
       <HStack gap="sm" align="center" justify="between">
-        <HStack gap="sm" align="center" className="min-w-0">
-          {/* UserLabel のアバター div(aria-hidden shrink-0。文字サイズクラスを持たない)と
-              同じ入れ物にする。この div はテキストクラスを持たないぶん基準フォント
-              (ページ既定サイズ)の strut を生み、実物のヘッダー行の高さはアバター24pxでは
-              なくこの strut(UserLabel 側の実測どおり)で決まっている。同じ入れ物構造に
-              しないとここだけ 24px 側に寄ってズレる。 */}
-          {avatar && (
-            <div aria-hidden="true" className="shrink-0">
-              <Skeleton circle size={AVATAR_SIZE} />
-            </div>
-          )}
-          {/* UserLabel の名前の行(trailing 有りのときの HStack align="baseline")と同じ
-              入れ物・テキストクラス。名前 span(font-body font-bold text-small)+
-              trailing(message-item.tsx のタイムスタンプ span と同じ font-body text-xs)を
-              同じ行に並べる。strut が UserLabel の実際の行の高さを再現する。 */}
-          <div className="min-w-0 flex-1">
-            <HStack gap="xs" align="baseline" className="min-w-0">
-              <span className="font-body font-bold text-small">
-                <Skeleton width={NAME_WIDTH} height="0.7em" />
-              </span>
-              <span className="shrink-0 font-body text-xs">
-                <Skeleton width={TIMESTAMP_WIDTH} height="0.7em" />
-              </span>
-            </HStack>
-          </div>
-        </HStack>
+        {/* UserLabel の名前の行(trailing 有りのときの HStack align="baseline")と同じ
+            入れ物・テキストクラス。名前 span(font-body font-bold text-small)+
+            trailing(message-item.tsx のタイムスタンプ span と同じ font-body text-xs)を
+            同じ行に並べる。strut が UserLabel の実際の行の高さを再現する。 */}
+        <div className="min-w-0 flex-1">
+          <HStack gap="xs" align="baseline" className="min-w-0">
+            <span className="font-body font-bold text-small">
+              <Skeleton width={NAME_WIDTH} height="0.7em" />
+            </span>
+            <span className="shrink-0 font-body text-xs">
+              <Skeleton width={TIMESTAMP_WIDTH} height="0.7em" />
+            </span>
+          </HStack>
+        </div>
       </HStack>
       {/* 本文。message-item.tsx の本文 div(font-body text-small)と同じテキストクラスを
           Skeleton.Text の既定(textClassName)に委ねる。 */}
@@ -97,7 +86,32 @@ export default function MessageItemSkeleton({
           ))}
         </HStack>
       )}
-    </VStack>
+    </>
+  );
+
+  // ルートの w-full min-w-0 は message-item.tsx と同じ理由(#97)。行方向 flex の子として
+  // 置かれても与えられた幅を使い切る。
+  const rootClass = `w-full min-w-0 ${className}`.trim();
+
+  if (!avatar) {
+    return (
+      <VStack gap="xs" className={rootClass}>
+        {stack}
+      </VStack>
+    );
+  }
+
+  return (
+    // message-item.tsx の2カラム(#180)と同じ外枠。gap / align を揃えないと実データに
+    // 差し替わったときに本文の左端が横滑りする。
+    <HStack gap="sm" align="start" className={rootClass}>
+      <div aria-hidden="true" className="shrink-0">
+        <Skeleton circle size={AVATAR_SIZE} />
+      </div>
+      <VStack gap="xs" className="min-w-0 flex-1">
+        {stack}
+      </VStack>
+    </HStack>
   );
 }
 

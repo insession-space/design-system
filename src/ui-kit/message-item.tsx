@@ -1,4 +1,5 @@
 import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from 'react';
+import Avatar from '../components/avatar.tsx';
 import IconButton from '../components/icon-button.tsx';
 import { HStack, VStack } from '../components/layout.tsx';
 import LinkPreview, { type LinkPreviewMeta } from '../components/link-preview.tsx';
@@ -22,13 +23,22 @@ import UserLabel from './user-label.tsx';
 //     onClick を発火するだけで、ピッカーを開く/閉じるのは呼び出し側が持つ。
 //   - 連続投稿のグルーピング・日付区切り・投稿リストのコンテナ(別 Issue の範囲)。
 //
+// ── レイアウトは Slack のメッセージ行と同じ2カラム(#180) ──────
+// avatarSrc を渡したときは「左カラム = アバター / 右カラム = ヘッダー(名前 + 時刻 + actions)・
+// 本文・リンクプレビュー・リアクション」の2カラムで組む。以前は UserLabel に src を渡して
+// アバターをヘッダー行の"内側"に持たせていたため、本文以下はコンテナの左端から始まり
+// アバターの真下に潜っていた(本文の左端が名前の左端と揃わない)。アバターを MessageItem 側の
+// 左カラムへ出すことで、右カラムの中身が機械的に名前の左端へ揃う。
+// アバターは align="start" でヘッダー行の上端に合わせる(Slack と同じく、アバターの高さが
+// ヘッダー行より高いぶんは本文1行目の横に並ぶ)。
+// avatarSrc 省略時は左カラム自体を作らず、従来どおり単一カラムのコンパクト表示にする
+// (アバターが無いのにインデントだけ残ると、宛先の無い余白になる)。
+//
 // ── 表示名は必ず UserLabel に委譲する ───────────────────
 // 表示名の押せる/押せない分岐(href/onClick/disabled)は UserLabel の実装そのものに委ねる。
-// UserLabel は自身の HStack の中にアバター(hideAvatar で出し分け)+ 名前を持つので、
-// ヘッダー行では UserLabel をそのまま置き、その"外側"(兄弟要素)にタイムスタンプを置く
-// (UserLabel の subtitle は名前の"下"にしか出せないため、名前の"横"に置く用途には使えない)。
-// avatarSrc を渡したときは UserLabel に src をそのまま渡してアバター付きレイアウトにし、
-// 省略時は hideAvatar でコンパクト表示にする。
+// アバターは上記のとおり MessageItem 側が持つので、UserLabel には常に hideAvatar を渡し、
+// ヘッダー行の「名前 + trailing(時刻)」だけを担わせる(size="sm" は名前の文字サイズ
+// text-small と結び付いているので変えない — アバターを外に出しても文字サイズは従来どおり)。
 //
 // ── アクション群はホバー/フォーカス時のみ見せる ───────────
 // 既定で opacity-0 にして視覚的なノイズを減らすが、キーボード操作でも到達できないと
@@ -179,6 +189,14 @@ const ACTIONS_VISIBILITY =
 const ACTION_BUTTON_SIZE = 36;
 const ACTIONS_ROW_HEIGHT_COMPENSATION = '-my-1';
 
+// ── 左カラムのアバター寸法(#180) ────────────────────────
+// Slack のメッセージ行と同じ 36px。UserLabel(size="sm")が内包していた 24px は、アバターが
+// ヘッダー行の中にしか無かった前提の寸法で、左カラムとして独立させると小さすぎる。
+// UserLabel の SIZE レコード(24/40/56)には無い値なので、size を上げる(= 名前の文字サイズも
+// 一緒に変わる)のではなく MessageItem 側で Avatar を直接描いて寸法だけを決める。
+// シェイプ(rounded-pill)は Avatar の既定のまま変えない。
+const AVATAR_SIZE = 36;
+
 // ── リアクションピル(#103) ─────────────────────────────
 // Chip ではなく専用の button で描く。Chip の既定は「クイック返信/フィルター/タグ」向けの
 // 12.5px + px-3.5 py-[7px] で、主役が絵文字1文字+数字しかないリアクションピルには余白が
@@ -322,19 +340,20 @@ export default function MessageItem({
   const authorInteractive = authorHref != null || authorOnClick != null;
   const hasInertTimestamp = authorInteractive && timestamp != null;
 
-  return (
-    // group はアクション群のホバー/フォーカス表示の起点になる。w-full は min-w-0 が
-    // 「縮むことを許可」するだけで幅を取り切る指定ではないための併記(#97)。行方向 flex
-    // の子として置かれたとき(消費側が MessageActionBar 等と横並びにする場合)、与えられた
-    // 幅を使い切って本文の折り返し幅を最大化する。
-    <VStack gap="xs" className={`group w-full min-w-0 ${className}`.trim()}>
+  // アバターの有無で左カラムを作るかが変わる(#180)。null 明示も「無し」として扱う
+  // (従来の hideAvatar={avatarSrc == null} と同じ判定に揃える)。
+  const hasAvatar = avatarSrc != null;
+
+  // 右カラム(アバター無しのときは単一カラム)の中身。アバターの有無で分岐するのは"外枠"だけに
+  // したいので、中身はここで一度だけ組む。
+  const stack = (
+    <>
       <HStack gap="sm" align="center" justify="between">
         <UserLabel
           name={authorName}
           href={authorHref}
           onClick={authorOnClick}
-          src={avatarSrc}
-          hideAvatar={avatarSrc == null}
+          hideAvatar
           size="sm"
           ariaLabel={hasInertTimestamp ? authorName : undefined}
           trailing={
@@ -419,6 +438,71 @@ export default function MessageItem({
           ))}
         </HStack>
       )}
-    </VStack>
+    </>
+  );
+
+  // group はアクション群のホバー/フォーカス表示の起点になるので、アバターも含む最も外側の
+  // 要素に置く(アバターの上をホバーしてもアクションが出る)。w-full は min-w-0 が
+  // 「縮むことを許可」するだけで幅を取り切る指定ではないための併記(#97)。行方向 flex
+  // の子として置かれたとき(消費側が MessageActionBar 等と横並びにする場合)、与えられた
+  // 幅を使い切って本文の折り返し幅を最大化する。
+  const rootClass = `group w-full min-w-0 ${className}`.trim();
+
+  if (!hasAvatar) {
+    // アバター無し = 従来どおりの単一カラム。左カラムもインデントも作らない(#180)。
+    return (
+      <VStack gap="xs" className={rootClass}>
+        {stack}
+      </VStack>
+    );
+  }
+
+  // Avatar は status / ring を指定しないと legacy 経路(見た目を消費側 CSS に依存)を返すため、
+  // UserLabel と同じく必ず `ds` を渡して DS 経路で描画させる。
+  const avatarNode = <Avatar ds name={authorName} src={avatarSrc} size={AVATAR_SIZE} />;
+
+  return (
+    <HStack gap="sm" align="start" className={rootClass}>
+      {/* アバターは隣の名前と同じ情報しか持たないので、入れ物ごと支援技術から隠す(UserLabel が
+          自身のアバターに対してやっているのと同じ理由 — 隠さないと Avatar の alt と
+          fallback の頭文字で名前が二重に読まれる)。
+          ⚠ 投稿者名を押せるようにしているとき(authorHref / authorOnClick)は、アバターも同じ
+          操作の当たり判定にする。#180 でアバターを UserLabel の外へ出す前は、アバターが
+          UserLabel の <a>/<button> の内側にあったため押せていた — ここを素の div にすると
+          「アバターを押してプロフィールを開く」が黙って効かなくなる(回帰)。
+          読み上げと tab 順は名前側だけで足りているので、こちらは aria-hidden + tabIndex={-1} で
+          支援技術・キーボードの両方から外し、ポインタの当たり判定だけを持たせる
+          (同じ遷移先が2回読まれる/2回 tab で止まるのを避ける)。 */}
+      {authorHref != null ? (
+        <a
+          href={authorHref}
+          onClick={authorOnClick}
+          aria-hidden="true"
+          tabIndex={-1}
+          className="flex shrink-0"
+        >
+          {avatarNode}
+        </a>
+      ) : authorOnClick != null ? (
+        <button
+          type="button"
+          onClick={authorOnClick}
+          aria-hidden="true"
+          tabIndex={-1}
+          className="flex shrink-0 cursor-pointer border-none bg-transparent p-0"
+        >
+          {avatarNode}
+        </button>
+      ) : (
+        <div aria-hidden="true" className="shrink-0">
+          {avatarNode}
+        </div>
+      )}
+      {/* min-w-0 が無いと flex の既定(min-width: auto)により本文の折り返し・truncate が
+          効かない。flex-1 で残り幅を取り切る(#97 の折り返し幅の担保をここで引き継ぐ)。 */}
+      <VStack gap="xs" className="min-w-0 flex-1">
+        {stack}
+      </VStack>
+    </HStack>
   );
 }

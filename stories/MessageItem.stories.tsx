@@ -85,6 +85,31 @@ export const WithAvatar: Story = {
   ),
 };
 
+export const TwoColumnAlignment: Story = {
+  render: () => (
+    <Section
+      title="2カラムの左端揃え(#180)"
+      note="アバターは左カラムに立ち(36px・上端揃え)、名前 + 時刻・本文・リンクプレビュー・リアクションはすべて右カラムで名前の左端に揃う。本文が複数行に折り返しても2行目以降がアバターの下に回り込まないこと。"
+    >
+      <div className="max-w-xl rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          avatarSrc={AVATAR_SRC}
+          actions={ACTIONS}
+          fetchLinkPreview={fetchLinkPreviewResolved}
+          reactions={[
+            { emoji: '🙂', count: 1, reacted: true, label: 'にっこり', onClick: () => {} },
+            { emoji: '🎉', count: 3, reacted: false, label: 'お祝い', onClick: () => {} },
+          ]}
+        >
+          本文の左端が名前の左端と揃っていることを確認する。折り返した2行目以降もアバターの下に回り込まず、同じ左端から始まる。https://insession.space/blog/release-notes
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
 export const WithoutAvatar: Story = {
   render: () => (
     <Section
