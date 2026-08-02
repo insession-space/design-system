@@ -25,8 +25,16 @@ import { createContext, useContext } from 'react';
 // アクティブ状態は旧実装では JS で value===tab.key を比較して TAB_ACTIVE を足していたが、Base UI の
 // Tabs.Tab は選択中に data-active を出す(docs: tabs.md の Tab Data Attributes)ため、
 // data-active: バリアントで表現する(動的クラス生成は禁止のため文字列リテラルで書く)。
+// モバイル幅では一段小さく・字間も詰める（text-xs=11px / tracking-wider=0.05em）。sm(640px)以上は
+// 従来どおり（text-sm=12px / tracking-widest=0.1em）。日本語ラベルのタブは字数がそのまま幅になり、
+// 0.1em の字間が余計に幅を食う（6タブで実測 442px → 408px、約8%縮む）。狭い画面で1画面に入る
+// タブ数を増やすのが狙いで、収まりきらないぶんは List 側の横スクロールが引き受ける。
+//
+// ⚠ このサイズ/字間は呼び出し側の className では上書きできない。TAB_BASE と同じ specificity の
+// ユーティリティ同士は「クラスの並び順」ではなく「CSS の定義順」で勝敗が決まるため
+// （tailwind-merge を通していない）。変えたい場合はここを直すこと。
 const TAB_BASE =
-  "relative inline-flex items-center justify-center gap-1.5 border-none bg-transparent py-2.5 font-body text-sm font-bold tracking-widest text-text-faint shadow-none transition-colors motion-reduce:transition-none duration-(--dur-base) cursor-pointer hover:text-text-dim hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent after:absolute after:inset-x-[12%] after:-bottom-px after:h-0.5 after:origin-center after:scale-x-0 after:rounded-xs after:bg-accent after:transition-transform motion-reduce:after:transition-none after:duration-(--dur-base) after:ease-spring after:content-[''] data-active:text-text data-active:after:scale-x-100";
+  "relative inline-flex items-center justify-center gap-1.5 border-none bg-transparent py-2.5 font-body text-xs tracking-wider sm:text-sm sm:tracking-widest font-bold text-text-faint shadow-none transition-colors motion-reduce:transition-none duration-(--dur-base) cursor-pointer hover:text-text-dim hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent after:absolute after:inset-x-[12%] after:-bottom-px after:h-0.5 after:origin-center after:scale-x-0 after:rounded-xs after:bg-accent after:transition-transform motion-reduce:after:transition-none after:duration-(--dur-base) after:ease-spring after:content-[''] data-active:text-text data-active:after:scale-x-100";
 const TAB_WIDTH: Record<'default' | 'fill', string> = {
   default: 'flex-none px-3.5',
   fill: 'flex-1 px-1.5',
@@ -67,7 +75,22 @@ function TabsList({
         // border-t-0 border-x-0 は必須: プリフライト未使用のため border-solid が全辺の border-style を
         // solid にし、border-b で未指定の上/左/右の border-width が既定 medium(3px) のまま枠として出る。
         // 明示的に 0 にして legacy .side-tabs(border-bottom のみ)へ一致させる(#448 リグレッション修正)。
-        className={`flex border-t-0 border-x-0 border-b border-solid border-border ${className}`.trim()}
+        //
+        // タブが行幅に収まらないときは横スクロールさせる。variant='default' の TAB_WIDTH は
+        // flex-none(縮まない)なので、overflow が無いとタブ列がそのままはみ出して切れる
+        // (insession-app のコミュニティ画面(6タブ)がモバイル幅で実際にそうなっていた)。
+        // 折り返し(flex-wrap)にしないのは、下線(border-b)とアクティブ下線(Tab の after:)が
+        // 段ごとに分かれて見た目が崩れるため。
+        //
+        // ⚠ overflow-x を指定すると overflow-y も visible ではなくなる(CSS の仕様)。
+        // Tab のアクティブ下線は after:-bottom-px で 1px 下へはみ出すため、そのままだと
+        // クリップされて消える。pb-px で 1px の余白を確保して逃がしている。
+        //
+        // overscroll-x-contain: タブ列の端まで引いたときに、その先の横スワイプが親(ページや
+        // カルーセル)へ伝播してブラウザの「戻る」ジェスチャ等を誘発しないようにする。
+        // スクロールバーは隠す(モバイルでは元から出ず、デスクトップでタブ行に灰色のバーが
+        // 出ると下線タブの見た目が崩れるため)。
+        className={`flex overflow-x-auto overscroll-x-contain pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-t-0 border-x-0 border-b border-solid border-border ${className}`.trim()}
         {...props}
       >
         {children}
