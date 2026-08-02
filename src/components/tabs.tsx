@@ -25,8 +25,16 @@ import { createContext, useContext } from 'react';
 // アクティブ状態は旧実装では JS で value===tab.key を比較して TAB_ACTIVE を足していたが、Base UI の
 // Tabs.Tab は選択中に data-active を出す(docs: tabs.md の Tab Data Attributes)ため、
 // data-active: バリアントで表現する(動的クラス生成は禁止のため文字列リテラルで書く)。
+// モバイル幅では一段小さく・字間も詰める（text-xs=11px / tracking-wider=0.05em）。sm(640px)以上は
+// 従来どおり（text-sm=12px / tracking-widest=0.1em）。日本語ラベルのタブは字数がそのまま幅になり、
+// 0.1em の字間が余計に幅を食う（6タブで実測 442px → 408px、約8%縮む）。狭い画面で1画面に入る
+// タブ数を増やすのが狙いで、収まりきらないぶんは List 側の横スクロールが引き受ける。
+//
+// ⚠ このサイズ/字間は呼び出し側の className では上書きできない。TAB_BASE と同じ specificity の
+// ユーティリティ同士は「クラスの並び順」ではなく「CSS の定義順」で勝敗が決まるため
+// （tailwind-merge を通していない）。変えたい場合はここを直すこと。
 const TAB_BASE =
-  "relative inline-flex items-center justify-center gap-1.5 border-none bg-transparent py-2.5 font-body text-sm font-bold tracking-widest text-text-faint shadow-none transition-colors motion-reduce:transition-none duration-(--dur-base) cursor-pointer hover:text-text-dim hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent after:absolute after:inset-x-[12%] after:-bottom-px after:h-0.5 after:origin-center after:scale-x-0 after:rounded-xs after:bg-accent after:transition-transform motion-reduce:after:transition-none after:duration-(--dur-base) after:ease-spring after:content-[''] data-active:text-text data-active:after:scale-x-100";
+  "relative inline-flex items-center justify-center gap-1.5 border-none bg-transparent py-2.5 font-body text-xs tracking-wider sm:text-sm sm:tracking-widest font-bold text-text-faint shadow-none transition-colors motion-reduce:transition-none duration-(--dur-base) cursor-pointer hover:text-text-dim hover:bg-transparent hover:shadow-none active:scale-100 active:bg-transparent after:absolute after:inset-x-[12%] after:-bottom-px after:h-0.5 after:origin-center after:scale-x-0 after:rounded-xs after:bg-accent after:transition-transform motion-reduce:after:transition-none after:duration-(--dur-base) after:ease-spring after:content-[''] data-active:text-text data-active:after:scale-x-100";
 const TAB_WIDTH: Record<'default' | 'fill', string> = {
   default: 'flex-none px-3.5',
   fill: 'flex-1 px-1.5',
