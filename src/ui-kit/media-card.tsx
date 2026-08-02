@@ -94,7 +94,10 @@ export function MediaCard({
       {/* min-w-0 は不要(Card は flex コンテナではない)。truncate 自体は block 要素にも
           効くが、幅の基準を親(Card の padding 内側)に持たせるため w-full を明示する。 */}
       <div className="mt-3 w-full">
-        <div className="truncate font-body text-base font-bold text-text">{title}</div>
+        {/* タイトルは text-sm(12px)。以前は text-base(14px) だったが、カード自体が小さい
+            モバイル幅ではタイトルだけが不釣り合いに大きく見えたため一段下げた。
+            太字 + text（最も強い文字色）で meta（text-xs / text-dim）との階層は保たれる。 */}
+        <div className="truncate font-body text-sm font-bold text-text">{title}</div>
         {meta && <div className="truncate font-body text-xs text-text-dim">{meta}</div>}
       </div>
       {footer && <div className="mt-3">{footer}</div>}
