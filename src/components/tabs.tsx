@@ -67,7 +67,22 @@ function TabsList({
         // border-t-0 border-x-0 は必須: プリフライト未使用のため border-solid が全辺の border-style を
         // solid にし、border-b で未指定の上/左/右の border-width が既定 medium(3px) のまま枠として出る。
         // 明示的に 0 にして legacy .side-tabs(border-bottom のみ)へ一致させる(#448 リグレッション修正)。
-        className={`flex border-t-0 border-x-0 border-b border-solid border-border ${className}`.trim()}
+        //
+        // タブが行幅に収まらないときは横スクロールさせる。variant='default' の TAB_WIDTH は
+        // flex-none(縮まない)なので、overflow が無いとタブ列がそのままはみ出して切れる
+        // (insession-app のコミュニティ画面(6タブ)がモバイル幅で実際にそうなっていた)。
+        // 折り返し(flex-wrap)にしないのは、下線(border-b)とアクティブ下線(Tab の after:)が
+        // 段ごとに分かれて見た目が崩れるため。
+        //
+        // ⚠ overflow-x を指定すると overflow-y も visible ではなくなる(CSS の仕様)。
+        // Tab のアクティブ下線は after:-bottom-px で 1px 下へはみ出すため、そのままだと
+        // クリップされて消える。pb-px で 1px の余白を確保して逃がしている。
+        //
+        // overscroll-x-contain: タブ列の端まで引いたときに、その先の横スワイプが親(ページや
+        // カルーセル)へ伝播してブラウザの「戻る」ジェスチャ等を誘発しないようにする。
+        // スクロールバーは隠す(モバイルでは元から出ず、デスクトップでタブ行に灰色のバーが
+        // 出ると下線タブの見た目が崩れるため)。
+        className={`flex overflow-x-auto overscroll-x-contain pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-t-0 border-x-0 border-b border-solid border-border ${className}`.trim()}
         {...props}
       >
         {children}

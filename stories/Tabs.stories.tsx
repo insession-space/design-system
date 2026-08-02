@@ -149,3 +149,49 @@ export const WithPanel: Story = {
     </Section>
   ),
 };
+
+// 行幅に収まらないタブ列（#183）。insession-app のコミュニティ画面がモバイル幅で
+// 6タブ入り、TAB_WIDTH.default が flex-none（縮まない）ため、overflow が無いと
+// タブがそのまま切れていた。狭い枠に閉じ込めて再現する。
+export const Overflowing: Story = {
+  render: () => (
+    <Section
+      title="はみ出すタブ（横スクロール）"
+      note="行幅に収まらないときは横スクロールする。折り返さないので下線は1本のまま。選択中のタブは狭い幅でも下線が出る。"
+    >
+      <div className="w-[320px] border border-dashed border-solid border-border-strong p-2">
+        <Tabs.Root defaultValue="now">
+          <Tabs.List ariaLabel="はみ出すタブ">
+            <Tabs.Tab value="now">いま</Tabs.Tab>
+            <Tabs.Tab value="spaces">スペース</Tabs.Tab>
+            <Tabs.Tab value="members">メンバー</Tabs.Tab>
+            <Tabs.Tab value="stamps">スタンプ</Tabs.Tab>
+            <Tabs.Tab value="gallery">ギャラリー</Tabs.Tab>
+            <Tabs.Tab value="settings">設定</Tabs.Tab>
+          </Tabs.List>
+        </Tabs.Root>
+      </div>
+    </Section>
+  ),
+};
+
+// 選択中のタブが行の外にある状態で開いたとき、そこが見えるか（#183 の検証用）。
+// community の /settings を直接開く動線に相当する。
+export const OverflowingLastSelected: Story = {
+  render: () => (
+    <Section title="はみ出す + 末尾が選択中" note="選択中のタブが行幅の外にある状態で開いた場合。">
+      <div className="w-[320px] border border-dashed border-solid border-border-strong p-2">
+        <Tabs.Root defaultValue="settings">
+          <Tabs.List ariaLabel="はみ出すタブ・末尾選択">
+            <Tabs.Tab value="now">いま</Tabs.Tab>
+            <Tabs.Tab value="spaces">スペース</Tabs.Tab>
+            <Tabs.Tab value="members">メンバー</Tabs.Tab>
+            <Tabs.Tab value="stamps">スタンプ</Tabs.Tab>
+            <Tabs.Tab value="gallery">ギャラリー</Tabs.Tab>
+            <Tabs.Tab value="settings">設定</Tabs.Tab>
+          </Tabs.List>
+        </Tabs.Root>
+      </div>
+    </Section>
+  ),
+};
