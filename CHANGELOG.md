@@ -1,5 +1,11 @@
 # @insession/design-system
 
+## 7.11.3
+
+### Patch Changes
+
+- 027557c: PageHeader の description のフォントサイズを一段下げる（text-body 16px → text-small 14px）。title(text-h2 22px) との主従関係を明確にするため。トークンの値自体は変更していない。
+
 ## 7.11.2
 
 ### Patch Changes
