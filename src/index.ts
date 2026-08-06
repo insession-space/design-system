@@ -54,6 +54,13 @@ export {
   type DrawerSide,
   default as Drawer,
 } from './components/drawer.tsx';
+export { default as EmojiPicker, type EmojiPickerProps } from './components/emoji-picker.tsx';
+export {
+  default as EmojiSuggest,
+  EMOJI_SUGGEST_TRIGGERS,
+  type EmojiSuggestItem,
+  type EmojiSuggestProps,
+} from './components/emoji-suggest.tsx';
 export { default as EmptyNote, type EmptyNoteProps } from './components/empty-note.tsx';
 export { default as EmptyState, type EmptyStateProps } from './components/empty-state.tsx';
 export {
@@ -237,6 +244,10 @@ export {
   type StepFlowStep,
 } from './components/step-flow.tsx';
 export { default as Stepper, type StepperProps } from './components/stepper.tsx';
+// Suggest 本体（トリガー検出 + 候補パネルの共通実装）は公開しない — 消費側が直接使う場面が
+// 無く、公開すると `@` / `:` 以外のトリガーまで DS の API 面に載ってしまうため。
+// 範囲の型だけは EmojiSuggest / Mention の onSelect に出るので公開する。
+export type { SuggestRange } from './components/suggest.tsx';
 export {
   Card,
   type CardProps,
