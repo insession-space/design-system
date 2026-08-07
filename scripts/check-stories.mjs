@@ -55,6 +55,8 @@ const EXEMPT = new Map([
   // Mention が既定で認識するトリガー文字の配列。消費側が「どの文字で発火するか」を自前の
   // パーサ（本文中のメンション抽出）と揃えるために読む定数で、描画物ではない。
   ['MENTION_TRIGGERS', 'トリガー文字の配列定数（見た目は Mention の story が示す）'],
+  // 同上。`:` の絵文字ショートコード補完が既定で認識するトリガー文字。
+  ['EMOJI_SUGGEST_TRIGGERS', 'トリガー文字の配列定数（見た目は EmojiSuggest の story が示す）'],
 ]);
 
 /* ---- src/index.ts が値として export する識別子を集める ---- */
