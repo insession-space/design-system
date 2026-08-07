@@ -157,7 +157,7 @@ export const InComposer: Story = {
   },
 };
 
-// 検索欄・肌の色の選択を出さない、寸法を変える、など。狭い場所へ収めたいとき用。
+// 検索欄を出さない・寸法を変える。狭い場所へ収めたいとき用。
 export const Compact: Story = {
   name: '検索なし / 小さめ',
   render: function Render() {
@@ -167,11 +167,55 @@ export const Compact: Story = {
         <EmojiPicker
           triggerLabel="絵文字を追加"
           searchDisabled
-          skinTonesDisabled
           height={280}
           width={260}
           onSelect={setLast}
         />
+        <p className="m-0 text-sm text-text-dim">
+          最後に選んだもの: <span className="text-h2 leading-none">{last}</span>
+        </p>
+      </div>
+    );
+  },
+};
+
+// 縮小表示。`scale` は**基準倍率**で、画面幅が足りなければ内部でこれより小さくなる
+// （`minScale` が下げ止まり）。ブラウザ幅を狭めると 0.6 まで縮んでいくのが確認できる。
+export const Scaled: Story = {
+  name: '縮小して表示する',
+  render: function Render() {
+    const [last, setLast] = useState('—');
+    return (
+      <div className="flex flex-col gap-6">
+        <Section title="等倍（既定）">
+          <EmojiPicker triggerLabel="絵文字を追加" onSelect={setLast} />
+        </Section>
+        {/* ⚠ width は既定（320）のまま変えない。emoji-picker-react の列レイアウトは width の値に
+            よっては端数が出て、絵文字リストに数 px の横スクロールが生まれる（実測: 320 なら 0、
+            340 だと 5px はみ出して右端が切れる）。ここで見せたいのは縮小であって width ではない。 */}
+        <Section title="scale=0.75（実寸 240）">
+          <EmojiPicker triggerLabel="絵文字を追加" scale={0.75} onSelect={setLast} />
+        </Section>
+        <Section title="scale=0.6（下げ止まりと同じ倍率）">
+          <EmojiPicker triggerLabel="絵文字を追加" scale={0.6} onSelect={setLast} />
+        </Section>
+        <p className="m-0 text-sm text-text-dim">
+          最後に選んだもの: <span className="text-h2 leading-none">{last}</span>
+        </p>
+      </div>
+    );
+  },
+};
+
+// 肌の色の選択は**既定で出さない**（DS の面の上で単色のまま浮くため）。
+// 出し分けが要る場合だけ明示的に有効化する。
+export const SkinTones: Story = {
+  name: '肌の色の選択を出す',
+  render: function Render() {
+    const [last, setLast] = useState('—');
+    return (
+      <div className="flex flex-col items-start gap-3">
+        <EmojiPicker triggerLabel="絵文字を追加" skinTonesDisabled={false} onSelect={setLast} />
         <p className="m-0 text-sm text-text-dim">
           最後に選んだもの: <span className="text-h2 leading-none">{last}</span>
         </p>
