@@ -1,6 +1,7 @@
 import type { FormEvent, KeyboardEvent, MutableRefObject, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import Icon from '../icons/icon.tsx';
+import { TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 
 // メッセージ入力フォーム(純粋 leaf UI)。space のチャット入力とコミュニティの投稿入力の共通化
@@ -159,7 +160,7 @@ export default function Composer({
           aria-label={sendLabel}
           title={sendLabel}
           disabled={!canSubmit}
-          className={`inline-flex shrink-0 cursor-pointer items-center justify-center rounded-pill border-none bg-transparent p-0 transition-colors motion-reduce:transition-none duration-(--dur-fast) ${btnSize} ${
+          className={`inline-flex shrink-0 cursor-pointer items-center justify-center rounded-pill border-none bg-transparent p-0 ${TRANSITION_COLORS} ${btnSize} ${
             canSubmit ? 'text-accent-soft' : 'text-text-dim'
           } enabled:hover:bg-tint-5 enabled:hover:text-accent-soft disabled:cursor-not-allowed disabled:forced-colors:text-[color:GrayText] disabled:opacity-35 focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring`}
         >

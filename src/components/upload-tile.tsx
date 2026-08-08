@@ -1,4 +1,5 @@
 import { type DragEvent, type ReactNode, useId, useRef, useState } from 'react';
+import { TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のアップロードタイル（#53）。「破線ボーダーのタイル + 隠しファイル入力」の複合部品。
@@ -38,8 +39,7 @@ export type UploadTileProps = {
   className?: string;
 };
 
-const TILE =
-  'relative flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-card border border-dashed p-4 text-center transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-within:shadow-focus';
+const TILE = `relative flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-card border border-dashed p-4 text-center ${TRANSITION_COLORS} focus-within:shadow-focus`;
 
 export default function UploadTile({
   label,

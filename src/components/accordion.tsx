@@ -10,6 +10,7 @@ import {
   useRef,
 } from 'react';
 import Icon from '../icons/icon.tsx';
+import { FOCUS_RING, TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 
 // 折りたたみリスト（アコーディオン）。「一覧の各行を要約1行に圧縮し、開いた1件だけが中身を出す」
@@ -226,7 +227,7 @@ export function AccordionItem({
       // overflow-hidden は展開部の角が枠からはみ出すのを防ぐ。開いている間は枠を一段強くして、
       // 「どれが開いているか」を色の差だけで伝える（位置や影を動かさない）。
       className={twMerge(
-        'overflow-hidden rounded-card border border-solid bg-surface transition-colors motion-reduce:transition-none duration-(--dur-fast)',
+        `overflow-hidden rounded-card border border-solid bg-surface ${TRANSITION_COLORS}`,
         open ? 'border-border-strong' : 'border-border',
         className,
       )}
@@ -245,7 +246,7 @@ export function AccordionItem({
           // legacy のグローバル button(glow)・button:active(scale) を打ち消す（Tabs と同じ理由。
           // 静止時にも当てないとホバー前から影が漏れる）。
           // min-h-11 = 44px でタップ領域の下限を満たす。モバイルは padding を 14px 均等に落とす。
-          className="flex min-h-11 w-full cursor-pointer items-start gap-3 border-none bg-transparent px-[18px] py-4 text-left shadow-none transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:bg-surface-hover hover:shadow-none active:scale-100 focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:forced-colors:text-[color:GrayText] disabled:opacity-(--disabled-opacity) disabled:hover:bg-transparent max-[480px]:p-3.5"
+          className={`flex min-h-11 w-full cursor-pointer items-start gap-3 border-none bg-transparent px-[18px] py-4 text-left shadow-none ${TRANSITION_COLORS} hover:bg-surface-hover hover:shadow-none active:scale-100 ${FOCUS_RING} disabled:cursor-not-allowed disabled:forced-colors:text-[color:GrayText] disabled:opacity-(--disabled-opacity) disabled:hover:bg-transparent max-[480px]:p-3.5`}
         >
           {/* ヘッダの器を全て <span> にしているのは、<button> の content model が phrasing content
               で、<div> を入れると HTML として不正になるため（ブラウザは許容するが仕様違反）。

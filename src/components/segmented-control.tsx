@@ -2,6 +2,7 @@ import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
+import { DISABLED_STATE, FOCUS_RING, TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のセグメンテッドコントロール（純粋 leaf UI。#53）。
@@ -51,8 +52,7 @@ export type SegmentedControlProps = Omit<
 const TRACK =
   'inline-flex items-center gap-0.5 rounded-md border border-solid border-border bg-surface-2 p-0.5';
 
-const SEGMENT =
-  'inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 min-w-(--control-hit-size) pointer-coarse:min-h-(--control-touch-size) pointer-coarse:min-w-(--control-touch-size) rounded-[7px] border-none bg-transparent px-3 py-1.5 font-body text-sm font-semibold whitespace-nowrap transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50';
+const SEGMENT = `inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 min-w-(--control-hit-size) pointer-coarse:min-h-(--control-touch-size) pointer-coarse:min-w-(--control-touch-size) rounded-[7px] border-none bg-transparent px-3 py-1.5 font-body text-sm font-semibold whitespace-nowrap ${TRANSITION_COLORS} ${FOCUS_RING} ${DISABLED_STATE}`;
 
 export default function SegmentedControl({
   items,

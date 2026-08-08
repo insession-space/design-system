@@ -3,6 +3,7 @@ import { Field } from '@base-ui/react/field';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { FOCUS_RING } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のチェックボックス（純粋 leaf UI）。claude design "INSESSION Design System" の Controls 仕様に準拠（#463）。
@@ -41,8 +42,7 @@ export type CheckboxProps = Omit<
 // ⚠ disabled は `disabled:` ではなく `data-disabled:` で書く。Base UI の Checkbox.Root が
 // 描画するのは `<span role="checkbox">` で、CSS の :disabled 疑似クラスはフォーム要素にしか
 // 適用されないため効かない（toggle.tsx / menu.tsx と同じ理由）。
-const BOX =
-  'relative grid h-[22px] w-[22px] place-items-center rounded-chip before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] border-2 border-solid p-0 transition-colors motion-reduce:transition-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const BOX = `relative grid h-[22px] w-[22px] place-items-center rounded-chip before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] border-2 border-solid p-0 transition-colors motion-reduce:transition-none ${FOCUS_RING}`;
 
 // disabled の見た目（薄く + not-allowed）は box だけでなく **ラベルを含む行全体** に効かせる。
 // has-[[data-disabled]] にしているのは、disabled が親から降ってくる経路があるため

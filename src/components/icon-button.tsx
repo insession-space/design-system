@@ -1,6 +1,7 @@
 import { Button as BaseButton } from '@base-ui/react/button';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
+import { FOCUS_RING, TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 
 // アイコンのみの正方形ボタン（純粋 leaf UI）。claude design "INSESSION Design System" 準拠（loophub #682）。
@@ -44,8 +45,7 @@ export type IconButtonProps = {
 //
 // これにより消費側は (a) `touchSize={44}` を渡す (b) `className="max-md:size-11"` のような
 // バリアント付きユーティリティを足す、のどちらでも「通常 30px / タッチ 44px」を表現できる。
-const BASE =
-  'inline-flex shrink-0 items-center justify-center rounded-md cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) size-(--icon-button-size) pointer-coarse:min-w-(--icon-button-touch-size) pointer-coarse:min-h-(--icon-button-touch-size) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-(--disabled-opacity) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const BASE = `inline-flex shrink-0 items-center justify-center rounded-md cursor-pointer ${TRANSITION_COLORS} size-(--icon-button-size) pointer-coarse:min-w-(--icon-button-touch-size) pointer-coarse:min-h-(--icon-button-touch-size) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-(--disabled-opacity) ${FOCUS_RING}`;
 
 const VARIANT: Record<IconButtonVariant, string> = {
   surface:

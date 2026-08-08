@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 
 // DS の Chip（純粋 leaf UI）。claude design "INSESSION Design System" の Chip 仕様に準拠（#463 / #663）。
@@ -35,8 +36,7 @@ export type ChipProps = {
   children: ReactNode;
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> & { className?: string };
 
-const BASE =
-  'inline-flex items-center gap-1.5 min-h-(--control-hit-size) min-w-(--control-hit-size) pointer-coarse:min-h-(--control-touch-size) pointer-coarse:min-w-(--control-touch-size) rounded-pill border border-solid text-sm cursor-pointer select-none transition-colors motion-reduce:transition-none duration-(--dur-fast)';
+const BASE = `inline-flex items-center gap-1.5 min-h-(--control-hit-size) min-w-(--control-hit-size) pointer-coarse:min-h-(--control-touch-size) pointer-coarse:min-w-(--control-touch-size) rounded-pill border border-solid text-sm cursor-pointer select-none ${TRANSITION_COLORS}`;
 // DS の3系統の pad。removable=6/10/6/14、avatar=5/13/5/5、既定=7/14。
 const PAD_DEFAULT = 'px-3.5 py-[7px]';
 const PAD_REMOVABLE = 'pl-[14px] pr-2.5 py-1.5';

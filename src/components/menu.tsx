@@ -2,6 +2,7 @@ import { Menu as BaseMenu } from '@base-ui/react/menu';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { FOCUS_RING, TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 import { mergePopupClassName, POPOVER_POSITIONER_BASE, popupBase } from './popover.tsx';
 
@@ -106,8 +107,7 @@ function MenuPopup({ padding = true, scroll = true, className, ...props }: MenuP
 // ⚠ mention.tsx が同じ行の見た目を再利用するため export しているが、**src/index.ts の公開
 // API には出さない**（パッケージ内部の共有に留める）。消費側に生のクラス文字列を配ると
 // 行の見た目が DS の外へ流出し、あとから変えられなくなる。
-export const MENU_ROW_BASE =
-  'flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-base shadow-none transition-colors motion-reduce:transition-none duration-(--dur-fast) cursor-pointer';
+export const MENU_ROW_BASE = `flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-base shadow-none ${TRANSITION_COLORS} cursor-pointer`;
 
 // Base UI の Item/RadioItem/CheckboxItem は <div> を描画するため、disabled は data-disabled
 // 属性で表現される(:disabled は button 等のフォーム要素にしか適用されないため効かない)。
@@ -137,7 +137,7 @@ export const MENU_ROW_BASE =
 // [data-disabled] の2ルールが同じ詳細度で並び、配布 CSS の出力順(Highlight が後)で勝敗が決まる。
 // その結果、無効行にカーソルが来たときだけ GrayText ではなく Highlight で描かれ、
 // 「操作できないのに選択可能に見える」状態になる。
-const ROW = `${MENU_ROW_BASE} data-highlighted:not-data-disabled:forced-colors:text-[color:Highlight] data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-highlighted:data-disabled:shadow-focus`;
+const ROW = `${MENU_ROW_BASE} data-highlighted:not-data-disabled:forced-colors:text-[color:Highlight] data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] ${FOCUS_RING} data-highlighted:data-disabled:shadow-focus`;
 
 // PlainItem は移行前と同じ <button> を描画するため、disabled/hover はネイティブ疑似クラス
 // (disabled:/enabled:)で表現できる。移行前の ROW と完全に同じ文字列になる。

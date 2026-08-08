@@ -4,6 +4,7 @@ import IconButton from '../components/icon-button.tsx';
 import { HStack, VStack } from '../components/layout.tsx';
 import LinkPreview, { type LinkPreviewMeta } from '../components/link-preview.tsx';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 import { hasSlotContent } from './slot.ts';
 import UserLabel from './user-label.tsx';
@@ -207,8 +208,7 @@ const AVATAR_SIZE = 36;
 // ユーティリティ(px-3.5 と px-2、bg-tint-22 と bg-surface-2)は「クラスを後ろに書いた方」ではなく
 // 「生成CSSで後に来た方」が勝つため、上書きが効くかがビルド順に依存してしまう。Chip 本体
 // (＝フィルター/タグ/入力トークンとしての見た目)は変えられないので、ここで閉じる。
-const REACTION_BASE =
-  'inline-flex items-center gap-1 rounded-pill border border-solid px-2 py-1 cursor-pointer select-none transition-colors motion-reduce:transition-none duration-(--dur-fast)';
+const REACTION_BASE = `inline-flex items-center gap-1 rounded-pill border border-solid px-2 py-1 cursor-pointer select-none ${TRANSITION_COLORS}`;
 const REACTION_DEFAULT = 'bg-surface-2 border-border-strong enabled:hover:bg-surface-hover';
 // 押している状態は「面」ではなく accent の枠で示す。tint の面を敷くと、その上に載る数字が
 // どの色でも同系色に寄って読みづらくなるため(#103)。数字は常に text 色なのでコントラストは

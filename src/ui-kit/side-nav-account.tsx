@@ -3,6 +3,7 @@ import type { AvatarStatus } from '../components/avatar.tsx';
 import Link from '../components/link.tsx';
 import { Menu, type MenuPositionerProps } from '../components/menu.tsx';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { FOCUS_RING, TRANSITION_COLORS } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 import UserLabel from './user-label.tsx';
 
@@ -91,8 +92,7 @@ const ROW =
   'flex w-full items-center gap-2.5 rounded-md border border-solid border-border bg-surface-3 px-2.5 py-2.5 text-left shadow-none';
 // 押せるときだけ足す（表示専用の行に cursor / hover を出すと押せると誤解させる。
 // user-label.tsx の INTERACTIVE と同じ考え方）。
-const ROW_INTERACTIVE =
-  'cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:bg-surface-hover hover:shadow-none active:scale-100 focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const ROW_INTERACTIVE = `cursor-pointer ${TRANSITION_COLORS} hover:bg-surface-hover hover:shadow-none active:scale-100 ${FOCUS_RING}`;
 
 const AFFORDANCE = 'shrink-0 text-text-faint';
 const AFFORDANCE_ICON_SIZE = 16;

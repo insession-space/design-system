@@ -1,6 +1,7 @@
 import { Button as BaseButton } from '@base-ui/react/button';
 import type { ReactNode } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { FOCUS_RING } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 import Spinner from './spinner.tsx';
 
@@ -69,8 +70,7 @@ export type ButtonProps = {
 // hover が効いてしまう**。Base UI Button は state の disabled を常に `data-disabled` として
 // 出すので、そちらを見れば両方の経路（disabled 属性 / aria-disabled）を1つの書き方で拾える。
 // 値は移行前から変えていない。
-const BASE =
-  'inline-flex items-center justify-center gap-2 border-2 border-solid box-border font-body cursor-pointer select-none transition-[transform,filter,background,color,box-shadow] motion-reduce:transition-none duration-(--dur-fast) ease-spring not-data-disabled:active:scale-[0.97] data-disabled:bg-surface-3 data-disabled:text-text-dim data-disabled:border-transparent data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:shadow-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const BASE = `inline-flex items-center justify-center gap-2 border-2 border-solid box-border font-body cursor-pointer select-none transition-[transform,filter,background,color,box-shadow] motion-reduce:transition-none duration-(--dur-fast) ease-spring not-data-disabled:active:scale-[0.97] data-disabled:bg-surface-3 data-disabled:text-text-dim data-disabled:border-transparent data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:shadow-none ${FOCUS_RING}`;
 
 // hover も `enabled:hover:` ではなく `hover:not-data-disabled:` で書く（理由は BASE のコメント）。
 // ⚠ **各 variant は background-color / color / border-color をそれぞれちょうど1つずつ持つ**。
