@@ -77,10 +77,7 @@ export default function ConfirmModal({
         <AlertDialog.Backdrop className={MODAL_BACKDROP_CLASS} />
         {/* Dialog.Popup と同様、Backdrop/Popup が兄弟になるため中央寄せは Viewport が担う
             （modal.tsx の Popup 内部実装と同じ理由。中央寄せクラス・z-index も modal.tsx と共有）。 */}
-        <AlertDialog.Viewport
-          className={MODAL_POSITIONER_CLASS}
-          style={{ zIndex: MODAL_Z_INDEX }}
-        >
+        <AlertDialog.Viewport className={MODAL_POSITIONER_CLASS} style={{ zIndex: MODAL_Z_INDEX }}>
           <AlertDialog.Popup
             className={twMerge(MODAL_LEGACY_POPUP_CLASS, className)}
             aria-label={ariaLabel ?? title}
