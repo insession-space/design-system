@@ -1,4 +1,4 @@
-import type { FormEvent, KeyboardEvent, MutableRefObject, ReactNode } from 'react';
+import type { FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { useEffect, useRef } from 'react';
 import Icon from '../icons/icon.tsx';
 import { TRANSITION_COLORS } from '../lib/class-presets.ts';
@@ -31,7 +31,7 @@ export type ComposerProps = {
   // 送信直後の一瞬の強調(呼び出し側が setTimeout で false に戻す想定)。
   flash?: boolean;
   // 外部から textarea へ focus するための ref。
-  textareaRef?: MutableRefObject<HTMLTextAreaElement | null>;
+  textareaRef?: RefObject<HTMLTextAreaElement | null>;
   // コンパクト表示(コミュニティの返信欄等、狭い行内に馴染ませたい場合)。
   size?: 'default' | 'compact';
   className?: string;
