@@ -66,16 +66,22 @@ export type ModalPortalProps = ComponentProps<typeof BaseDialog.Portal>;
 // legacy/ds 共通で .modal-backdrop（暗幕 + ブラー + fade-in）を使う（旧実装も両体裁で共通だった）。
 // className は twMerge へ渡すため string に絞る（Base UI の関数形式 `(state) => string` は
 // 旧実装のテンプレート連結でも文字列化されて壊れていたので、実質サポートしていなかった。button.tsx と同じ扱い）。
+//
+// ⚠ 下の MODAL_* は confirm-modal.tsx（AlertDialog 版）も同じ暗幕・中央寄せ・z-index を
+// 再現するために共有する。src/index.ts の公開 API には出さない（内部のクラス文字列）。
+export const MODAL_BACKDROP_CLASS = 'modal-backdrop';
+
 export type ModalBackdropProps = Omit<ComponentProps<typeof BaseDialog.Backdrop>, 'className'> & {
   className?: string;
 };
 
 function Backdrop({ className = '', ...props }: ModalBackdropProps) {
-  return <BaseDialog.Backdrop className={twMerge('modal-backdrop', className)} {...props} />;
+  return <BaseDialog.Backdrop className={twMerge(MODAL_BACKDROP_CLASS, className)} {...props} />;
 }
 
 // legacy 経路の本体クラス。components.css の .modal（幅 min(400px,92vw)・padding・card-in 等）。
-const LEGACY_POPUP_CLASS = 'modal';
+// confirm-modal.tsx も同じ .modal 体裁を共有する。
+export const MODAL_LEGACY_POPUP_CLASS = 'modal';
 // DS 構造の本体クラス。旧 modal.tsx の DS ブランチのクラス文字列をそのまま流用。
 const DS_POPUP_CLASS =
   'relative flex w-full flex-col overflow-hidden rounded-card border border-solid border-border bg-surface shadow-overlay animate-[card-in_0.4s_var(--ease-spring)_both] motion-reduce:animate-none';
@@ -86,7 +92,9 @@ const DS_POPUP_CLASS =
 // （オーケストレーター指定の公開 API 一覧に無いため）が、Popup の内部実装として使い、旧来の
 // 中央寄せ + 20px の余白を再現する。z-index は .modal-backdrop と同じ --z-modal を明示しないと、
 // Backdrop 側の明示 z-index が勝って Popup が背面に回ってしまう点に注意。
-const POSITIONER_CLASS = 'fixed inset-0 flex items-center justify-center p-5';
+// confirm-modal.tsx（AlertDialog）も同じ Viewport の中央寄せ + z-index を共有する。
+export const MODAL_POSITIONER_CLASS = 'fixed inset-0 flex items-center justify-center p-5';
+export const MODAL_Z_INDEX = 'var(--z-modal)';
 
 export type ModalPopupProps = Omit<ComponentProps<typeof BaseDialog.Popup>, 'className'> & {
   // 体裁の切り替え。既定 'legacy'。
@@ -95,10 +103,10 @@ export type ModalPopupProps = Omit<ComponentProps<typeof BaseDialog.Popup>, 'cla
 };
 
 function Popup({ variant = 'legacy', className = '', style, ...props }: ModalPopupProps) {
-  const popupClassName = variant === 'ds' ? DS_POPUP_CLASS : LEGACY_POPUP_CLASS;
+  const popupClassName = variant === 'ds' ? DS_POPUP_CLASS : MODAL_LEGACY_POPUP_CLASS;
   const popupStyle = variant === 'ds' ? { width: 'min(420px, 92vw)', ...style } : style;
   return (
-    <BaseDialog.Viewport className={POSITIONER_CLASS} style={{ zIndex: 'var(--z-modal)' }}>
+    <BaseDialog.Viewport className={MODAL_POSITIONER_CLASS} style={{ zIndex: MODAL_Z_INDEX }}>
       <BaseDialog.Popup
         className={twMerge(popupClassName, className)}
         style={popupStyle}
