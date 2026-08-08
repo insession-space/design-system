@@ -1,6 +1,7 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import type { ReactNode } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import Button, { type ButtonVariant } from './button.tsx';
 
 // 確認ダイアログ（純粋 leaf UI）。Base UI の AlertDialog を土台に DS
@@ -75,7 +76,7 @@ export default function ConfirmModal({
           style={{ zIndex: 'var(--z-modal)' }}
         >
           <AlertDialog.Popup
-            className={`modal ${className}`.trim()}
+            className={twMerge('modal', className)}
             aria-label={ariaLabel ?? title}
           >
             <span

@@ -1,6 +1,7 @@
 import { Popover as BasePopover } from '@base-ui/react/popover';
 import type * as React from 'react';
 import { createContext, useContext } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // ポップオーバーの共通基盤。Base UI(floating-ui ベース)の Popover へ委譲する薄い compound
 // ラッパー(#6)。以前はここで自前の PLACEMENT クラスマップ・portal 実測配置・useDismiss を
@@ -182,8 +183,12 @@ export type PopoverDescriptionProps = React.ComponentProps<typeof BasePopover.De
 export type PopoverCloseProps = React.ComponentProps<typeof BasePopover.Close>;
 export type PopoverArrowProps = React.ComponentProps<typeof BasePopover.Arrow>;
 
-export type PopoverPositionerProps = React.ComponentProps<typeof BasePopover.Positioner> & {
+export type PopoverPositionerProps = Omit<
+  React.ComponentProps<typeof BasePopover.Positioner>,
+  'className'
+> & {
   mobileSheet?: boolean;
+  className?: string;
 };
 
 function PopoverPositioner({
@@ -200,7 +205,7 @@ function PopoverPositioner({
         sideOffset={sideOffset}
         positionMethod={mobileSheet ? 'fixed' : positionMethod}
         collisionPadding={mobileSheet ? MOBILE_SHEET_COLLISION_PADDING : collisionPadding}
-        className={`${POPOVER_POSITIONER_BASE} ${className}`.trim()}
+        className={twMerge(POPOVER_POSITIONER_BASE, className)}
         {...props}
       />
     </MobileSheetContext.Provider>
@@ -238,14 +243,12 @@ export function popupBase({
   scroll: boolean;
   mobileSheet: boolean;
 }) {
-  return [
+  return twMerge(
     POPOVER_POPUP_BASE,
     padding ? POPOVER_POPUP_PADDING : '',
     scroll ? POPOVER_POPUP_SCROLL : '',
     mobileSheet ? MOBILE_SHEET_POPUP_CLASSNAME : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  );
 }
 
 // Base UI の className は `string | ((state) => string | undefined)` の union を受ける
@@ -257,9 +260,9 @@ export function mergePopupClassName<S>(
   className: string | ((state: S) => string | undefined) | undefined,
 ): string | ((state: S) => string) {
   if (typeof className === 'function') {
-    return (state: S) => `${base} ${className(state) ?? ''}`.trim();
+    return (state: S) => twMerge(base, className(state) ?? '');
   }
-  return `${base} ${className ?? ''}`.trim();
+  return twMerge(base, className ?? '');
 }
 
 export const Popover = {

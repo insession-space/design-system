@@ -1,6 +1,7 @@
 import { Button as BaseButton } from '@base-ui/react/button';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // アイコンのみの正方形ボタン（純粋 leaf UI）。claude design "INSESSION Design System" 準拠（loophub #682）。
 // 振る舞いは Base UI の Button へ委譲する（#33）。DS 側は見た目だけを持つ。
@@ -79,7 +80,7 @@ export default function IconButton({
         } as React.CSSProperties),
         ...style,
       }}
-      className={`${BASE} ${VARIANT[variant]} ${className}`.trim()}
+      className={twMerge(BASE, VARIANT[variant], className)}
       {...rest}
     >
       {icon}

@@ -5,6 +5,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のテキストリンク（純粋 leaf UI）。#633。下線は全 variant で使わず、ボタンのラベルのように
 // 「色 + フォントウェイト（+ hover の色/面変化）」で区別する。用途で3種に整理する:
@@ -58,7 +59,7 @@ const VARIANT: Record<LinkVariant, string> = {
 
 // variant のクラス文字列。react-router `Link`/`NavLink` の className にそのまま渡せる。
 export function linkClass(variant: LinkVariant = 'inline', className = ''): string {
-  return `${VARIANT[variant]} ${className}`.trim();
+  return twMerge(VARIANT[variant], className);
 }
 
 export type LinkProps = {
@@ -84,7 +85,7 @@ export default function Link({
     const child = children as ReactElement<{ className?: string }>;
     return cloneElement(child, {
       ...rest,
-      className: `${cls} ${child.props.className ?? ''}`.trim(),
+      className: twMerge(cls, child.props.className ?? ''),
     });
   }
   return (

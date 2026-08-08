@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS の Chip（純粋 leaf UI）。claude design "INSESSION Design System" の Chip 仕様に準拠（#463 / #663）。
 // タップできる要素（クイック返信・フィルター・タグ・入力トークン）。非対話の status ラベルは Badge を使う。
@@ -65,7 +66,7 @@ export default function Chip({
     <button
       type={type}
       aria-pressed={selected}
-      className={`${BASE} ${pad} ${selected ? SELECTED : DEFAULT} ${className}`.trim()}
+      className={twMerge(BASE, pad, selected ? SELECTED : DEFAULT, className)}
       {...rest}
     >
       {avatar && (

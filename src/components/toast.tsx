@@ -7,6 +7,7 @@ import { Toast as BaseToast } from '@base-ui/react/toast';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 const useToastManager = BaseToast.useToastManager;
 
@@ -106,7 +107,7 @@ function Viewport({ className = '' }: ToastViewportProps) {
   const { toasts } = useToastManager<ToastData>();
   return (
     <BaseToast.Portal>
-      <BaseToast.Viewport className={`${VIEWPORT} ${className}`.trim()}>
+      <BaseToast.Viewport className={twMerge(VIEWPORT, className)}>
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} />
         ))}

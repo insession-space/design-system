@@ -3,6 +3,7 @@ import { Field } from '@base-ui/react/field';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のチェックボックス（純粋 leaf UI）。claude design "INSESSION Design System" の Controls 仕様に準拠（#463）。
 // 振る舞いは Base UI の Checkbox へ委譲する（#22）。DS 側はトークンベースの見た目だけを持つ。
@@ -63,7 +64,7 @@ const LABEL = 'cursor-[inherit] text-base text-text';
 
 export default function Checkbox({ label, className = '', disabled, ...rest }: CheckboxProps) {
   return (
-    <Field.Root disabled={disabled} className={`${ROW} ${className}`.trim()}>
+    <Field.Root disabled={disabled} className={twMerge(ROW, className)}>
       <BaseCheckbox.Root
         disabled={disabled}
         className={(state) =>

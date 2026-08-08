@@ -2,6 +2,7 @@ import { Field } from '@base-ui/react/field';
 import { Slider as BaseSlider } from '@base-ui/react/slider';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 import { FIELD_LABEL, fieldLabelColor } from './input.tsx';
 
 // DS のスライダー（純粋 leaf UI。#53）。振る舞いは Base UI の Slider へ委譲し、
@@ -60,7 +61,10 @@ export default function Slider({
   return (
     <Field.Root
       disabled={disabled}
-      className={`flex w-full flex-col gap-2 data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50 ${className}`.trim()}
+      className={twMerge(
+        'flex w-full flex-col gap-2 data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50',
+        className,
+      )}
     >
       {(label || valueLabel) && (
         <div className="flex items-baseline justify-between gap-2">

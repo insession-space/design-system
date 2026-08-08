@@ -4,6 +4,7 @@ import IconButton from '../components/icon-button.tsx';
 import { HStack, VStack } from '../components/layout.tsx';
 import LinkPreview, { type LinkPreviewMeta } from '../components/link-preview.tsx';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import { hasSlotContent } from './slot.ts';
 import UserLabel from './user-label.tsx';
 
@@ -446,7 +447,7 @@ export default function MessageItem({
   // 「縮むことを許可」するだけで幅を取り切る指定ではないための併記(#97)。行方向 flex
   // の子として置かれたとき(消費側が MessageActionBar 等と横並びにする場合)、与えられた
   // 幅を使い切って本文の折り返し幅を最大化する。
-  const rootClass = `group w-full min-w-0 ${className}`.trim();
+  const rootClass = twMerge('group w-full min-w-0', className);
 
   if (!hasAvatar) {
     // アバター無し = 従来どおりの単一カラム。左カラムもインデントも作らない(#180)。

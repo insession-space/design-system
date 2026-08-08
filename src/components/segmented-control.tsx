@@ -2,6 +2,7 @@ import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のセグメンテッドコントロール（純粋 leaf UI。#53）。
 // 「並んだ選択肢のうち1つが必ず選ばれている」切り替え。振る舞いは Base UI の
@@ -63,7 +64,7 @@ export default function SegmentedControl({
   return (
     <RadioGroup
       aria-label={ariaLabel}
-      className={`${TRACK} ${fill ? 'flex w-full' : ''} ${className}`.trim()}
+      className={twMerge(TRACK, fill ? 'flex w-full' : '', className)}
       {...rest}
     >
       {items.map((item) => (
@@ -72,11 +73,13 @@ export default function SegmentedControl({
           value={item.value}
           disabled={item.disabled}
           className={(state) =>
-            `${SEGMENT} ${fill ? 'flex-1' : ''} ${
+            twMerge(
+              SEGMENT,
+              fill ? 'flex-1' : '',
               state.checked
                 ? 'bg-surface text-text shadow-elevation-1 forced-colors:text-[color:Highlight]'
-                : 'text-text-dim hover:text-text'
-            }`.trim()
+                : 'text-text-dim hover:text-text',
+            )
           }
         >
           {item.icon}

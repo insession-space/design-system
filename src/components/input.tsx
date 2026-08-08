@@ -1,6 +1,7 @@
 import { Field } from '@base-ui/react/field';
 import type { InputHTMLAttributes, ReactNode } from 'react';
 import { useState } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のテキスト入力（純粋 leaf UI）。claude design "INSESSION Design System" の Inputs 仕様に準拠（#463 / #663）。
 // label と control の紐付け・error メッセージの aria 連携を Base UI の Field へ委譲する（#22）。
@@ -96,7 +97,7 @@ export default function Input({
     <Field.Root
       disabled={disabled}
       invalid={invalid}
-      className={`flex flex-col gap-[7px] ${className}`.trim()}
+      className={twMerge('flex flex-col gap-[7px]', className)}
     >
       {label != null && (
         <Field.Label className={`${FIELD_LABEL} ${fieldLabelColor(invalid, focused)}`}>

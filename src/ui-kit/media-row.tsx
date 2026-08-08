@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // キュー/プレイリストの1行(#94)。MediaThumbnail / IconButton 等の複数プリミティブを束ねる
 // 横1行のレイアウトなので、src/components/ ではなく src/ui-kit/ に置く。
@@ -43,7 +44,7 @@ export function MediaRow({
 }: MediaRowProps) {
   return (
     <div
-      className={`flex items-center gap-3 rounded-card bg-surface p-2 ${className}`.trim()}
+      className={twMerge('flex items-center gap-3 rounded-card bg-surface p-2', className)}
       {...rest}
     >
       {dragHandle && (

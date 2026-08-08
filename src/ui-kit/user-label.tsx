@@ -1,6 +1,7 @@
 import type { MouseEvent, ReactNode } from 'react';
 import Avatar, { type AvatarStatus } from '../components/avatar.tsx';
 import { type Gap, HStack, VStack } from '../components/layout.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import { hasSlotContent } from './slot.ts';
 
 // アバター + ユーザー名の複合コンポーネント(#62)。src/components/ のプリミティブ(Avatar /
@@ -143,7 +144,7 @@ export default function UserLabel({
   const interactiveClass = interactive
     ? ` ${INTERACTIVE} ${disabled ? INTERACTIVE_DISABLED : INTERACTIVE_ENABLED}`
     : '';
-  const rootClass = `min-w-0${interactiveClass} ${className}`.trim();
+  const rootClass = twMerge('min-w-0', interactiveClass, className);
 
   const body = (
     <HStack gap={spec.gap} align="center" className={interactive ? 'min-w-0' : rootClass}>

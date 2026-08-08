@@ -1,4 +1,5 @@
 import { type DragEvent, type ReactNode, useId, useRef, useState } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のアップロードタイル（#53）。「破線ボーダーのタイル + 隠しファイル入力」の複合部品。
 //
@@ -91,13 +92,15 @@ export default function UploadTile({
       // ⚠ 状態別のクラスは排他で出す（#17 の教訓）。border-color / background が
       // dragging / disabled / 既定で入れ替わるため、同一クラス属性に並べると
       // 勝敗が配布 CSS の出力順で決まってしまう。
-      className={`${TILE} ${
+      className={twMerge(
+        TILE,
         disabled
           ? 'cursor-not-allowed border-border bg-transparent opacity-50'
           : dragging
             ? 'border-accent bg-tint-5'
-            : 'border-border bg-transparent hover:border-border-strong hover:bg-tint-3'
-      } ${className}`.trim()}
+            : 'border-border bg-transparent hover:border-border-strong hover:bg-tint-3',
+        className,
+      )}
       onDragEnter={onDragEnter}
       onDragOver={(e) => {
         if (!disabled) e.preventDefault();

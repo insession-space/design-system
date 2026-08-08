@@ -1,6 +1,7 @@
 import type { FormEvent, KeyboardEvent, MutableRefObject, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // メッセージ入力フォーム(純粋 leaf UI)。space のチャット入力とコミュニティの投稿入力の共通化
 // (#1027)。textarea + 下段アクション行(左: actions props / 右: 送信アイコンボタン)の構成で、
@@ -133,9 +134,11 @@ export default function Composer({
     // フォーカスが来た場合はフォーカス表示が優先される（意図どおり）。
     <form
       onSubmit={handleFormSubmit}
-      className={`flex flex-col rounded-card border border-solid bg-surface transition-[border-color,box-shadow] motion-reduce:transition-none duration-(--dur-fast) focus-within:outline-(length:--focus-ring-width) focus-within:outline-offset-(--focus-ring-offset) focus-within:outline-focus-ring ${
-        flash ? 'border-accent shadow-focus' : 'border-border'
-      } ${className}`.trim()}
+      className={twMerge(
+        'flex flex-col rounded-card border border-solid bg-surface transition-[border-color,box-shadow] motion-reduce:transition-none duration-(--dur-fast) focus-within:outline-(length:--focus-ring-width) focus-within:outline-offset-(--focus-ring-offset) focus-within:outline-focus-ring',
+        flash ? 'border-accent shadow-focus' : 'border-border',
+        className,
+      )}
     >
       <textarea
         ref={ref}

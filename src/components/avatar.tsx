@@ -1,5 +1,6 @@
 import { Avatar as BaseAvatar } from '@base-ui/react/avatar';
 import type { CSSProperties, ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // アバター（純粋 leaf UI）。DS(claude design "INSESSION Design System" #663)の Avatar 仕様へ寄せる。
 // 画像があれば <img>、無ければ名前先頭1文字（label 指定時はその文字列）の fallback 円を出す。
@@ -88,7 +89,7 @@ export default function Avatar({
     };
     return (
       <span
-        className={`relative inline-flex shrink-0 ${className}`.trim()}
+        className={twMerge('relative inline-flex shrink-0', className)}
         style={{ width: dim, height: dim }}
       >
         {/* Root が円。Image が読み込めたときだけ Image が、失敗・未読み込みのときは
@@ -98,9 +99,11 @@ export default function Avatar({
             画像が正常なら Image が object-cover で Root を覆うので背景は見えない
             （透過 PNG のときだけ移行前と差が出るが、fallback が成立する方を優先した）。 */}
         <BaseAvatar.Root
-          className={`inline-flex items-center justify-center overflow-hidden rounded-pill font-bold text-white ${
-            bg ? '' : 'bg-info'
-          } ${ring ? 'border-2 border-solid border-surface' : ''}`.trim()}
+          className={twMerge(
+            'inline-flex items-center justify-center overflow-hidden rounded-pill font-bold text-white',
+            bg ? '' : 'bg-info',
+            ring ? 'border-2 border-solid border-surface' : '',
+          )}
           style={circleStyle}
         >
           {src && (
@@ -137,7 +140,7 @@ export default function Avatar({
   }
   return (
     <span
-      className={`${className} ${fallbackClassName}`.trim()}
+      className={twMerge(className, fallbackClassName)}
       style={bg ? { ...dim, background: bg } : dim}
     >
       {content}
@@ -167,7 +170,7 @@ export function AvatarStack({ people = [], max = 4, size = 40, className = '' }:
   const extra = people.length - shown.length;
   const overlap = -(size * 0.3);
   return (
-    <span className={`inline-flex items-center ${className}`.trim()}>
+    <span className={twMerge('inline-flex items-center', className)}>
       {shown.map((p, i) => (
         <span key={i} style={{ marginLeft: i ? overlap : 0 }} className="inline-flex rounded-pill">
           <Avatar {...p} size={size} ring />

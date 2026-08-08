@@ -1,5 +1,6 @@
 import { Switch } from '@base-ui/react/switch';
 import type * as React from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS の Switch（トグル。純粋 leaf UI）。claude design "INSESSION Design System" の Switch 仕様に準拠（#463 / #663）。
 // 振る舞いは Base UI の Switch へ委譲する（#22）。DS 側はトークンベースの見た目だけを持つ。
@@ -64,7 +65,11 @@ export default function Toggle({
       // 移行前の onClick={onChange}（引数なしトグル）と同じ呼び方を保つ。
       onCheckedChange={() => onChange?.()}
       className={(state) =>
-        `${TRACK} ${state.checked ? 'bg-success forced-colors:border-[Highlight]' : 'bg-border-strong'} ${className}`.trim()
+        twMerge(
+          TRACK,
+          state.checked ? 'bg-success forced-colors:border-[Highlight]' : 'bg-border-strong',
+          className,
+        )
       }
       {...rest}
     >

@@ -10,6 +10,7 @@ import {
   useRef,
 } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // 折りたたみリスト（アコーディオン）。「一覧の各行を要約1行に圧縮し、開いた1件だけが中身を出す」
 // という形を提供する。スレッド一覧・FAQ・設定のセクションなど、件数が増えてもページの縦の長さを
@@ -140,7 +141,7 @@ export function Accordion({
         ref={rootRef}
         {...{ [ROOT_ATTR]: '' }}
         onKeyDown={handleKeyDown}
-        className={`flex flex-col gap-2.5 ${className}`.trim()}
+        className={twMerge('flex flex-col gap-2.5', className)}
         {...rest}
       >
         {children}
@@ -224,9 +225,11 @@ export function AccordionItem({
     <div
       // overflow-hidden は展開部の角が枠からはみ出すのを防ぐ。開いている間は枠を一段強くして、
       // 「どれが開いているか」を色の差だけで伝える（位置や影を動かさない）。
-      className={`overflow-hidden rounded-card border border-solid bg-surface transition-colors motion-reduce:transition-none duration-(--dur-fast) ${
-        open ? 'border-border-strong' : 'border-border'
-      } ${className}`.trim()}
+      className={twMerge(
+        'overflow-hidden rounded-card border border-solid bg-surface transition-colors motion-reduce:transition-none duration-(--dur-fast)',
+        open ? 'border-border-strong' : 'border-border',
+        className,
+      )}
       {...rest}
     >
       <Heading className="m-0 font-body text-base font-normal leading-none">

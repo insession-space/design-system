@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 import { type Align, type Gap, HStack, VStack } from './layout.tsx';
 import {
   ELEVATION_BG,
@@ -42,7 +43,13 @@ export function AppBar({
   const stickyClass = sticky ? 'sticky top-0 z-[var(--z-sticky)]' : '';
   return (
     <header
-      className={`${stickyClass} ${ELEVATION_BG[1]} border-x-0 border-t-0 border-b border-solid ${ELEVATION_BORDER_COLOR[1]} ${className}`.trim()}
+      className={twMerge(
+        stickyClass,
+        ELEVATION_BG[1],
+        'border-x-0 border-t-0 border-b border-solid',
+        ELEVATION_BORDER_COLOR[1],
+        className,
+      )}
       {...rest}
     >
       <HStack align="center" gap="sm" className="px-4 py-3">
@@ -104,7 +111,7 @@ export function PageHeader({
       justify="between"
       align="start"
       gap="md"
-      className={`flex-wrap ${className}`.trim()}
+      className={twMerge('flex-wrap', className)}
       {...rest}
     >
       <VStack gap="xs" className="min-w-0">
@@ -179,7 +186,7 @@ export function PageLayout({
     <main className={PAGE_SCROLL_MAIN[scroll]}>{children}</main>
   );
   return (
-    <VStack className={`${PAGE_SCROLL_ROOT[scroll]} ${className}`.trim()} {...rest}>
+    <VStack className={twMerge(PAGE_SCROLL_ROOT[scroll], className)} {...rest}>
       {appBar}
       {body}
       {footer}
@@ -199,7 +206,12 @@ export type FooterProps = {
 export function Footer({ padding = 'md', className = '', ...rest }: FooterProps) {
   return (
     <footer
-      className={`border-x-0 border-b-0 border-t border-solid ${ELEVATION_BORDER_COLOR[1]} ${SURFACE_PADDING_CLASS[padding]} ${className}`.trim()}
+      className={twMerge(
+        'border-x-0 border-b-0 border-t border-solid',
+        ELEVATION_BORDER_COLOR[1],
+        SURFACE_PADDING_CLASS[padding],
+        className,
+      )}
       {...rest}
     />
   );

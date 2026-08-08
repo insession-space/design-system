@@ -1,4 +1,5 @@
 import type { MouseEvent, ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // 設定行（純粋 leaf UI。#73）。
 // 「アイコン + ラベル（+ 説明）」の左側と、「Toggle / SegmentedControl / Button / 値」の
@@ -135,7 +136,7 @@ export default function SettingRow({
         </span>
         {description ? (
           <span
-            className={`text-sm text-text-dim ${DESCRIPTION_LINES_CLASS[descriptionLines]}`.trim()}
+            className={twMerge('text-sm text-text-dim', DESCRIPTION_LINES_CLASS[descriptionLines])}
           >
             {description}
           </span>
@@ -145,8 +146,10 @@ export default function SettingRow({
     </div>
   );
 
-  const interactiveClass =
-    `${INTERACTIVE} ${disabled ? INTERACTIVE_DISABLED : INTERACTIVE_ENABLED}`.trim();
+  const interactiveClass = twMerge(
+    INTERACTIVE,
+    disabled ? INTERACTIVE_DISABLED : INTERACTIVE_ENABLED,
+  );
 
   let mainNode = main;
   if (href != null) {
@@ -179,7 +182,7 @@ export default function SettingRow({
   }
 
   return (
-    <div className={`${ROW} ${className}`.trim()}>
+    <div className={twMerge(ROW, className)}>
       {mainNode}
       {/* trailing は常に対話要素の**外**。ここが `<button>` の中に入らないことが
           この部品の存在理由なので、mainNode の内側へ移さないこと。 */}

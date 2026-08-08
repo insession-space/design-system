@@ -2,6 +2,7 @@ import { useRender } from '@base-ui/react/use-render';
 import type * as React from 'react';
 import { createContext, useContext } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import { linkClass } from './link.tsx';
 
 // 画面左の縦ナビ（左レール）。#76。insession-app（web / help）と loophub-app が同型の左レールを
@@ -97,7 +98,7 @@ function SideNavRoot({
     defaultTagName: 'nav',
     props: {
       ...props,
-      className: `${ROOT} ${ROOT_HEIGHT[fullHeight ? 'true' : 'false']} ${className}`.trim(),
+      className: twMerge(ROOT, ROOT_HEIGHT[fullHeight ? 'true' : 'false'], className),
     },
   });
 }
@@ -110,7 +111,7 @@ function SideNavBrand({ className = '', render, ...props }: SideNavBrandProps): 
   return useRender({
     render,
     defaultTagName: 'a',
-    props: { ...props, className: `${BRAND} ${className}`.trim() },
+    props: { ...props, className: twMerge(BRAND, className) },
   });
 }
 
@@ -131,7 +132,7 @@ function SideNavGroup({
     state: { secondary },
     props: {
       ...props,
-      className: `${secondary ? GROUP_SECONDARY : GROUP} ${className}`.trim(),
+      className: twMerge(secondary ? GROUP_SECONDARY : GROUP, className),
     },
   });
   return <SecondaryContext.Provider value={secondary}>{element}</SecondaryContext.Provider>;
@@ -177,7 +178,7 @@ function SideNavItem({
       ...externalProps,
       ...props,
       'aria-current': active ? 'page' : undefined,
-      className: `${ITEM} ${ITEM_VARIANT[secondary ? 'secondary' : 'primary']} ${className}`.trim(),
+      className: twMerge(ITEM, ITEM_VARIANT[secondary ? 'secondary' : 'primary'], className),
       children: (
         <>
           {icon && (

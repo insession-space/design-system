@@ -2,6 +2,7 @@ import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup as BaseToggleGroup } from '@base-ui/react/toggle-group';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のトグルグループ（純粋 leaf UI。#53）。ツールバーの「排他選択される道具ボタン」を組む。
 // 振る舞いは Base UI の ToggleGroup / Toggle へ委譲し、DS 側は見た目だけを持つ（#22 の方針）。
@@ -48,9 +49,7 @@ const TOOL =
   'inline-flex size-10 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-solid p-0 font-body text-sm transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50';
 
 export function ToggleGroup({ ariaLabel, className = '', ...rest }: ToggleGroupProps) {
-  return (
-    <BaseToggleGroup aria-label={ariaLabel} className={`${GROUP} ${className}`.trim()} {...rest} />
-  );
+  return <BaseToggleGroup aria-label={ariaLabel} className={twMerge(GROUP, className)} {...rest} />;
 }
 
 export function ToolButton({ icon, label, children, className = '', ...rest }: ToolButtonProps) {
@@ -58,11 +57,14 @@ export function ToolButton({ icon, label, children, className = '', ...rest }: T
     <Toggle
       aria-label={label}
       className={(state) =>
-        `${TOOL} ${
+        twMerge(
+          TOOL,
           state.pressed
             ? 'border-transparent bg-accent text-on-accent forced-colors:text-[color:Highlight]'
-            : 'border-transparent bg-transparent text-text-dim hover:bg-surface-hover hover:text-text'
-        } ${children ? 'w-auto px-3' : ''} ${className}`.trim()
+            : 'border-transparent bg-transparent text-text-dim hover:bg-surface-hover hover:text-text',
+          children ? 'w-auto px-3' : '',
+          className,
+        )
       }
       {...rest}
     >

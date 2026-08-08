@@ -1,6 +1,7 @@
 import ReactEmojiPicker, { EmojiStyle, Theme } from 'emoji-picker-react';
 import { type CSSProperties, type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import { Popover, type PopoverPortalProps, type PopoverPositionerProps } from './popover.tsx';
 
 // 絵文字ピッカー(#190)。Popover で開き、選ばれた絵文字を `onSelect` で返す。リアクションの
@@ -299,11 +300,12 @@ export default function EmojiPicker({
             //   320px、スクロールバーが2本）。スクロールは Picker が内部で持っている。
             scroll={false}
             aria-label={triggerLabel}
-            className={`${PICKER_POPUP_CLASS} ${HIDE_CATEGORY_NAV} ${
-              shrunk ? UNCLAMP_POPUP_WIDTH : ''
-            } ${className}`
-              .replace(/\s+/g, ' ')
-              .trim()}
+            className={twMerge(
+              PICKER_POPUP_CLASS,
+              HIDE_CATEGORY_NAV,
+              shrunk ? UNCLAMP_POPUP_WIDTH : '',
+              className,
+            )}
           >
             <PickerFrame width={width} height={fitted.height} scale={fitted.scale} shrunk={shrunk}>
               <ReactEmojiPicker

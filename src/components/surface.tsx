@@ -1,5 +1,6 @@
 import { useRender } from '@base-ui/react/use-render';
 import type * as React from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // 面プリミティブ(Surface / Paper / Card / Panel。純粋 leaf UI)。
 // layout.tsx が「並び・余白・揃え」だけを扱い色/面/角丸を持たないのに対し、こちらは逆に
@@ -79,7 +80,7 @@ function surfaceClass(elevation: Elevation, tone: SurfaceTone, shadow: SurfaceSh
   const borderColor = ELEVATION_BORDER_COLOR[elevation];
   const border = borderColor ? `border border-solid ${borderColor}` : '';
   const shadowClass = shadow === 'none' ? '' : ELEVATION_SHADOW[elevation];
-  return [bg, border, shadowClass].filter(Boolean).join(' ');
+  return twMerge(bg, border, shadowClass);
 }
 
 export type SurfaceRadius = 'none' | 'chip' | 'md' | 'card' | 'panel' | 'pill';
@@ -175,8 +176,14 @@ export function Surface({
     defaultTagName: 'div',
     props: {
       ...rest,
-      className:
-        `${surfaceClass(elevation, tone, shadow)} ${RADIUS_CLASS[radius]} ${SURFACE_PADDING_CLASS[padding]}${interactiveClass}${resetClass} ${className}`.trim(),
+      className: twMerge(
+        surfaceClass(elevation, tone, shadow),
+        RADIUS_CLASS[radius],
+        SURFACE_PADDING_CLASS[padding],
+        interactiveClass,
+        resetClass,
+        className,
+      ),
     },
   });
 }

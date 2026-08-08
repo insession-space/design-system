@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // フィード(アクティビティ/タイムライン)の1件分。src/components/ のプリミティブと違い、
 // これは複数のプリミティブを束ねた**複合**コンポーネントなので src/ui-kit/ に置く。
@@ -48,7 +49,10 @@ export function FeedItem({
 }: FeedItemProps) {
   return (
     <article
-      className={`flex gap-3 rounded-card border border-solid border-border bg-surface p-3.5 ${className}`.trim()}
+      className={twMerge(
+        'flex gap-3 rounded-card border border-solid border-border bg-surface p-3.5',
+        className,
+      )}
       {...rest}
     >
       {/* アバターは本文が長くても縮まないよう固定幅の列にする。self-start により、
@@ -96,7 +100,10 @@ export function FeedItemAttachment({
 }: FeedItemAttachmentProps) {
   return (
     <div
-      className={`flex items-center gap-3 rounded-md border border-solid border-border bg-bg-elevated p-2.5 ${className}`.trim()}
+      className={twMerge(
+        'flex items-center gap-3 rounded-md border border-solid border-border bg-bg-elevated p-2.5',
+        className,
+      )}
       {...rest}
     >
       {thumbnail && (

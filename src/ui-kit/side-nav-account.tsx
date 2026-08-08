@@ -3,6 +3,7 @@ import type { AvatarStatus } from '../components/avatar.tsx';
 import Link from '../components/link.tsx';
 import { Menu, type MenuPositionerProps } from '../components/menu.tsx';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import UserLabel from './user-label.tsx';
 
 // SideNav 最下部に常設するログインユーザーのエリア（#79）。行（アバター + 名前 + メール +
@@ -172,7 +173,7 @@ export default function SideNavAccount({
   className = '',
 }: SideNavAccountProps): ReactNode {
   const interactive = items != null && items.length > 0;
-  const rowClassName = `${ROW} ${ROW_INTERACTIVE} ${className}`.trim();
+  const rowClassName = twMerge(ROW, ROW_INTERACTIVE, className);
   const content = (
     <AccountRowContent
       name={name}
@@ -189,7 +190,7 @@ export default function SideNavAccount({
   // items が無ければ「表示だけ」の行。押せないので <div> で描き、hover / cursor も出さない。
   if (!interactive) {
     return (
-      <div className={`${ROW} ${className}`.trim()} aria-label={ariaLabel}>
+      <div className={twMerge(ROW, className)} aria-label={ariaLabel}>
         {content}
       </div>
     );

@@ -1,5 +1,6 @@
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import type { ComponentProps } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // 汎用モーダルの外殻（純粋 leaf UI）。Base UI の Dialog に委譲し、focus trap・scroll lock・
 // 閉じた後のフォーカス復帰を自前実装せずに獲得する（#6）。backdrop クリック判定・Esc リスナー・
@@ -63,10 +64,14 @@ export type ModalPortalProps = ComponentProps<typeof BaseDialog.Portal>;
 
 // ---- Backdrop ----
 // legacy/ds 共通で .modal-backdrop（暗幕 + ブラー + fade-in）を使う（旧実装も両体裁で共通だった）。
-export type ModalBackdropProps = ComponentProps<typeof BaseDialog.Backdrop>;
+// className は twMerge へ渡すため string に絞る（Base UI の関数形式 `(state) => string` は
+// 旧実装のテンプレート連結でも文字列化されて壊れていたので、実質サポートしていなかった。button.tsx と同じ扱い）。
+export type ModalBackdropProps = Omit<ComponentProps<typeof BaseDialog.Backdrop>, 'className'> & {
+  className?: string;
+};
 
 function Backdrop({ className = '', ...props }: ModalBackdropProps) {
-  return <BaseDialog.Backdrop className={`modal-backdrop ${className}`.trim()} {...props} />;
+  return <BaseDialog.Backdrop className={twMerge('modal-backdrop', className)} {...props} />;
 }
 
 // legacy 経路の本体クラス。components.css の .modal（幅 min(400px,92vw)・padding・card-in 等）。
@@ -83,9 +88,10 @@ const DS_POPUP_CLASS =
 // Backdrop 側の明示 z-index が勝って Popup が背面に回ってしまう点に注意。
 const POSITIONER_CLASS = 'fixed inset-0 flex items-center justify-center p-5';
 
-export type ModalPopupProps = ComponentProps<typeof BaseDialog.Popup> & {
+export type ModalPopupProps = Omit<ComponentProps<typeof BaseDialog.Popup>, 'className'> & {
   // 体裁の切り替え。既定 'legacy'。
   variant?: ModalVariant;
+  className?: string;
 };
 
 function Popup({ variant = 'legacy', className = '', style, ...props }: ModalPopupProps) {
@@ -94,7 +100,7 @@ function Popup({ variant = 'legacy', className = '', style, ...props }: ModalPop
   return (
     <BaseDialog.Viewport className={POSITIONER_CLASS} style={{ zIndex: 'var(--z-modal)' }}>
       <BaseDialog.Popup
-        className={`${popupClassName} ${className}`.trim()}
+        className={twMerge(popupClassName, className)}
         style={popupStyle}
         {...props}
       />
@@ -106,12 +112,14 @@ function Popup({ variant = 'legacy', className = '', style, ...props }: ModalPop
 // legacy 経路は消費側が素の <h2> を書く運用のまま（components.css の `.modal h2` 装飾に依存する
 // 既存消費側を壊さないため。ConfirmModal もこの流儀）。Modal.Title は主に ds 構造で使う想定なので、
 // 既定クラスは ds 側の見出し文字装飾のみ持たせる。
-export type ModalTitleProps = ComponentProps<typeof BaseDialog.Title>;
+export type ModalTitleProps = Omit<ComponentProps<typeof BaseDialog.Title>, 'className'> & {
+  className?: string;
+};
 
 function Title({ className = '', ...props }: ModalTitleProps) {
   return (
     <BaseDialog.Title
-      className={`text-lg font-extrabold text-text ${className}`.trim()}
+      className={twMerge('text-lg font-extrabold text-text', className)}
       {...props}
     />
   );
@@ -125,15 +133,19 @@ export type ModalDescriptionProps = ComponentProps<typeof BaseDialog.Description
 // ---- Close ----
 // legacy/ds でクラス・既定の子要素（× 記号 or Icon）が異なるため Popup と同じく variant で切り替える。
 // Base UI の Close は押下で自動的にダイアログを閉じる（onClick で onClose を呼ぶ配線は不要になった）。
-export type ModalCloseProps = ComponentProps<typeof BaseDialog.Close> & {
+export type ModalCloseProps = Omit<ComponentProps<typeof BaseDialog.Close>, 'className'> & {
   variant?: ModalVariant;
+  className?: string;
 };
 
 function Close({ variant = 'legacy', className = '', children, ...props }: ModalCloseProps) {
   if (variant === 'ds') {
     return (
       <BaseDialog.Close
-        className={`inline-flex h-[30px] w-[30px] items-center justify-center rounded-chip border-none bg-transparent text-text-dim cursor-pointer enabled:hover:bg-surface-hover enabled:hover:text-text ${className}`.trim()}
+        className={twMerge(
+          'inline-flex h-[30px] w-[30px] items-center justify-center rounded-chip border-none bg-transparent text-text-dim cursor-pointer enabled:hover:bg-surface-hover enabled:hover:text-text',
+          className,
+        )}
         {...props}
       >
         {children}
@@ -141,7 +153,7 @@ function Close({ variant = 'legacy', className = '', children, ...props }: Modal
     );
   }
   return (
-    <BaseDialog.Close className={`modal-close ${className}`.trim()} {...props}>
+    <BaseDialog.Close className={twMerge('modal-close', className)} {...props}>
       {children ?? '×'}
     </BaseDialog.Close>
   );
@@ -152,7 +164,7 @@ function Close({ variant = 'legacy', className = '', children, ...props }: Modal
 export type ModalBodyProps = ComponentProps<'div'>;
 
 function Body({ className = '', ...props }: ModalBodyProps) {
-  return <div className={`p-[18px] ${className}`.trim()} {...props} />;
+  return <div className={twMerge('p-[18px]', className)} {...props} />;
 }
 
 // ---- Footer ----
@@ -162,7 +174,10 @@ export type ModalFooterProps = ComponentProps<'div'>;
 function Footer({ className = '', ...props }: ModalFooterProps) {
   return (
     <div
-      className={`flex justify-end gap-2.5 border-x-0 border-b-0 border-t border-solid border-border bg-surface-2 px-[18px] py-3.5 ${className}`.trim()}
+      className={twMerge(
+        'flex justify-end gap-2.5 border-x-0 border-b-0 border-t border-solid border-border bg-surface-2 px-[18px] py-3.5',
+        className,
+      )}
       {...props}
     />
   );

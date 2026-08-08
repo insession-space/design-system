@@ -11,6 +11,8 @@
 //   レイアウトの判断なので消費側が決める。
 // - 文言は i18n を持たない DS の規約どおり props 注入。人数に応じた出し分け(「〇〇さんが入力中」/
 //   「〇〇さん他2人が入力中」)は呼び出し側で組み立て済みの文字列にして渡す。
+import { twMerge } from '../lib/tw-merge.ts';
+
 export type TypingIndicatorProps = {
   // 表示する文言(組み立て済みの文字列)。空 / 未指定なら非表示になる。
   label?: string;
@@ -42,7 +44,11 @@ export default function TypingIndicator({
   return (
     <div
       aria-live="polite"
-      className={`flex items-center gap-1.5 overflow-hidden text-sm italic leading-none text-text-dim ${state} ${className}`.trim()}
+      className={twMerge(
+        'flex items-center gap-1.5 overflow-hidden text-sm italic leading-none text-text-dim',
+        state,
+        className,
+      )}
     >
       {visible && (
         <>

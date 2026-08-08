@@ -1,5 +1,6 @@
 import type { ReactNode, RefObject } from 'react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 import { Popover, type PopoverPositionerProps } from './popover.tsx';
 
 // テキスト入力欄の中でトリガー文字を打つと候補を出すサジェストの**共通実装**（#190）。
@@ -332,7 +333,7 @@ export default function Suggest<T extends SuggestItem>({
             role="listbox"
             id={listboxId}
             aria-label={ariaLabel}
-            className={`flex flex-col gap-0.5 p-1 ${className}`.trim()}
+            className={twMerge('flex flex-col gap-0.5 p-1', className)}
           >
             {items.length === 0 && hasEmptyLabel ? (
               <div role="presentation" className="px-[13px] py-[11px] text-base text-text-dim">

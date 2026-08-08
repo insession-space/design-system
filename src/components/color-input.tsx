@@ -2,6 +2,7 @@ import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
 import type * as React from 'react';
 import type { InputHTMLAttributes } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS の色選択（#53）。パレットから選ぶ `ColorSwatchGroup` と、任意色を選ぶ `ColorInput`。
 //
@@ -51,7 +52,7 @@ export function ColorSwatchGroup({
   return (
     <RadioGroup
       aria-label={ariaLabel}
-      className={`flex flex-wrap items-center gap-2 ${className}`.trim()}
+      className={twMerge('flex flex-wrap items-center gap-2', className)}
       {...rest}
     >
       {swatches.map((s) => (
@@ -97,7 +98,10 @@ export function ColorInput({ label, size = 28, className = '', ...rest }: ColorI
   return (
     <span
       style={{ width: size, height: size }}
-      className={`relative inline-flex shrink-0 overflow-hidden rounded-pill shadow-[inset_0_0_0_1px_var(--color-border)] focus-within:shadow-focus ${className}`.trim()}
+      className={twMerge(
+        'relative inline-flex shrink-0 overflow-hidden rounded-pill shadow-[inset_0_0_0_1px_var(--color-border)] focus-within:shadow-focus',
+        className,
+      )}
     >
       {/* 現在値の面はネイティブの swatch がそのまま描く（`value` を JS で読んで親に
           background を当て直す必要はない）。input を親より 1.5 倍に広げて負の inset で

@@ -1,5 +1,6 @@
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
 import type { ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // 画面端からスライドインする Drawer(サイドシート。純粋 leaf UI。#155)。
 // 振る舞いは Base UI の Dialog へ委譲する(Modal / BottomSheet と同じ土台)。DS 側は見た目と、
@@ -137,7 +138,7 @@ export default function Drawer({
           <BaseDialog.Popup
             data-drawer-popup=""
             data-drawer-side={side}
-            className={`${POPUP_BASE} ${POPUP_SIDE[side]} ${className}`.trim()}
+            className={twMerge(POPUP_BASE, POPUP_SIDE[side], className)}
             style={{ width }}
             aria-label={ariaLabel}
           >

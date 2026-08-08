@@ -8,6 +8,8 @@
 // 無く、DS の配布 CSS には含まれていなかった。DS のプリビルド CSS だけを読む loophub や、
 // DS 単体利用・Storybook では回転が止まらないままだった。動きの抑制ユーティリティを
 // クラス文字列に併記して、取り込み方に依らず必ず届くようにしている。
+import { twMerge } from '../lib/tw-merge.ts';
+
 export type SpinnerProps = {
   // 直径(px)。既定 16。
   size?: number;
@@ -25,7 +27,10 @@ export default function Spinner({ size = 16, thickness, label, className = '' }:
       role={label ? 'status' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      className={`inline-block shrink-0 rounded-pill border-solid border-border-strong animate-spin motion-reduce:animate-none ${className}`.trim()}
+      className={twMerge(
+        'inline-block shrink-0 rounded-pill border-solid border-border-strong animate-spin motion-reduce:animate-none',
+        className,
+      )}
       style={{
         width: size,
         height: size,

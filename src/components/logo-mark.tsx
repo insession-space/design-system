@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // ロゴマーク（純粋 leaf UI）。DS 既定は「リング＋3 ドット」マーク（loophub #724）。
 // リング(ストローク)は @theme の text トークン(var(--color-text)=currentColor)を参照し、ライト/ダークで
@@ -72,7 +73,7 @@ export type BrandImageProps = {
 };
 
 export function BrandImage({ src, lightSrc, alt, width, height, className = '' }: BrandImageProps) {
-  const imgClass = `block ${className}`.trim();
+  const imgClass = twMerge('block', className);
   if (lightSrc == null) {
     return <img src={src} alt={alt} width={width} height={height} className={imgClass} />;
   }
@@ -94,7 +95,7 @@ export function BrandImage({ src, lightSrc, alt, width, height, className = '' }
         aria-hidden="true"
         width={width}
         height={height}
-        className={`hidden [[data-theme=light]_&]:block ${className}`.trim()}
+        className={twMerge('hidden [[data-theme=light]_&]:block', className)}
       />
     </>
   );
@@ -112,13 +113,13 @@ export default function LogoMark({
   const markNode = mark ?? <Mark size={size} />;
 
   if (variant === 'cluster') {
-    return <span className={`inline-flex ${className}`.trim()}>{markNode}</span>;
+    return <span className={twMerge('inline-flex', className)}>{markNode}</span>;
   }
 
   const wordmarkPx = wordmarkSize ?? Math.round(size * 0.85);
 
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`.trim()}>
+    <span className={twMerge('inline-flex items-center gap-2', className)}>
       {markNode}
       {showWordmark && (
         <span
