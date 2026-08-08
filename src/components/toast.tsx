@@ -56,7 +56,7 @@ export type ToastData = {
 const SNACKBAR_TONE: Record<ToastTone, { border: string; icon: string }> = {
   success: { border: 'border-border-strong', icon: 'text-success' },
   error: { border: 'border-snackbar-danger-border', icon: 'text-snackbar-danger' },
-  info: { border: 'border-border-strong', icon: 'text-success' },
+  info: { border: 'border-border-strong', icon: 'text-info' },
   warn: { border: 'border-border-strong', icon: 'text-warning' },
   danger: { border: 'border-snackbar-danger-border', icon: 'text-snackbar-danger' },
 };
