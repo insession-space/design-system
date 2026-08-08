@@ -1,5 +1,23 @@
 # @insession/design-system
 
+## 7.13.2
+
+### Patch Changes
+
+- 77e6423: refactor(composer): `textareaRef` の型を非推奨の `MutableRefObject` から `RefObject` へ
+
+  `Composer` の `textareaRef` prop が React 19 で非推奨の `MutableRefObject<HTMLTextAreaElement | null>` を使っていた。兄弟コンポーネント（`Suggest` / `Mention` / `EmojiSuggest`）と同じ `RefObject<HTMLTextAreaElement | null>` へ揃えた。React 19 では両者は構造的に同一（`{ current: T }`）で、`useRef(null)` の戻り値もそのまま渡せるため、消費側の変更は不要。
+
+- 77e6423: fix(toast): snackbar variant の `info` トーンのアイコン色を緑（`text-success`）から `text-info` へ修正
+
+  `snackbar` variant の `info` トーンは、アイコン色に `text-success`（緑）を割り当てており、`success` トーンと見分けがつかなかった（`success` からのコピペと思われる）。同じファイルの default variant 用マップ（`DS_TONE.info`）は正しく `text-info` を使っている。`info` を本来のセマンティック色 `text-info` へ揃えた。
+
+- 77e6423: fix(className): 全プリミティブの `className` 合成を twMerge 経由に統一する
+
+  これまで `twMerge`（`src/lib/tw-merge.ts`）を通していたのは `Button` だけで、他の全コンポーネントは `` `${BASE} ${variant} ${className}`.trim() `` の**単純連結**で class を組んでいた。連結は class 属性の並びを変えるだけなので、消費側の `className` が効くかどうかは配布 CSS の生成順で決まり、`<Chip className="text-accent">` のような上書きが variant 側のユーティリティに負けていた（消費側は毎回 `text-accent!` のように `!important` で回避する必要があった）。
+
+  全プリミティブ／ui-kit の className 合成を `twMerge(...)` へ置き換え、`BASE < variant < className` の順序を優先順位として確定させた。これにより消費側の `className` が `!` なしで確実に勝つ。DS 自身の class 文字列は「同一プロパティのユーティリティを 1 つだけ出す」契約を守っているため、既存の描画は変わらない（`scripts/check-merge-collapse.mjs` が 1 リテラル内の同一プロパティ重複が無いことを機械的に検証する）。DOM に出るクラス名は公開契約ではないため、消費側の import は不変。
+
 ## 7.13.1
 
 ### Patch Changes
