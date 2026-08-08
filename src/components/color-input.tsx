@@ -2,6 +2,8 @@ import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
 import type * as React from 'react';
 import type { InputHTMLAttributes } from 'react';
+import { DISABLED_STATE, FOCUS_RING } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS の色選択（#53）。パレットから選ぶ `ColorSwatchGroup` と、任意色を選ぶ `ColorInput`。
 //
@@ -38,8 +40,7 @@ export type ColorSwatchGroupProps = Omit<
 
 // 選択中は「外側にリング、内側に地の色の隙間」で示す。塗り自体は色データなので変えられない
 // （チェックマークを重ねる案は淡い色の上で見えなくなるため採らなかった）。
-const SWATCH =
-  'relative shrink-0 cursor-pointer rounded-pill border-none p-0 transition-[box-shadow,transform] motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50';
+const SWATCH = `relative shrink-0 cursor-pointer rounded-pill border-none p-0 transition-[box-shadow,transform] motion-reduce:transition-none duration-(--dur-fast) ${FOCUS_RING} ${DISABLED_STATE}`;
 
 export function ColorSwatchGroup({
   swatches,
@@ -51,7 +52,7 @@ export function ColorSwatchGroup({
   return (
     <RadioGroup
       aria-label={ariaLabel}
-      className={`flex flex-wrap items-center gap-2 ${className}`.trim()}
+      className={twMerge('flex flex-wrap items-center gap-2', className)}
       {...rest}
     >
       {swatches.map((s) => (
@@ -97,7 +98,10 @@ export function ColorInput({ label, size = 28, className = '', ...rest }: ColorI
   return (
     <span
       style={{ width: size, height: size }}
-      className={`relative inline-flex shrink-0 overflow-hidden rounded-pill shadow-[inset_0_0_0_1px_var(--color-border)] focus-within:shadow-focus ${className}`.trim()}
+      className={twMerge(
+        'relative inline-flex shrink-0 overflow-hidden rounded-pill shadow-[inset_0_0_0_1px_var(--color-border)] focus-within:shadow-focus',
+        className,
+      )}
     >
       {/* 現在値の面はネイティブの swatch がそのまま描く（`value` を JS で読んで親に
           background を当て直す必要はない）。input を親より 1.5 倍に広げて負の inset で

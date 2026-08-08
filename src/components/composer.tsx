@@ -1,6 +1,8 @@
-import type { FormEvent, KeyboardEvent, MutableRefObject, ReactNode } from 'react';
+import type { FormEvent, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { useEffect, useRef } from 'react';
 import Icon from '../icons/icon.tsx';
+import { TRANSITION_COLORS } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // メッセージ入力フォーム(純粋 leaf UI)。space のチャット入力とコミュニティの投稿入力の共通化
 // (#1027)。textarea + 下段アクション行(左: actions props / 右: 送信アイコンボタン)の構成で、
@@ -29,7 +31,7 @@ export type ComposerProps = {
   // 送信直後の一瞬の強調(呼び出し側が setTimeout で false に戻す想定)。
   flash?: boolean;
   // 外部から textarea へ focus するための ref。
-  textareaRef?: MutableRefObject<HTMLTextAreaElement | null>;
+  textareaRef?: RefObject<HTMLTextAreaElement | null>;
   // コンパクト表示(コミュニティの返信欄等、狭い行内に馴染ませたい場合)。
   size?: 'default' | 'compact';
   className?: string;
@@ -133,9 +135,11 @@ export default function Composer({
     // フォーカスが来た場合はフォーカス表示が優先される（意図どおり）。
     <form
       onSubmit={handleFormSubmit}
-      className={`flex flex-col rounded-card border border-solid bg-surface transition-[border-color,box-shadow] motion-reduce:transition-none duration-(--dur-fast) focus-within:outline-(length:--focus-ring-width) focus-within:outline-offset-(--focus-ring-offset) focus-within:outline-focus-ring ${
-        flash ? 'border-accent shadow-focus' : 'border-border'
-      } ${className}`.trim()}
+      className={twMerge(
+        'flex flex-col rounded-card border border-solid bg-surface transition-[border-color,box-shadow] motion-reduce:transition-none duration-(--dur-fast) focus-within:outline-(length:--focus-ring-width) focus-within:outline-offset-(--focus-ring-offset) focus-within:outline-focus-ring',
+        flash ? 'border-accent shadow-focus' : 'border-border',
+        className,
+      )}
     >
       <textarea
         ref={ref}
@@ -156,7 +160,7 @@ export default function Composer({
           aria-label={sendLabel}
           title={sendLabel}
           disabled={!canSubmit}
-          className={`inline-flex shrink-0 cursor-pointer items-center justify-center rounded-pill border-none bg-transparent p-0 transition-colors motion-reduce:transition-none duration-(--dur-fast) ${btnSize} ${
+          className={`inline-flex shrink-0 cursor-pointer items-center justify-center rounded-pill border-none bg-transparent p-0 ${TRANSITION_COLORS} ${btnSize} ${
             canSubmit ? 'text-accent-soft' : 'text-text-dim'
           } enabled:hover:bg-tint-5 enabled:hover:text-accent-soft disabled:cursor-not-allowed disabled:forced-colors:text-[color:GrayText] disabled:opacity-35 focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring`}
         >

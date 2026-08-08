@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // Badge（非対話の status/meta ラベル。純粋 leaf UI）。claude design "INSESSION Design System" 準拠（#463 / #663）。
 // タップできる要素は Chip、継続的な状態の点+枠は StatusBadge、mono-caps の状態タグは Lozenge を使う
@@ -22,9 +23,11 @@ export type CountChipProps = {
 export function CountChip({ children, animated = false, className = '' }: CountChipProps) {
   return (
     <span
-      className={`inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 rounded-pill bg-success-surface-strong text-success text-xs font-extrabold tracking-normal${
-        animated ? ' animate-[pop-in_0.3s_var(--ease-spring)] motion-reduce:animate-none' : ''
-      } ${className}`.trim()}
+      className={twMerge(
+        'inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 rounded-pill bg-success-surface-strong text-success text-xs font-extrabold tracking-normal',
+        animated ? ' animate-[pop-in_0.3s_var(--ease-spring)] motion-reduce:animate-none' : '',
+        className,
+      )}
     >
       {children}
     </span>
@@ -82,9 +85,13 @@ export function Badge({
   const shapeClass = isPill ? 'rounded-pill' : 'rounded-chip';
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 font-body text-xs font-semibold ${TONE[legacyTone]} ${shapeClass}${
-        legacyNew ? ' uppercase tracking-tag' : ''
-      } ${className}`.trim()}
+      className={twMerge(
+        'inline-flex shrink-0 items-center gap-1.5 px-2.5 py-1 font-body text-xs font-semibold',
+        TONE[legacyTone],
+        shapeClass,
+        legacyNew ? ' uppercase tracking-tag' : '',
+        className,
+      )}
     >
       {showDot && (
         <span className={`h-1.5 w-1.5 rounded-pill ${DOT[legacyTone]}`} aria-hidden="true" />

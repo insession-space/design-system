@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // ステータス表現（純粋 leaf UI）。オンライン/実行中/エラー等の状態を、セマンティックカラー
 // トークンに沿って表す。feature ごとに個別だった app-running-dot / 参加者オンライン点 /
@@ -40,7 +41,12 @@ export function StatusDot({
       aria-label={label}
       aria-hidden={label ? undefined : true}
       style={{ width: size, height: size }}
-      className={`inline-block shrink-0 rounded-pill ${DOT_TONE[tone]}${pulse ? ' animate-pulse' : ''} ${className}`.trim()}
+      className={twMerge(
+        'inline-block shrink-0 rounded-pill',
+        DOT_TONE[tone],
+        pulse ? ' animate-pulse' : '',
+        className,
+      )}
     />
   );
 }
@@ -72,7 +78,11 @@ export function StatusBadge({
 }: StatusBadgeProps) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-pill border border-solid px-2 py-0.5 text-xs font-extrabold uppercase tracking-tag ${BADGE_TONE[tone]} ${className}`.trim()}
+      className={twMerge(
+        'inline-flex shrink-0 items-center gap-1.5 rounded-pill border border-solid px-2 py-0.5 text-xs font-extrabold uppercase tracking-tag',
+        BADGE_TONE[tone],
+        className,
+      )}
     >
       {dot && <StatusDot tone={tone} size={6} pulse={pulse} />}
       {children}

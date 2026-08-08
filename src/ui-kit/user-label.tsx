@@ -1,6 +1,8 @@
 import type { MouseEvent, ReactNode } from 'react';
 import Avatar, { type AvatarStatus } from '../components/avatar.tsx';
 import { type Gap, HStack, VStack } from '../components/layout.tsx';
+import { FOCUS_RING, TRANSITION_COLORS } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 import { hasSlotContent } from './slot.ts';
 
 // アバター + ユーザー名の複合コンポーネント(#62)。src/components/ のプリミティブ(Avatar /
@@ -110,8 +112,7 @@ export type UserLabelProps = {
 // 操作可能にしたときだけ当てる打ち消し + 状態表現。素の <button> / <a> が持つ既定
 // (塗り・padding・下線・色)を消し、面はホバーでだけ出す。行そのものが押せることを
 // 示すため cursor と focus リングをここで持つ(消費側で毎回書かせない)。
-const INTERACTIVE =
-  'w-full rounded-md border-none bg-transparent p-0 text-left no-underline transition-colors motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const INTERACTIVE = `w-full rounded-md border-none bg-transparent p-0 text-left no-underline ${TRANSITION_COLORS} ${FOCUS_RING}`;
 const INTERACTIVE_ENABLED = 'cursor-pointer hover:bg-surface-hover';
 // ⚠ hover の面は disabled のときに出さない。薄いのに反応する見た目は押せると誤解させる
 // (list-row.tsx が持っていた注意点をここへ引き継ぐ)。
@@ -143,7 +144,7 @@ export default function UserLabel({
   const interactiveClass = interactive
     ? ` ${INTERACTIVE} ${disabled ? INTERACTIVE_DISABLED : INTERACTIVE_ENABLED}`
     : '';
-  const rootClass = `min-w-0${interactiveClass} ${className}`.trim();
+  const rootClass = twMerge('min-w-0', interactiveClass, className);
 
   const body = (
     <HStack gap={spec.gap} align="center" className={interactive ? 'min-w-0' : rootClass}>

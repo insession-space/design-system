@@ -7,6 +7,7 @@ import { Toast as BaseToast } from '@base-ui/react/toast';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 const useToastManager = BaseToast.useToastManager;
 
@@ -56,7 +57,7 @@ export type ToastData = {
 const SNACKBAR_TONE: Record<ToastTone, { border: string; icon: string }> = {
   success: { border: 'border-border-strong', icon: 'text-success' },
   error: { border: 'border-snackbar-danger-border', icon: 'text-snackbar-danger' },
-  info: { border: 'border-border-strong', icon: 'text-success' },
+  info: { border: 'border-border-strong', icon: 'text-info' },
   warn: { border: 'border-border-strong', icon: 'text-warning' },
   danger: { border: 'border-snackbar-danger-border', icon: 'text-snackbar-danger' },
 };
@@ -106,7 +107,7 @@ function Viewport({ className = '' }: ToastViewportProps) {
   const { toasts } = useToastManager<ToastData>();
   return (
     <BaseToast.Portal>
-      <BaseToast.Viewport className={`${VIEWPORT} ${className}`.trim()}>
+      <BaseToast.Viewport className={twMerge(VIEWPORT, className)}>
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} />
         ))}

@@ -1,5 +1,6 @@
 import { HStack, VStack } from '../components/layout.tsx';
 import Skeleton from '../components/skeleton.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // `MessageItem`(src/ui-kit/message-item.tsx)の読み込み中プレースホルダ(#87)。
 //
@@ -91,7 +92,7 @@ export default function MessageItemSkeleton({
 
   // ルートの w-full min-w-0 は message-item.tsx と同じ理由(#97)。行方向 flex の子として
   // 置かれても与えられた幅を使い切る。
-  const rootClass = `w-full min-w-0 ${className}`.trim();
+  const rootClass = twMerge('w-full min-w-0', className);
 
   if (!avatar) {
     return (

@@ -1,5 +1,7 @@
 import { useRender } from '@base-ui/react/use-render';
 import type * as React from 'react';
+import { FOCUS_RING } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // 面プリミティブ(Surface / Paper / Card / Panel。純粋 leaf UI)。
 // layout.tsx が「並び・余白・揃え」だけを扱い色/面/角丸を持たないのに対し、こちらは逆に
@@ -79,7 +81,7 @@ function surfaceClass(elevation: Elevation, tone: SurfaceTone, shadow: SurfaceSh
   const borderColor = ELEVATION_BORDER_COLOR[elevation];
   const border = borderColor ? `border border-solid ${borderColor}` : '';
   const shadowClass = shadow === 'none' ? '' : ELEVATION_SHADOW[elevation];
-  return [bg, border, shadowClass].filter(Boolean).join(' ');
+  return twMerge(bg, border, shadowClass);
 }
 
 export type SurfaceRadius = 'none' | 'chip' | 'md' | 'card' | 'panel' | 'pill';
@@ -117,8 +119,7 @@ export const SURFACE_PADDING_CLASS: Record<SurfacePadding, string> = {
 // 面変化 + translateY(-2px) の控えめな持ち上げで表す(theme.css の --shadow-glow 廃止コメント
 // 参照)。ホバーの持ち上げがあるぶん、transition も interactive のときだけ付ける
 // (静止状態のカードにまで transition を持たせる理由が無いため)。
-const INTERACTIVE_CLASS =
-  'cursor-pointer transition-[transform,background,box-shadow] motion-reduce:transition-none duration-(--dur-fast) hover:-translate-y-0.5 hover:bg-surface-hover focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const INTERACTIVE_CLASS = `cursor-pointer transition-[transform,background,box-shadow] motion-reduce:transition-none duration-(--dur-fast) hover:-translate-y-0.5 hover:bg-surface-hover ${FOCUS_RING}`;
 
 // render で要素の実体を差し替えたときにだけ足す打ち消し(#56)。既定の <div> には当てない
 // —— `m-0` / `text-left` は同じプロパティのユーティリティ(`mt-4` / `text-center`)と強さが
@@ -175,8 +176,14 @@ export function Surface({
     defaultTagName: 'div',
     props: {
       ...rest,
-      className:
-        `${surfaceClass(elevation, tone, shadow)} ${RADIUS_CLASS[radius]} ${SURFACE_PADDING_CLASS[padding]}${interactiveClass}${resetClass} ${className}`.trim(),
+      className: twMerge(
+        surfaceClass(elevation, tone, shadow),
+        RADIUS_CLASS[radius],
+        SURFACE_PADDING_CLASS[padding],
+        interactiveClass,
+        resetClass,
+        className,
+      ),
     },
   });
 }

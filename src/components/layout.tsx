@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // レイアウトプリミティブ（Stack / Grid / Spacer / Divider / Center / Container。純粋 leaf UI）。
 // アプリの画面組みで繰り返し書かれる flex/grid の定型を吸収する。見た目のトークンは持たず、
@@ -193,7 +194,15 @@ export function Stack({
   const wrapClass = wrap ? ' flex-wrap' : '';
   return (
     <div
-      className={`flex ${DIRECTION[direction]} ${gapClass}${alignClass}${justifyClass}${wrapClass} ${className}`.trim()}
+      className={twMerge(
+        'flex',
+        DIRECTION[direction],
+        gapClass,
+        alignClass,
+        justifyClass,
+        wrapClass,
+        className,
+      )}
       {...rest}
     />
   );
@@ -236,7 +245,7 @@ export function Grid({
   const justifyClass = justify ? ` ${JUSTIFY[justify]}` : '';
   return (
     <div
-      className={`grid ${columnsClass} ${gapClass}${alignClass}${justifyClass} ${className}`.trim()}
+      className={twMerge('grid', columnsClass, gapClass, alignClass, justifyClass, className)}
       {...rest}
     />
   );
@@ -248,7 +257,7 @@ export type SpacerProps = {
 
 // Spacer: flex 中で余白を食う不可視の伸縮要素。装飾のみなので aria-hidden にする。
 export function Spacer({ className = '', ...rest }: SpacerProps) {
-  return <div aria-hidden="true" className={`flex-1 ${className}`.trim()} {...rest} />;
+  return <div aria-hidden="true" className={twMerge('flex-1', className)} {...rest} />;
 }
 
 export type DividerOrientation = 'horizontal' | 'vertical';
@@ -272,7 +281,7 @@ export function Divider({ orientation = 'horizontal', className = '', ...rest }:
     <div
       role="separator"
       aria-orientation={orientation}
-      className={`shrink-0 bg-border ${DIVIDER_ORIENTATION[orientation]} ${className}`.trim()}
+      className={twMerge('shrink-0 bg-border', DIVIDER_ORIENTATION[orientation], className)}
       {...rest}
     />
   );
@@ -289,7 +298,7 @@ export type CenterProps = {
 // 意図しない横並びになるため grid を選ぶ）。
 export function Center({ inline = false, className = '', ...rest }: CenterProps) {
   const display = inline ? 'inline-grid' : 'grid';
-  return <div className={`${display} place-items-center ${className}`.trim()} {...rest} />;
+  return <div className={twMerge(display, 'place-items-center', className)} {...rest} />;
 }
 
 export type ContainerSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -313,6 +322,6 @@ export type ContainerProps = {
 // max-width が効かない（要素が縮んだままになる）ことがあるため明示する。
 export function Container({ size = 'lg', className = '', ...rest }: ContainerProps) {
   return (
-    <div className={`mx-auto w-full px-4 ${CONTAINER_SIZE[size]} ${className}`.trim()} {...rest} />
+    <div className={twMerge('mx-auto w-full px-4', CONTAINER_SIZE[size], className)} {...rest} />
   );
 }

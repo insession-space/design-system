@@ -54,6 +54,10 @@
 @source "../components/*.tsx";
 @source "../icons/*.tsx";
 @source "../ui-kit/*.tsx";
+/* class-presets.ts にも DOM に出るクラス列（FOCUS_RING 等）が静的リテラルで載る。substitution 後は
+ * それらのクラスの唯一の出所になるので、走査対象に明示して含める。lib/ 全体ではなくこのファイルだけを
+ * 指すのは、tw-merge.ts が持つトークン名の配列（'focus' 'soft' 等）を走査対象に入れないため。 */
+@source "../lib/class-presets.ts";
 
 /* ⚠ **明示した @source だけでは走査対象は閉じない。** Tailwind CLI はリポジトリ配下を自動でも
  * 走査するため、上の3つ以外のファイル（stories/ .storybook/ scripts/ …）に書かれた

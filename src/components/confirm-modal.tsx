@@ -1,7 +1,14 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import type { ReactNode } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import Button, { type ButtonVariant } from './button.tsx';
+import {
+  MODAL_BACKDROP_CLASS,
+  MODAL_LEGACY_POPUP_CLASS,
+  MODAL_POSITIONER_CLASS,
+  MODAL_Z_INDEX,
+} from './modal.tsx';
 
 // 確認ダイアログ（純粋 leaf UI）。Base UI の AlertDialog を土台に DS
 // (claude design "INSESSION Design System" #663) の Confirm 体裁「tone のアイコン円 + 見出し + 本文 +
@@ -66,16 +73,13 @@ export default function ConfirmModal({
       }}
     >
       <AlertDialog.Portal>
-        {/* legacy 経路と同じ .modal-backdrop（暗幕 + ブラー + fade-in）。 */}
-        <AlertDialog.Backdrop className="modal-backdrop" />
+        {/* legacy 経路と同じ .modal-backdrop（暗幕 + ブラー + fade-in）。modal.tsx と共有。 */}
+        <AlertDialog.Backdrop className={MODAL_BACKDROP_CLASS} />
         {/* Dialog.Popup と同様、Backdrop/Popup が兄弟になるため中央寄せは Viewport が担う
-            （modal.tsx の Popup 内部実装と同じ理由。z-index も .modal-backdrop と揃える）。 */}
-        <AlertDialog.Viewport
-          className="fixed inset-0 flex items-center justify-center p-5"
-          style={{ zIndex: 'var(--z-modal)' }}
-        >
+            （modal.tsx の Popup 内部実装と同じ理由。中央寄せクラス・z-index も modal.tsx と共有）。 */}
+        <AlertDialog.Viewport className={MODAL_POSITIONER_CLASS} style={{ zIndex: MODAL_Z_INDEX }}>
           <AlertDialog.Popup
-            className={`modal ${className}`.trim()}
+            className={twMerge(MODAL_LEGACY_POPUP_CLASS, className)}
             aria-label={ariaLabel ?? title}
           >
             <span

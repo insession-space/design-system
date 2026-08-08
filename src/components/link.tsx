@@ -5,6 +5,8 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
+import { TRANSITION_COLORS } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のテキストリンク（純粋 leaf UI）。#633。下線は全 variant で使わず、ボタンのラベルのように
 // 「色 + フォントウェイト（+ hover の色/面変化）」で区別する。用途で3種に整理する:
@@ -42,10 +44,8 @@ const VARIANT: Record<LinkVariant, string> = {
   // 下線はベタではなく **1px の控えめな下線 + 4px のオフセット**にして、DS の「下線を使わない」
   // 意匠からの逸脱を最小に留める(ベタ下線ほど強く出ない)。hover で下線を濃くして反応も返す。
   // 他の variant は本文に埋め込まれないので下線を持たない(下のコメント参照)。
-  inline:
-    'text-link font-semibold underline decoration-1 underline-offset-4 decoration-link/60 cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:text-link-hover hover:decoration-link-hover',
-  subtle:
-    'text-link text-sm font-semibold no-underline cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) hover:text-link-hover',
+  inline: `text-link font-semibold underline decoration-1 underline-offset-4 decoration-link/60 cursor-pointer ${TRANSITION_COLORS} hover:text-link-hover hover:decoration-link-hover`,
+  subtle: `text-link text-sm font-semibold no-underline cursor-pointer ${TRANSITION_COLORS} hover:text-link-hover`,
   pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-pill uppercase no-underline cursor-pointer transition-[background,color,transform] motion-reduce:transition-none duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent-soft hover:-translate-y-px',
   wrapper: 'text-inherit no-underline cursor-pointer',
   bare: 'no-underline cursor-pointer',
@@ -58,7 +58,7 @@ const VARIANT: Record<LinkVariant, string> = {
 
 // variant のクラス文字列。react-router `Link`/`NavLink` の className にそのまま渡せる。
 export function linkClass(variant: LinkVariant = 'inline', className = ''): string {
-  return `${VARIANT[variant]} ${className}`.trim();
+  return twMerge(VARIANT[variant], className);
 }
 
 export type LinkProps = {
@@ -84,7 +84,7 @@ export default function Link({
     const child = children as ReactElement<{ className?: string }>;
     return cloneElement(child, {
       ...rest,
-      className: `${cls} ${child.props.className ?? ''}`.trim(),
+      className: twMerge(cls, child.props.className ?? ''),
     });
   }
   return (

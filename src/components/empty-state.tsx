@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // 空状態のカード（純粋 leaf UI）。EmptyNote が「一行だけのそっけない不在の告知」なのに対し、
 // こちらは アイコン + タイトル + ヒント + CTA で「なぜ空なのか / 次に何をすればよいか」まで
@@ -24,7 +25,10 @@ export type EmptyStateProps = {
 export default function EmptyState({ icon, title, hint, action, className = '' }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center gap-3 rounded-card border border-dashed border-border bg-surface/40 px-6 py-10 text-center ${className}`.trim()}
+      className={twMerge(
+        'flex flex-col items-center gap-3 rounded-card border border-dashed border-border bg-surface/40 px-6 py-10 text-center',
+        className,
+      )}
     >
       <span className="flex h-12 w-12 items-center justify-center rounded-pill bg-tint-8 text-accent">
         <Icon name={icon} size={24} />

@@ -3,6 +3,8 @@ import { Radio as BaseRadio } from '@base-ui/react/radio';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
+import { FOCUS_RING } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS のラジオ（純粋 leaf UI）。claude design "INSESSION Design System" の Controls 仕様に準拠（#463）。
 // 振る舞いは Base UI の Radio / RadioGroup へ委譲する（#22）。DS 側は見た目だけを持つ。
@@ -45,8 +47,7 @@ export type RadioItemProps = Omit<
   className?: string;
 };
 
-const CIRCLE =
-  'relative grid h-[22px] w-[22px] place-items-center rounded-pill before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] border-2 border-solid bg-transparent p-0 transition-colors motion-reduce:transition-none focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const CIRCLE = `relative grid h-[22px] w-[22px] place-items-center rounded-pill before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] border-2 border-solid bg-transparent p-0 transition-colors motion-reduce:transition-none ${FOCUS_RING}`;
 const DOT =
   'h-2.5 w-2.5 rounded-pill bg-accent forced-colors:bg-[Highlight] transition-transform motion-reduce:transition-none duration-(--dur-fast)';
 
@@ -70,7 +71,7 @@ const LABEL = 'cursor-[inherit] text-base text-text';
 // レイアウトの既定をここで持つ）。横並びにしたいときは className で上書きする。
 function RadioGroup({ children, className = '', ...rest }: RadioGroupProps) {
   return (
-    <BaseRadioGroup className={`flex flex-col gap-2.5 ${className}`.trim()} {...rest}>
+    <BaseRadioGroup className={twMerge('flex flex-col gap-2.5', className)} {...rest}>
       {children}
     </BaseRadioGroup>
   );
@@ -78,7 +79,7 @@ function RadioGroup({ children, className = '', ...rest }: RadioGroupProps) {
 
 function RadioItem({ label, disabled, className = '', ...rest }: RadioItemProps) {
   return (
-    <Field.Root disabled={disabled} className={`${ROW} ${className}`.trim()}>
+    <Field.Root disabled={disabled} className={twMerge(ROW, className)}>
       <BaseRadio.Root
         disabled={disabled}
         className={(state) =>

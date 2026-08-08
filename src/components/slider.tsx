@@ -2,6 +2,8 @@ import { Field } from '@base-ui/react/field';
 import { Slider as BaseSlider } from '@base-ui/react/slider';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
+import { DISABLED_STATE, FOCUS_RING } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 import { FIELD_LABEL, fieldLabelColor } from './input.tsx';
 
 // DS のスライダー（純粋 leaf UI。#53）。振る舞いは Base UI の Slider へ委譲し、
@@ -47,8 +49,7 @@ const TRACK = 'relative h-1.5 w-full grow rounded-pill bg-border';
 // `style="position: relative"` が出ていた）。効かないクラスを残すと「絶対配置で組んである」
 // という誤読を招くので置かない。inset/width も Base UI が inline で入れる。
 const INDICATOR = 'rounded-pill bg-accent';
-const THUMB =
-  'relative size-4 rounded-pill bg-white before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] shadow-[0_1px_3px_rgba(0,0,0,0.3)] transition-transform motion-reduce:transition-none duration-(--dur-fast) focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const THUMB = `relative size-4 rounded-pill bg-white before:absolute before:left-1/2 before:top-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:size-(--control-hit-size) pointer-coarse:before:size-(--control-touch-size) before:content-[""] shadow-[0_1px_3px_rgba(0,0,0,0.3)] transition-transform motion-reduce:transition-none duration-(--dur-fast) ${FOCUS_RING}`;
 
 export default function Slider({
   label,
@@ -60,7 +61,7 @@ export default function Slider({
   return (
     <Field.Root
       disabled={disabled}
-      className={`flex w-full flex-col gap-2 data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:opacity-50 ${className}`.trim()}
+      className={twMerge(`flex w-full flex-col gap-2 ${DISABLED_STATE}`, className)}
     >
       {(label || valueLabel) && (
         <div className="flex items-baseline justify-between gap-2">

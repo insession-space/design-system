@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS の Lozenge（純粋 leaf UI）。claude design "INSESSION Design System" の Lozenge 仕様に準拠（#463）。
 // 状態やメタ情報の小ラベル（LIVE / PENDING / REC / BETA 等）。モノスペース大文字・塗り控えめ・非操作。
@@ -40,7 +41,11 @@ export default function Lozenge({
 }: LozengeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 font-body text-xs font-semibold uppercase tracking-pill ${TONE[tone]} ${className}`.trim()}
+      className={twMerge(
+        'inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 font-body text-xs font-semibold uppercase tracking-pill',
+        TONE[tone],
+        className,
+      )}
     >
       {dot && <span className={`h-1.5 w-1.5 rounded-pill ${DOT[tone]}`} aria-hidden="true" />}
       {children}

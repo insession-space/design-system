@@ -9,6 +9,8 @@
 // 代わりにネイティブの正しいセマンティクスを与えた: 順序付きリスト（<ol>/<li>）+
 // 現在位置に aria-current="step"。これで支援技術は「3項目中2番目、現在: 集計」と読める。
 // 移行前は素の <div> の入れ子で、順序も現在位置も一切伝わっていなかった。
+import { twMerge } from '../lib/tw-merge.ts';
+
 export type StepFlowStep = {
   key: string;
   label: string;
@@ -45,7 +47,11 @@ export default function StepFlow({
   // <ol>/<li> のマーカーと既定の余白は消す（見た目は移行前の <div> と同一に保つ）。
   return (
     <ol
-      className={`m-0 flex list-none p-0 ${isRow ? 'flex-row flex-wrap items-center gap-1.5' : 'flex-col items-stretch gap-1.5'} ${className}`.trim()}
+      className={twMerge(
+        'm-0 flex list-none p-0',
+        isRow ? 'flex-row flex-wrap items-center gap-1.5' : 'flex-col items-stretch gap-1.5',
+        className,
+      )}
     >
       {steps.map((step, index) => {
         const tone = stepTone(index, currentIndex);

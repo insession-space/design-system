@@ -2,6 +2,8 @@ import { Menu as BaseMenu } from '@base-ui/react/menu';
 import type * as React from 'react';
 import type { ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { FOCUS_RING, TRANSITION_COLORS } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 import { mergePopupClassName, POPOVER_POSITIONER_BASE, popupBase } from './popover.tsx';
 
 // ポップオーバーの上に載せるメニュー。Base UI(floating-ui ベース)の Menu へ委譲する薄い
@@ -39,7 +41,12 @@ export type MenuGroupProps = React.ComponentProps<typeof BaseMenu.Group>;
 export type MenuGroupLabelProps = React.ComponentProps<typeof BaseMenu.GroupLabel>;
 export type MenuSubmenuRootProps = React.ComponentProps<typeof BaseMenu.SubmenuRoot>;
 
-export type MenuPositionerProps = React.ComponentProps<typeof BaseMenu.Positioner>;
+// className は twMerge へ渡すため string に絞る（Base UI の関数形式は旧実装でも文字列化されて
+// 壊れていた。button.tsx と同じ扱い）。
+export type MenuPositionerProps = Omit<
+  React.ComponentProps<typeof BaseMenu.Positioner>,
+  'className'
+> & { className?: string };
 
 // z-index は Popover と同じく **Positioner 側**に置く(#14)。Base UI では Popup が
 // position:static なので、Popup に z-index を書いても効かない。詳細は popover.tsx の
@@ -52,7 +59,7 @@ function MenuPositioner({
   return (
     <BaseMenu.Positioner
       sideOffset={sideOffset}
-      className={`${POPOVER_POSITIONER_BASE} ${className}`.trim()}
+      className={twMerge(POPOVER_POSITIONER_BASE, className)}
       {...props}
     />
   );
@@ -100,8 +107,7 @@ function MenuPopup({ padding = true, scroll = true, className, ...props }: MenuP
 // ⚠ mention.tsx が同じ行の見た目を再利用するため export しているが、**src/index.ts の公開
 // API には出さない**（パッケージ内部の共有に留める）。消費側に生のクラス文字列を配ると
 // 行の見た目が DS の外へ流出し、あとから変えられなくなる。
-export const MENU_ROW_BASE =
-  'flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-base shadow-none transition-colors motion-reduce:transition-none duration-(--dur-fast) cursor-pointer';
+export const MENU_ROW_BASE = `flex w-full items-center gap-[13px] rounded-md border-none px-[13px] py-[11px] text-left text-base shadow-none ${TRANSITION_COLORS} cursor-pointer`;
 
 // Base UI の Item/RadioItem/CheckboxItem は <div> を描画するため、disabled は data-disabled
 // 属性で表現される(:disabled は button 等のフォーム要素にしか適用されないため効かない)。
@@ -131,7 +137,7 @@ export const MENU_ROW_BASE =
 // [data-disabled] の2ルールが同じ詳細度で並び、配布 CSS の出力順(Highlight が後)で勝敗が決まる。
 // その結果、無効行にカーソルが来たときだけ GrayText ではなく Highlight で描かれ、
 // 「操作できないのに選択可能に見える」状態になる。
-const ROW = `${MENU_ROW_BASE} data-highlighted:not-data-disabled:forced-colors:text-[color:Highlight] data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring data-highlighted:data-disabled:shadow-focus`;
+const ROW = `${MENU_ROW_BASE} data-highlighted:not-data-disabled:forced-colors:text-[color:Highlight] data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] ${FOCUS_RING} data-highlighted:data-disabled:shadow-focus`;
 
 // PlainItem は移行前と同じ <button> を描画するため、disabled/hover はネイティブ疑似クラス
 // (disabled:/enabled:)で表現できる。移行前の ROW と完全に同じ文字列になる。
@@ -200,11 +206,12 @@ function ItemContent({ icon, trailing, children }: ItemContentProps) {
   );
 }
 
-export type MenuItemProps = React.ComponentProps<typeof BaseMenu.Item> & {
+export type MenuItemProps = Omit<React.ComponentProps<typeof BaseMenu.Item>, 'className'> & {
   icon?: ReactNode;
   trailing?: ReactNode;
   active?: boolean;
   danger?: boolean;
+  className?: string;
 };
 
 function MenuItem({
@@ -217,10 +224,7 @@ function MenuItem({
   ...props
 }: MenuItemProps) {
   return (
-    <BaseMenu.Item
-      className={`${ROW} ${toneClassName(active, danger)} ${className}`.trim()}
-      {...props}
-    >
+    <BaseMenu.Item className={twMerge(ROW, toneClassName(active, danger), className)} {...props}>
       <ItemContent icon={icon} trailing={trailing}>
         {children}
       </ItemContent>
@@ -228,11 +232,15 @@ function MenuItem({
   );
 }
 
-export type MenuRadioItemProps = React.ComponentProps<typeof BaseMenu.RadioItem> & {
+export type MenuRadioItemProps = Omit<
+  React.ComponentProps<typeof BaseMenu.RadioItem>,
+  'className'
+> & {
   icon?: ReactNode;
   trailing?: ReactNode;
   active?: boolean;
   danger?: boolean;
+  className?: string;
 };
 
 function MenuRadioItem({
@@ -246,7 +254,7 @@ function MenuRadioItem({
 }: MenuRadioItemProps) {
   return (
     <BaseMenu.RadioItem
-      className={`${ROW} ${toneClassName(active, danger)} ${className}`.trim()}
+      className={twMerge(ROW, toneClassName(active, danger), className)}
       {...props}
     >
       <ItemContent icon={icon} trailing={trailing}>
@@ -256,11 +264,15 @@ function MenuRadioItem({
   );
 }
 
-export type MenuCheckboxItemProps = React.ComponentProps<typeof BaseMenu.CheckboxItem> & {
+export type MenuCheckboxItemProps = Omit<
+  React.ComponentProps<typeof BaseMenu.CheckboxItem>,
+  'className'
+> & {
   icon?: ReactNode;
   trailing?: ReactNode;
   active?: boolean;
   danger?: boolean;
+  className?: string;
 };
 
 function MenuCheckboxItem({
@@ -274,7 +286,7 @@ function MenuCheckboxItem({
 }: MenuCheckboxItemProps) {
   return (
     <BaseMenu.CheckboxItem
-      className={`${ROW} ${toneClassName(active, danger)} ${className}`.trim()}
+      className={twMerge(ROW, toneClassName(active, danger), className)}
       {...props}
     >
       <ItemContent icon={icon} trailing={trailing}>
@@ -288,9 +300,13 @@ function MenuCheckboxItem({
 // 共有し、将来 ROW を変えたときの追随漏れを防ぐ)。既定 tone(danger/active は無い、常時
 // 通常行)。trailing 省略時はサブメニューであることを示す chevron_right を既定で出す
 // (呼び出し側が明示的に trailing を渡した場合はそちらを優先する)。
-export type MenuSubmenuTriggerProps = React.ComponentProps<typeof BaseMenu.SubmenuTrigger> & {
+export type MenuSubmenuTriggerProps = Omit<
+  React.ComponentProps<typeof BaseMenu.SubmenuTrigger>,
+  'className'
+> & {
   icon?: ReactNode;
   trailing?: ReactNode;
+  className?: string;
 };
 
 function MenuSubmenuTrigger({
@@ -302,7 +318,7 @@ function MenuSubmenuTrigger({
 }: MenuSubmenuTriggerProps) {
   return (
     <BaseMenu.SubmenuTrigger
-      className={`${ROW} ${toneClassName(false, false)} ${className}`.trim()}
+      className={twMerge(ROW, toneClassName(false, false), className)}
       {...props}
     >
       <ItemContent icon={icon} trailing={trailing ?? <Icon name="chevron_right" size={18} />}>
@@ -332,7 +348,7 @@ function MenuPlainList({ children, ariaLabel, className = '' }: MenuPlainListPro
     <ul
       role="menu"
       aria-label={ariaLabel}
-      className={`m-0 flex list-none flex-col gap-0.5 p-0 ${className}`.trim()}
+      className={twMerge('m-0 flex list-none flex-col gap-0.5 p-0', className)}
     >
       {children}
     </ul>

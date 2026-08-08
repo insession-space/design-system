@@ -1,6 +1,7 @@
 import type { useRender } from '@base-ui/react/use-render';
 import type { ComponentProps, ReactNode } from 'react';
 import { Card } from '../components/surface.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // メディア/ライブのカード(#94)。Card(surface.tsx)を器にカバー画像・バッジ列・タイトル/メタ/
 // 参加者を束ねる複合コンポーネントなので src/ui-kit/ に置く。
@@ -116,7 +117,10 @@ export type CircleBadgeProps = {
 export function CircleBadge({ children, className = '', ...rest }: CircleBadgeProps) {
   return (
     <span
-      className={`inline-flex size-6 shrink-0 items-center justify-center rounded-pill bg-surface-3 text-text-dim ${className}`.trim()}
+      className={twMerge(
+        'inline-flex size-6 shrink-0 items-center justify-center rounded-pill bg-surface-3 text-text-dim',
+        className,
+      )}
       {...rest}
     >
       {children}

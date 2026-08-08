@@ -1,6 +1,7 @@
 import { Tabs as BaseTabs } from '@base-ui/react/tabs';
 import type * as React from 'react';
 import { createContext, useContext } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // タブ / セグメンテッドコントロール（純粋 leaf UI）。legacy の .side-tabs / .tab-btn（下線式タブ）を
 // トークン経由のユーティリティで再構成する。media-tabs・playlist サブタブ・sticker picker タブなどの
@@ -48,7 +49,7 @@ const TabsVariantContext = createContext<'default' | 'fill'>('default');
 const Root = BaseTabs.Root;
 export type TabsRootProps = React.ComponentProps<typeof BaseTabs.Root>;
 
-export type TabsListProps = React.ComponentProps<typeof BaseTabs.List> & {
+export type TabsListProps = Omit<React.ComponentProps<typeof BaseTabs.List>, 'className'> & {
   // 幅の振る舞い。'default'=内容幅で左詰め（media-tabs 等）。'fill'=各タブが均等に伸びて
   // 行幅いっぱいを占める（legacy 基底 .tab-btn の flex:1 相当。playlist サブタブ / sticker タブ）。
   variant?: 'default' | 'fill';
@@ -58,6 +59,7 @@ export type TabsListProps = React.ComponentProps<typeof BaseTabs.List> & {
   // ではない子を混ぜても壊れない(node_modules 同梱の TabsList 実装で確認済み)。
   trailing?: React.ReactNode;
   ariaLabel?: string;
+  className?: string;
 };
 
 function TabsList({
@@ -90,7 +92,10 @@ function TabsList({
         // カルーセル)へ伝播してブラウザの「戻る」ジェスチャ等を誘発しないようにする。
         // スクロールバーは隠す(モバイルでは元から出ず、デスクトップでタブ行に灰色のバーが
         // 出ると下線タブの見た目が崩れるため)。
-        className={`flex overflow-x-auto overscroll-x-contain pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-t-0 border-x-0 border-b border-solid border-border ${className}`.trim()}
+        className={twMerge(
+          'flex overflow-x-auto overscroll-x-contain pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-t-0 border-x-0 border-b border-solid border-border',
+          className,
+        )}
         {...props}
       >
         {children}
@@ -100,13 +105,13 @@ function TabsList({
   );
 }
 
-export type TabsTabProps = React.ComponentProps<typeof BaseTabs.Tab>;
+export type TabsTabProps = Omit<React.ComponentProps<typeof BaseTabs.Tab>, 'className'> & {
+  className?: string;
+};
 
 function TabsTab({ className = '', ...props }: TabsTabProps) {
   const variant = useContext(TabsVariantContext);
-  return (
-    <BaseTabs.Tab className={`${TAB_BASE} ${TAB_WIDTH[variant]} ${className}`.trim()} {...props} />
-  );
+  return <BaseTabs.Tab className={twMerge(TAB_BASE, TAB_WIDTH[variant], className)} {...props} />;
 }
 
 // Base UI Tabs の Panel をそのまま薄く再 export する(既定クラスは付けない。DS はパネルの

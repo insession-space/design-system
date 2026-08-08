@@ -25,6 +25,8 @@
 // 装飾要素なので常に `aria-hidden="true"`。「読み込み中」であることの読み上げ
 // (aria-busy / role="status" のライブリージョン等)は呼び出し側の責務とし、この
 // コンポーネントは持たない(スコープ外。Issue #87)。
+import { twMerge } from '../lib/tw-merge.ts';
+
 export type SkeletonShape = 'rect' | 'circle';
 
 export type SkeletonProps = {
@@ -60,7 +62,7 @@ export default function Skeleton({
     return (
       <span
         aria-hidden="true"
-        className={`inline-block shrink-0 rounded-pill ${SURFACE_SHIMMER} ${className}`.trim()}
+        className={twMerge('inline-block shrink-0 rounded-pill', SURFACE_SHIMMER, className)}
         style={{ width: size, height: size }}
       />
     );
@@ -68,7 +70,7 @@ export default function Skeleton({
   return (
     <span
       aria-hidden="true"
-      className={`inline-block shrink-0 rounded-md ${SURFACE_SHIMMER} ${className}`.trim()}
+      className={twMerge('inline-block shrink-0 rounded-md', SURFACE_SHIMMER, className)}
       style={{ width: toLength(width, '100%'), height: toLength(height, '1em') }}
     />
   );
@@ -95,7 +97,7 @@ Skeleton.Text = function SkeletonText({
   className = '',
 }: SkeletonTextProps) {
   return (
-    <span aria-hidden="true" className={`flex flex-col ${className}`.trim()}>
+    <span aria-hidden="true" className={twMerge('flex flex-col', className)}>
       {Array.from({ length: lines }, (_, index) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: 行はプレースホルダで内容を持たないため index で十分
         <span key={index} className={textClassName}>

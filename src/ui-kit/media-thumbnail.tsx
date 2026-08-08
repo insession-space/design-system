@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react';
 import { Badge } from '../components/badge.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // メディア(動画/音声)のサムネイル枠(16:9・角丸・はみ出しの切り落とし)。MediaRow の
 // サムネイル列に差すためのものだが、枠自体は単体でも成立するので独立コンポーネントとして
@@ -42,7 +43,10 @@ export function MediaThumbnail({
 }: MediaThumbnailProps) {
   return (
     <div
-      className={`relative aspect-video w-24 shrink-0 overflow-hidden rounded-md bg-surface-3 ${className}`.trim()}
+      className={twMerge(
+        'relative aspect-video w-24 shrink-0 overflow-hidden rounded-md bg-surface-3',
+        className,
+      )}
       {...rest}
     >
       {src ? <img src={src} alt={alt} className="h-full w-full object-cover" /> : children}

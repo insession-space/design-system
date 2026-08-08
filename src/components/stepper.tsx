@@ -1,4 +1,5 @@
 import { NumberField } from '@base-ui/react/number-field';
+import { FOCUS_RING } from '../lib/class-presets.ts';
 
 // 数値増減ステッパー（純粋 leaf UI）。− / 値 / ＋ の3要素。
 // 振る舞いを Base UI の NumberField へ委譲する（#33）。DS 側は見た目だけを持つ。
@@ -52,8 +53,7 @@ const BTN =
 // ⚠ 素の outline-none は置かない。ブラウザ既定のアウトラインを常時消したうえで、代わりに置いた
 // shadow-focus は α が低くコントラストを満たさないため、キーボードフォーカスが完全に不可視だった。
 // 他の部品と同じトークン参照のアウトラインを出す。
-const VALUE =
-  'text-center text-lg font-bold tabular-nums text-text bg-transparent border-none p-0 focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring rounded-sm';
+const VALUE = `text-center text-lg font-bold tabular-nums text-text bg-transparent border-none p-0 ${FOCUS_RING} rounded-sm`;
 
 export default function Stepper({
   value,

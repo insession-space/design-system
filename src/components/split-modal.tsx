@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useState } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import BottomSheet from './bottom-sheet.tsx';
 import { Modal } from './modal.tsx';
 
@@ -321,7 +322,10 @@ export default function SplitModal({
         <Modal.Popup
           aria-label={ariaLabel}
           style={{ width }}
-          className={`gap-0 overflow-hidden p-0 text-left max-h-[calc(100dvh-40px)] ${className}`.trim()}
+          className={twMerge(
+            'gap-0 overflow-hidden p-0 text-left max-h-[calc(100dvh-40px)]',
+            className,
+          )}
         >
           {inner}
         </Modal.Popup>

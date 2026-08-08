@@ -1,6 +1,7 @@
 import { Field } from '@base-ui/react/field';
 import type { FC, ReactElement, ReactNode, TextareaHTMLAttributes } from 'react';
 import { useState } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 import {
   FIELD_BOX_BASE,
   FIELD_CONTROL,
@@ -68,7 +69,7 @@ export default function Textarea({
     <Field.Root
       disabled={disabled}
       invalid={invalid}
-      className={`flex flex-col gap-[7px] ${className}`.trim()}
+      className={twMerge('flex flex-col gap-[7px]', className)}
     >
       {label != null && (
         <Field.Label className={`${FIELD_LABEL} ${fieldLabelColor(invalid, focused)}`}>

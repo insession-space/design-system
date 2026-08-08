@@ -1,5 +1,7 @@
 import { Switch } from '@base-ui/react/switch';
 import type * as React from 'react';
+import { FOCUS_RING, TRANSITION_COLORS } from '../lib/class-presets.ts';
+import { twMerge } from '../lib/tw-merge.ts';
 
 // DS の Switch（トグル。純粋 leaf UI）。claude design "INSESSION Design System" の Switch 仕様に準拠（#463 / #663）。
 // 振る舞いは Base UI の Switch へ委譲する（#22）。DS 側はトークンベースの見た目だけを持つ。
@@ -39,8 +41,7 @@ export type ToggleProps = Omit<
 // まま残すと、型検査もビルドも通り disabled が視覚的に無効化されないまま出荷される
 // （実測で opacity:1 / cursor:pointer のままだった）。menu.tsx の Item も同じ理由で
 // data-disabled: を使っている。
-const TRACK =
-  'relative inline-flex h-[26px] w-[46px] shrink-0 items-center rounded-pill before:absolute before:inset-x-0 before:top-1/2 before:-translate-y-1/2 before:h-(--control-hit-size) pointer-coarse:before:h-(--control-touch-size) before:content-[""] border border-solid border-transparent p-0 transition-colors motion-reduce:transition-none duration-(--dur-fast) cursor-pointer data-disabled:opacity-50 data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
+const TRACK = `relative inline-flex h-[26px] w-[46px] shrink-0 items-center rounded-pill before:absolute before:inset-x-0 before:top-1/2 before:-translate-y-1/2 before:h-(--control-hit-size) pointer-coarse:before:h-(--control-touch-size) before:content-[""] border border-solid border-transparent p-0 ${TRANSITION_COLORS} cursor-pointer data-disabled:opacity-50 data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] ${FOCUS_RING}`;
 const KNOB =
   'absolute top-[3px] h-5 w-5 rounded-pill bg-white shadow-[0_1px_2px_rgba(0,0,0,0.25)] transition-[left] motion-reduce:transition-none duration-(--dur-fast)';
 
@@ -64,7 +65,11 @@ export default function Toggle({
       // 移行前の onClick={onChange}（引数なしトグル）と同じ呼び方を保つ。
       onCheckedChange={() => onChange?.()}
       className={(state) =>
-        `${TRACK} ${state.checked ? 'bg-success forced-colors:border-[Highlight]' : 'bg-border-strong'} ${className}`.trim()
+        twMerge(
+          TRACK,
+          state.checked ? 'bg-success forced-colors:border-[Highlight]' : 'bg-border-strong',
+          className,
+        )
       }
       {...rest}
     >

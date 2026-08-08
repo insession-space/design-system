@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { twMerge } from '../lib/tw-merge.ts';
 import { MediaCard } from '../ui-kit/media-card.tsx';
 import Skeleton from './skeleton.tsx';
 
@@ -87,7 +88,7 @@ export default function LinkPreview({ meta, loading = false, className = '' }: L
   if (loading) {
     return (
       <MediaCard
-        className={`${CARD_CLASS} ${className}`.trim()}
+        className={twMerge(CARD_CLASS, className)}
         cover={<Skeleton width="100%" height="100%" />}
         title={<Skeleton width="70%" />}
         meta={<Skeleton width="35%" />}
@@ -105,7 +106,7 @@ export default function LinkPreview({ meta, loading = false, className = '' }: L
   return (
     <MediaCard
       interactive
-      className={`${CARD_CLASS} ${className}`.trim()}
+      className={twMerge(CARD_CLASS, className)}
       render={
         <a href={meta.url} target="_blank" rel="noopener noreferrer" aria-label={accessibleName} />
       }

@@ -1,6 +1,7 @@
 import { Field } from '@base-ui/react/field';
 import type { InputHTMLAttributes, ReactNode } from 'react';
 import Icon from '../icons/icon.tsx';
+import { twMerge } from '../lib/tw-merge.ts';
 import { FIELD_BOX_BASE, FIELD_CONTROL, FIELD_LABEL, fieldLabelColor } from './input.tsx';
 
 // 検索入力（純粋 leaf UI）。claude design "INSESSION Design System" 準拠（loophub #682）。
@@ -41,7 +42,7 @@ export default function SearchField({
   // **打ち消せなかった**（同一プロパティのユーティリティは配布 CSS の出力順で決まる。
   // 実測で py-3 が勝ち padding が 12px になっていた）。#21 と同じ構図。
   const box = (extra: string) => (
-    <div className={`${FIELD_BOX_BASE} items-center gap-2 py-2.5 ${FOCUS_RING} ${extra}`.trim()}>
+    <div className={twMerge(FIELD_BOX_BASE, 'items-center gap-2 py-2.5', FOCUS_RING, extra)}>
       <Icon name="search" size={16} className="shrink-0 text-text-faint" />
       <Field.Control type="search" className={FIELD_CONTROL} disabled={disabled} {...rest} />
     </div>
@@ -58,7 +59,7 @@ export default function SearchField({
   // label があるときは縦積みの Root が要る。className はラベルとボックスの両方を含む
   // **全体**に効かせる（max-w-* のような幅制御でラベルとボックスの幅を揃えるため）。
   return (
-    <Field.Root disabled={disabled} className={`flex flex-col gap-[7px] ${className}`.trim()}>
+    <Field.Root disabled={disabled} className={twMerge('flex flex-col gap-[7px]', className)}>
       <Field.Label className={`${FIELD_LABEL} ${fieldLabelColor(false, false)}`}>
         {label}
       </Field.Label>

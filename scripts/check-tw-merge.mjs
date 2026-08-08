@@ -213,16 +213,32 @@ expect('px-[22px]! → px-3!（`!` 同士は後勝ち）', twMerge('px-[22px]!',
 // button.tsx と同じ組み立てを再現する（本体を import すると React / JSX の解決が要るため、
 // 定数だけをソースから読み取って突き合わせる。定数が変わればここも自然に追随する）。
 const buttonSrc = readFileSync(join(ROOT, 'src', 'components', 'button.tsx'), 'utf8');
+// button.tsx は共有クラス定数（class-presets.ts の FOCUS_RING 等）を `${FOCUS_RING}` として
+// 埋め込むため、定数は素の文字列リテラルではなくテンプレートリテラルになりうる。ここで
+// class-presets.ts の値を読み、その埋め込みを解決してから突き合わせる（値が変われば追随する）。
+const presetsSrc = readFileSync(join(ROOT, 'src', 'lib', 'class-presets.ts'), 'utf8');
+const PRESETS = {};
+for (const m of presetsSrc.matchAll(/export const (\w+) =\s*\n?\s*'([^']*)'/g))
+  PRESETS[m[1]] = m[2];
+function resolvePresets(s) {
+  return s.replace(/\$\{(\w+)\}/g, (_, name) => {
+    if (!(name in PRESETS))
+      throw new Error(`class-presets.ts に ${name} が無い（button.tsx の埋め込み）`);
+    return PRESETS[name];
+  });
+}
+// 値は `'...'` でも `` `...` ``（テンプレート）でもよい。テンプレート中の `${PRESET}` は解決する。
 function constOf(name) {
-  const m = buttonSrc.match(new RegExp(`const ${name} =\\s*\\n?\\s*'([^']*)'`));
+  const m = buttonSrc.match(new RegExp(`const ${name} =\\s*\\n?\\s*['\`]([^'\`]*)['\`]`));
   if (!m) throw new Error(`button.tsx から ${name} を読めなかった`);
-  return m[1];
+  return resolvePresets(m[1]);
 }
 function recordOf(name) {
   const m = buttonSrc.match(new RegExp(`const ${name}: Record<[^>]+> = \\{([\\s\\S]*?)\\n\\};`));
   if (!m) throw new Error(`button.tsx から ${name} を読めなかった`);
   const out = {};
-  for (const e of m[1].matchAll(/(\w+):\s*\n?\s*'([^']*)'/g)) out[e[1]] = e[2];
+  for (const e of m[1].matchAll(/(\w+):\s*\n?\s*['`]([^'`]*)['`]/g))
+    out[e[1]] = resolvePresets(e[2]);
   return out;
 }
 const BASE = constOf('BASE');
