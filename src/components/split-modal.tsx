@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useId, useState } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
 import { twMerge } from '../lib/tw-merge.ts';
 import BottomSheet from './bottom-sheet.tsx';
@@ -27,6 +27,12 @@ export type SplitModalItem = {
   label: string;
   // 行頭に出すアイコン。DS ではレール・ドリルダウン一覧の両方で使う。
   icon?: IconName;
+  // 所属グループの見出し文言（例「あなた」「アプリ」）。**連続する同じ文字列が1つの束**に
+  // なり、束の先頭にだけ見出しが出る（#1870）。省略した項目は見出しなしの束として扱うので、
+  // 既存の呼び出し（group を渡さない）は従来どおりフラットな一列のまま描画される。
+  // ⚠ グループの順序は items の並び順そのもの。同じ group 名を離れた位置に置くと束が2つに
+  // 割れる（並べ替えは呼び出し側の責務。DS 側でソートし直さない）。
+  group?: string;
 };
 
 export type SplitModalProps = {
@@ -41,6 +47,10 @@ export type SplitModalProps = {
   navLabel: string;
   // レール上部の見出し（例「設定」）。省略すると見出し行を出さない。
   navTitle?: string;
+  // navTitle の下・項目一覧の上に差し込むスロット（#1870。設定の絞り込み検索など）。
+  // 広い画面のレールでも狭い画面の一覧でも同じ位置に出る。スクロールする項目一覧とは分けて
+  // 置くので、一覧を送っても入力欄は残る。
+  navHeader?: ReactNode;
   // レール下部に固定される補足文。
   navFooter?: ReactNode;
   // 右ペインの見出し。省略すると見出し行を出さない（children が自前で持つ場合）。
@@ -59,6 +69,11 @@ export type SplitModalProps = {
   asSheet?: boolean;
   // Modal 外殻の幅。
   width?: string;
+  // 中身（レール + 右ペイン）の高さ。CSS の length 値をそのまま渡す（#1870）。
+  // 既定は min(520px, 72dvh)。セクション数が増えてレールが縦に溢れるモーダルだけ、
+  // ここを広げて全項目を一度に見せる。⚠ 広げるのは「レールが溢れる」ときだけにすること
+  // （右ペインの中身が少ないモーダルまで背を高くすると余白だけが増える）。
+  bodyHeight?: string;
   // 左レールの幅（border-box）。
   navWidth?: number;
   // 外殻に足す追加クラス。
@@ -92,6 +107,25 @@ function useNarrowViewport(maxWidth: number) {
   return narrow;
 }
 
+// items を「連続する同じ group」の束に畳む（#1870）。group を持たない項目は見出しなしの束に
+// なるので、group を1つも渡さない従来の呼び出しでは束が1つだけできて描画は変わらない。
+type SplitModalNavGroup = { key: string; label?: string; items: SplitModalItem[] };
+
+function toNavGroups(items: SplitModalItem[]): SplitModalNavGroup[] {
+  const groups: SplitModalNavGroup[] = [];
+  for (const it of items) {
+    const last = groups[groups.length - 1];
+    if (last && last.label === it.group) last.items.push(it);
+    else groups.push({ key: `${it.group ?? ''}::${it.id}`, label: it.group, items: [it] });
+  }
+  return groups;
+}
+
+// グループ見出しの文字組み。DS のセマンティックな text-label(11px / 600 / tracking .14em)に
+// uppercase を掛けたもので、消費側（account / space-core）のセクション見出しと同じ扱いにする。
+// ⚠ font-mono は付けない（3つの font トークンは同値なので font-body に一本化する規約。#117）。
+const NAV_GROUP_LABEL = 'text-label uppercase text-accent-soft';
+
 export default function SplitModal({
   items,
   value,
@@ -100,6 +134,7 @@ export default function SplitModal({
   onClose,
   navLabel,
   navTitle,
+  navHeader,
   navFooter,
   title,
   description,
@@ -109,6 +144,7 @@ export default function SplitModal({
   backLabel,
   asSheet = false,
   width = 'min(760px, 94vw)',
+  bodyHeight = 'min(520px, 72dvh)',
   navWidth = 214,
   className = '',
   narrow,
@@ -123,6 +159,9 @@ export default function SplitModal({
   }, [isNarrow]);
 
   const current = items.find((it) => it.id === value);
+  // ナビのグループ束と、見出しを role="group" に結び付けるための id 接頭辞（#1870）。
+  const navGroups = toNavGroups(items);
+  const groupLabelId = useId();
 
   // ⚠ asSheet のときは自前の × を描かない。外殻の BottomSheet が同じ closeLabel を受け取って
   // 自分の閉じるボタン（.bottom-sheet-close）を出すため、両方描くと **× が2つ並ぶ**
@@ -179,27 +218,45 @@ export default function SplitModal({
           {closeButton}
         </div>
       )}
+      {navHeader && <div className="shrink-0 px-3.5 py-3">{navHeader}</div>}
       <nav className="flex flex-1 min-h-0 flex-col overflow-y-auto" aria-label={navLabel}>
-        {items.map((it) => (
-          <button
-            key={it.id}
-            type="button"
-            className="flex w-full cursor-pointer items-center gap-3 border-x-0 border-t-0 border-b border-solid border-border bg-transparent px-4 py-3.5 text-left text-base font-semibold text-text"
-            onClick={() => {
-              onSelect(it.id);
-              setDrilled(true);
-            }}
+        {navGroups.map((g, gi) => (
+          <div
+            key={g.key}
+            className="flex flex-col"
+            role={g.label ? 'group' : undefined}
+            aria-labelledby={g.label ? `${groupLabelId}-${gi}` : undefined}
           >
-            {it.icon && (
-              <span className="shrink-0 text-accent-soft" aria-hidden="true">
-                <Icon name={it.icon} size={20} />
-              </span>
+            {g.label && (
+              <div
+                id={`${groupLabelId}-${gi}`}
+                className={`${NAV_GROUP_LABEL} border-x-0 border-t-0 border-b border-solid border-border bg-bg-elevated px-4 py-2`}
+              >
+                {g.label}
+              </div>
             )}
-            <span className="min-w-0 flex-1">{it.label}</span>
-            <span className="shrink-0 text-lg text-text-faint" aria-hidden="true">
-              ›
-            </span>
-          </button>
+            {g.items.map((it) => (
+              <button
+                key={it.id}
+                type="button"
+                className="flex w-full cursor-pointer items-center gap-3 border-x-0 border-t-0 border-b border-solid border-border bg-transparent px-4 py-3.5 text-left text-base font-semibold text-text"
+                onClick={() => {
+                  onSelect(it.id);
+                  setDrilled(true);
+                }}
+              >
+                {it.icon && (
+                  <span className="shrink-0 text-accent-soft" aria-hidden="true">
+                    <Icon name={it.icon} size={20} />
+                  </span>
+                )}
+                <span className="min-w-0 flex-1">{it.label}</span>
+                <span className="shrink-0 text-lg text-text-faint" aria-hidden="true">
+                  ›
+                </span>
+              </button>
+            ))}
+          </div>
         ))}
       </nav>
     </div>
@@ -241,33 +298,51 @@ export default function SplitModal({
         style={{ width: navWidth }}
       >
         {navTitle && <h3 className="m-0 px-1 text-base font-extrabold text-text">{navTitle}</h3>}
-        <nav className="flex flex-col gap-1" aria-label={navLabel}>
-          {items.map((it) => {
-            const active = it.id === value;
-            return (
-              <button
-                key={it.id}
-                type="button"
-                aria-selected={active}
-                className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-solid px-3 py-2.5 text-left text-base transition-colors motion-reduce:transition-none ${
-                  active
-                    ? 'border-border bg-surface-3 font-bold text-text'
-                    : 'border-transparent bg-transparent font-semibold text-text-dim hover:bg-surface-hover hover:text-text'
-                }`}
-                onClick={() => onSelect(it.id)}
-              >
-                {it.icon && (
-                  <span
-                    className={`shrink-0 ${active ? 'text-accent-soft' : 'text-text-faint'}`}
-                    aria-hidden="true"
+        {navHeader}
+        {/* グループ間は gap-1 より広く空けて束を見せる。束の中は従来どおり gap-1。 */}
+        {/* グループ見出しぶん背が伸びるので、レール内で項目一覧だけがスクロールするようにする
+            （min-h-0 が無いと flex アイテムは縮まず、レールごと外殻からはみ出す）。 */}
+        <nav className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto" aria-label={navLabel}>
+          {navGroups.map((g, gi) => (
+            <div
+              key={g.key}
+              className="flex flex-col gap-1"
+              role={g.label ? 'group' : undefined}
+              aria-labelledby={g.label ? `${groupLabelId}-${gi}` : undefined}
+            >
+              {g.label && (
+                <div id={`${groupLabelId}-${gi}`} className={`${NAV_GROUP_LABEL} px-3 pb-0.5`}>
+                  {g.label}
+                </div>
+              )}
+              {g.items.map((it) => {
+                const active = it.id === value;
+                return (
+                  <button
+                    key={it.id}
+                    type="button"
+                    aria-selected={active}
+                    className={`flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-solid px-3 py-2.5 text-left text-base transition-colors motion-reduce:transition-none ${
+                      active
+                        ? 'border-border bg-surface-3 font-bold text-text'
+                        : 'border-transparent bg-transparent font-semibold text-text-dim hover:bg-surface-hover hover:text-text'
+                    }`}
+                    onClick={() => onSelect(it.id)}
                   >
-                    <Icon name={it.icon} size={17} />
-                  </span>
-                )}
-                <span className="min-w-0 flex-1">{it.label}</span>
-              </button>
-            );
-          })}
+                    {it.icon && (
+                      <span
+                        className={`shrink-0 ${active ? 'text-accent-soft' : 'text-text-faint'}`}
+                        aria-hidden="true"
+                      >
+                        <Icon name={it.icon} size={17} />
+                      </span>
+                    )}
+                    <span className="min-w-0 flex-1">{it.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         {navFooter && (
           <div className="mt-auto px-1 text-xs leading-relaxed text-text-faint">{navFooter}</div>
@@ -288,13 +363,22 @@ export default function SplitModal({
   );
 
   // asSheet はシート側でスクロールさせるので固定高を持たせない。
+  // ⚠ 高さは className ではなく style で渡す（#1870）。Tailwind の任意値クラスは
+  // 生成 CSS の出力順で勝敗が決まるため、呼び出し側から `h-[...]` を後ろに足しても
+  // 既定の `h-[min(520px,72dvh)]` に勝てるとは限らない。
   const innerClass = isNarrow
     ? 'flex flex-col flex-1 min-h-0'
     : asSheet
       ? 'flex flex-1 min-h-0'
-      : 'flex flex-[1_1_auto] min-h-0 max-h-[min(520px,72dvh)] h-[min(520px,72dvh)]';
+      : 'flex flex-[1_1_auto] min-h-0';
+  const innerStyle =
+    isNarrow || asSheet ? undefined : { height: bodyHeight, maxHeight: bodyHeight };
 
-  const inner = <div className={innerClass}>{isNarrow ? (drilled ? detail : list) : wide}</div>;
+  const inner = (
+    <div className={innerClass} style={innerStyle}>
+      {isNarrow ? (drilled ? detail : list) : wide}
+    </div>
+  );
 
   if (asSheet) {
     // シートは自前の×とスクロール領域を持つので、closeLabel はシート側へ渡す。
