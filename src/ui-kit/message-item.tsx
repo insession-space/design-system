@@ -1,4 +1,4 @@
-import { type MouseEvent, type ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import Avatar from '../components/avatar.tsx';
 import IconButton from '../components/icon-button.tsx';
 import { HStack, VStack } from '../components/layout.tsx';
@@ -144,6 +144,15 @@ export type MessageItemProps = {
   previewUrls?: string[];
   // プレビューを表示する上限件数。既定 1。
   maxLinkPreviews?: number;
+  // この投稿を「直前の同一投稿者の続き」として詰めて描く(#連続投稿グルーピング)。true のとき:
+  //   - ヘッダー(名前 + 時刻)を視覚的に出さない。著者・時刻は sr-only で支援技術には残す。
+  //   - アバターを繰り返さない。ただし列幅(AVATAR_SIZE)だけ確保して本文の左端を非継続行と
+  //     機械的に揃える(消費側が nth-child セレクタで DS の内部 DOM を上書きする必要をなくす)。
+  //   - actions / actionsSlot は行の右上へ絶対配置で浮かせ、ホバー/フォーカスで到達できる
+  //     ようにする(浮いたバーが本文に重なっても読めるよう、可視時だけ面と影を敷く)。
+  // 「いつ続きとみなすか」(同一著者・時間窓など)と行間の余白(mt)は**消費側の責務**。DS は
+  // 「続きをどう描くか」だけを持つ(連続投稿のグルーピング判定・投稿リストのコンテナは範囲外)。
+  continuation?: boolean;
   className?: string;
 };
 
@@ -171,6 +180,17 @@ const ACTIONS_ROW_HEIGHT_COMPENSATION = '-my-1';
 // 一緒に変わる)のではなく MessageItem 側で Avatar を直接描いて寸法だけを決める。
 // シェイプ(rounded-pill)は Avatar の既定のまま変えない。
 const AVATAR_SIZE = 36;
+
+// ── continuation(続き投稿)のヘッダー省略時に操作群を浮かせる位置 ────────────
+// continuation ではヘッダー行(名前 + 時刻)を出さないので、actions / actionsSlot の置き場が
+// 無くなる。行の右上へ絶対配置で浮かせ、ホバー/フォーカスで到達できるようにする(root の
+// `group` が起点)。浮いたバーは本文1行目に重なりうるため、可視状態(hover / focus-within)の
+// ときだけ面と影を敷いて可読性を確保する — 常時面を敷くと、opacity-0 で見えない間も空の
+// チップが全 continuation 行に浮いて見えるため当てない。位置基準は root 側の `relative`。
+const CONTINUATION_ACTIONS_FLOAT =
+  'absolute top-0 right-0 z-10 rounded-full px-1 transition-colors motion-reduce:transition-none ' +
+  'duration-(--dur-fast) group-hover:bg-surface-2 group-hover:shadow-popover ' +
+  'group-focus-within:bg-surface-2 group-focus-within:shadow-popover';
 
 // ── リアクションピル(#103) ─────────────────────────────
 // Chip ではなく専用の button で描く。Chip の既定は「クイック返信/フィルター/タグ」向けの
@@ -223,6 +243,7 @@ export default function MessageItem({
   fetchLinkPreview,
   previewUrls,
   maxLinkPreviews = 1,
+  continuation = false,
   className = '',
 }: MessageItemProps) {
   // 本文/ previewUrls からのリンクプレビュー取得は use-link-previews.ts に閉じ込める
@@ -250,58 +271,62 @@ export default function MessageItem({
   // (従来の hideAvatar={avatarSrc == null} と同じ判定に揃える)。
   const hasAvatar = avatarSrc != null;
 
-  // 右カラム(アバター無しのときは単一カラム)の中身。アバターの有無で分岐するのは"外枠"だけに
-  // したいので、中身はここで一度だけ組む。
-  const stack = (
+  // ヘッダー右の操作群(actions アイコン + actionsSlot)。通常はヘッダー行の中に、continuation の
+  // ときはヘッダーを出さないので行の右上へ浮かせて再利用する(下記)。
+  const headerTrailing = hasHeaderTrailing ? (
+    <HStack gap="xs" className="shrink-0">
+      {actions != null && actions.length > 0 && (
+        <HStack gap="xs" className={`${ACTIONS_VISIBILITY} ${ACTIONS_ROW_HEIGHT_COMPENSATION}`}>
+          {actions.map((action) => (
+            <IconButton
+              key={action.label}
+              label={action.label}
+              icon={<Icon name={action.icon} size={20} />}
+              variant="ghost"
+              size={ACTION_BUTTON_SIZE}
+              onClick={action.onClick}
+            />
+          ))}
+        </HStack>
+      )}
+      {actionsSlot}
+    </HStack>
+  ) : null;
+
+  // ヘッダー行(名前 + 時刻 + 操作群)。continuation では出さない。
+  const header = (
+    <HStack gap="sm" align="center" justify="between">
+      <UserLabel
+        name={authorName}
+        href={authorHref}
+        onClick={authorOnClick}
+        hideAvatar
+        size="sm"
+        ariaLabel={hasInertTimestamp ? authorName : undefined}
+        trailing={
+          timestamp != null ? (
+            <span
+              className="font-body text-xs text-text-dim"
+              aria-hidden={hasInertTimestamp || undefined}
+              onClick={hasInertTimestamp ? swallowActivation : undefined}
+              // 中クリック(新しいタブで開く)は click ではなく auxclick / mousedown の経路を
+              // 通るので、onClick だけでは <a> の既定動作を止められない。両方を塞ぐ。
+              onAuxClick={hasInertTimestamp ? swallowActivation : undefined}
+              onMouseDown={hasInertTimestamp ? swallowMiddleMouseDown : undefined}
+            >
+              {timestamp}
+            </span>
+          ) : undefined
+        }
+      />
+      {hasInertTimestamp && <span className="sr-only">{timestamp}</span>}
+      {headerTrailing}
+    </HStack>
+  );
+
+  // 本文 + リンクプレビュー + リアクション。ヘッダーの有無(continuation)に関わらず共通。
+  const body = (
     <>
-      <HStack gap="sm" align="center" justify="between">
-        <UserLabel
-          name={authorName}
-          href={authorHref}
-          onClick={authorOnClick}
-          hideAvatar
-          size="sm"
-          ariaLabel={hasInertTimestamp ? authorName : undefined}
-          trailing={
-            timestamp != null ? (
-              <span
-                className="font-body text-xs text-text-dim"
-                aria-hidden={hasInertTimestamp || undefined}
-                onClick={hasInertTimestamp ? swallowActivation : undefined}
-                // 中クリック(新しいタブで開く)は click ではなく auxclick / mousedown の経路を
-                // 通るので、onClick だけでは <a> の既定動作を止められない。両方を塞ぐ。
-                onAuxClick={hasInertTimestamp ? swallowActivation : undefined}
-                onMouseDown={hasInertTimestamp ? swallowMiddleMouseDown : undefined}
-              >
-                {timestamp}
-              </span>
-            ) : undefined
-          }
-        />
-        {hasInertTimestamp && <span className="sr-only">{timestamp}</span>}
-        {hasHeaderTrailing && (
-          <HStack gap="xs" className="shrink-0">
-            {actions != null && actions.length > 0 && (
-              <HStack
-                gap="xs"
-                className={`${ACTIONS_VISIBILITY} ${ACTIONS_ROW_HEIGHT_COMPENSATION}`}
-              >
-                {actions.map((action) => (
-                  <IconButton
-                    key={action.label}
-                    label={action.label}
-                    icon={<Icon name={action.icon} size={20} />}
-                    variant="ghost"
-                    size={ACTION_BUTTON_SIZE}
-                    onClick={action.onClick}
-                  />
-                ))}
-              </HStack>
-            )}
-            {actionsSlot}
-          </HStack>
-        )}
-      </HStack>
       {children != null && (
         <div className="min-w-0 whitespace-pre-wrap break-words font-body text-small text-text">
           {children}
@@ -347,12 +372,33 @@ export default function MessageItem({
     </>
   );
 
+  // 右カラム(アバター無しのときは単一カラム)の中身。アバターの有無で分岐するのは"外枠"だけに
+  // したいので、中身はここで一度だけ組む。
+  // continuation ではヘッダー行を出さず本文だけを詰める。著者・時刻は sr-only で支援技術に残し、
+  // 操作群(headerTrailing)は行の右上へ絶対配置で浮かせる(位置基準は root 側の `relative`)。
+  const stack = continuation ? (
+    <>
+      <span className="sr-only">
+        {authorName}
+        {timestamp != null ? <> {timestamp}</> : null}
+      </span>
+      {headerTrailing && <div className={CONTINUATION_ACTIONS_FLOAT}>{headerTrailing}</div>}
+      {body}
+    </>
+  ) : (
+    <>
+      {header}
+      {body}
+    </>
+  );
+
   // group はアクション群のホバー/フォーカス表示の起点になるので、アバターも含む最も外側の
   // 要素に置く(アバターの上をホバーしてもアクションが出る)。w-full は min-w-0 が
   // 「縮むことを許可」するだけで幅を取り切る指定ではないための併記(#97)。行方向 flex
   // の子として置かれたとき(消費側が MessageActionBar 等と横並びにする場合)、与えられた
   // 幅を使い切って本文の折り返し幅を最大化する。
-  const rootClass = twMerge('group w-full min-w-0', className);
+  // continuation では headerTrailing を絶対配置で浮かせるので、その位置基準として `relative` を敷く。
+  const rootClass = twMerge('group w-full min-w-0', continuation && 'relative', className);
 
   if (!hasAvatar) {
     // アバター無し = 従来どおりの単一カラム。左カラムもインデントも作らない(#180)。
@@ -360,6 +406,20 @@ export default function MessageItem({
       <VStack gap="xs" className={rootClass}>
         {stack}
       </VStack>
+    );
+  }
+
+  // continuation はアバターを繰り返さない。ただし本文の左端を非継続行と揃えるため、列幅
+  // (AVATAR_SIZE)だけを確保した空のスペーサーを置く(消費側が DS の内部 DOM を nth-child で
+  // 上書きする必要をなくすのがこの prop の目的)。寸法は Avatar の size と同じ単一ソース。
+  if (continuation) {
+    return (
+      <HStack gap="sm" align="start" className={rootClass}>
+        <div aria-hidden="true" className="shrink-0" style={{ width: AVATAR_SIZE }} />
+        <VStack gap="xs" className="min-w-0 flex-1">
+          {stack}
+        </VStack>
+      </HStack>
     );
   }
 

@@ -164,6 +164,47 @@ export const ChatUsage: Story = {
   ),
 };
 
+export const Continuation: Story = {
+  render: () => (
+    <Section
+      title="続き投稿(continuation)"
+      note="同一投稿者の連投を詰めるための prop。continuation を渡した行はヘッダー(名前 + 時刻)とアバターを繰り返さず、本文だけを詰めて描く。アバター列の幅は保つので本文の左端は先頭行と揃う。著者・時刻は sr-only で支援技術には残る。ホバーすると各行の右上に操作(actions)が浮く。行間(mt)の詰め具合は消費側が決める(ここでは gap-1 で近似)。"
+    >
+      <div className="flex max-w-xl flex-col gap-1 rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:02"
+          avatarSrc={AVATAR_SRC}
+          actions={ACTIONS}
+        >
+          もうすぐ配信始めます
+        </MessageItem>
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:02"
+          avatarSrc={AVATAR_SRC}
+          continuation
+          actions={ACTIONS}
+        >
+          準備しています
+        </MessageItem>
+        <MessageItem
+          authorName="川村静哉"
+          timestamp="01:03"
+          avatarSrc={AVATAR_SRC}
+          continuation
+          actions={ACTIONS}
+          reactions={[
+            { emoji: '🎉', count: 2, reacted: false, label: 'お祝い', onClick: () => {} },
+          ]}
+        >
+          お待たせしました、始めます!
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
 export const LongJapaneseTextWrapping: Story = {
   render: () => (
     <Section
