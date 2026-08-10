@@ -1,7 +1,7 @@
 import { Button as BaseButton } from '@base-ui/react/button';
 import type { ReactNode } from 'react';
 import Icon, { type IconName } from '../icons/icon.tsx';
-import { FOCUS_RING } from '../lib/class-presets.ts';
+import { FOCUS_RING, TRANSITION_INTERACTIVE } from '../lib/class-presets.ts';
 import { twMerge } from '../lib/tw-merge.ts';
 import Spinner from './spinner.tsx';
 
@@ -12,7 +12,7 @@ import Spinner from './spinner.tsx';
 // `join` は歴史的別名として live にマップする（後方互換。消費側は当面そのまま動く）。
 // radius は既定 DS の md(10px)。pill prop で rounded-pill、live/join は常に pill。font 15px、
 // weight は primary/accent/secondary/danger/live=700・ghost=600。disabled は DS の沈んだ面(surface-3 + text-dim)。
-// hover は DS へ準拠: soft(secondary/ghost)=surface-hover の面変化 / filled(primary/accent/live/danger)=brightness(.93)。
+// hover は **全 variant が面変化**（#960。filled は state layer の --color-*-hover、soft は surface-hover）。
 // press=scale(.97)。フォーカスは shadow-focus。i18n は持たない（ラベルは children）。
 // icon / iconRight は名前(IconName)なら fontSize+2 の Icon を、ReactNode ならそのまま先頭/末尾に置く。
 export type ButtonVariant =
@@ -70,27 +70,34 @@ export type ButtonProps = {
 // hover が効いてしまう**。Base UI Button は state の disabled を常に `data-disabled` として
 // 出すので、そちらを見れば両方の経路（disabled 属性 / aria-disabled）を1つの書き方で拾える。
 // 値は移行前から変えていない。
-const BASE = `inline-flex items-center justify-center gap-2 border-2 border-solid box-border font-body cursor-pointer select-none transition-[transform,filter,background,color,box-shadow] motion-reduce:transition-none duration-(--dur-fast) ease-spring not-data-disabled:active:scale-[0.97] data-disabled:bg-surface-3 data-disabled:text-text-dim data-disabled:border-transparent data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:shadow-none ${FOCUS_RING}`;
+const BASE = `inline-flex items-center justify-center gap-2 border-2 border-solid box-border font-body cursor-pointer select-none ${TRANSITION_INTERACTIVE} not-data-disabled:active:scale-[0.97] data-disabled:bg-surface-3 data-disabled:text-text-dim data-disabled:border-transparent data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText] data-disabled:shadow-none ${FOCUS_RING}`;
 
 // hover も `enabled:hover:` ではなく `hover:not-data-disabled:` で書く（理由は BASE のコメント）。
 // ⚠ **各 variant は background-color / color / border-color をそれぞれちょうど1つずつ持つ**。
 // BASE 側は同じプロパティのユーティリティを一切持たないので、出力順の勝負が起きない（#58）。
+// ⚠ hover は **全 variant が「面の色を変える」1つの形に揃っている**（#960）。以前は filled 系
+// （primary / accent / danger / live / join）だけが `brightness-[.93]` で、soft 系
+// （secondary / ghost）の bg-surface-hover、apple の bg-apple-hover と合わせて **同じ「hover」に
+// 3 通りの実装**があった。--color-*-hover トークンへ寄せて面変化に統一してある。
+// **見た目は変わっていない** — トークンの実体は brightness(0.93) と同値の color-mix
+// （theme.css の当該コメント参照）。
+// 新しい variant を足すときも `hover:not-data-disabled:bg-*` の形にすること。
 const VARIANT: Record<ButtonVariant, string> = {
   primary:
-    'bg-fill border-transparent text-on-fill font-bold hover:not-data-disabled:brightness-[.93]',
+    'bg-fill border-transparent text-on-fill font-bold hover:not-data-disabled:bg-fill-hover',
   // ⚠ 塗りは **accent 本体**へ戻した(#130 の accent-fill は撤回・トークンごと削除)。
   // ラベルの on-accent も白へ戻してある(#122 の撤回)。詳細は theme.css の当該コメント。
   accent:
-    'bg-accent border-transparent text-on-accent font-bold hover:not-data-disabled:brightness-[.93]',
+    'bg-accent border-transparent text-on-accent font-bold hover:not-data-disabled:bg-accent-hover',
   secondary:
     'bg-transparent border-text text-text font-bold hover:not-data-disabled:bg-surface-hover',
   ghost:
     'bg-transparent border-transparent text-info font-semibold hover:not-data-disabled:bg-surface-hover',
   danger:
-    'bg-danger-surface border-danger-border text-danger font-bold hover:not-data-disabled:brightness-[.93]',
-  live: 'bg-success border-transparent text-white font-bold hover:not-data-disabled:brightness-[.93]',
+    'bg-danger-surface border-danger-border text-danger font-bold hover:not-data-disabled:bg-danger-hover',
+  live: 'bg-success border-transparent text-white font-bold hover:not-data-disabled:bg-success-hover',
   // 後方互換: join は live と同一。
-  join: 'bg-success border-transparent text-white font-bold hover:not-data-disabled:brightness-[.93]',
+  join: 'bg-success border-transparent text-white font-bold hover:not-data-disabled:bg-success-hover',
   // Sign in with Apple 用（#72）。Apple の HIG が黒地 / 白文字 / 白ロゴを規定しているので、
   // **ライトテーマでも黒地のまま**にする（--color-apple はテーマオーバーレイを持たない）。
   // hover は brightness では動かない（黒は乗算で黒のまま）ため、白を少量混ぜた

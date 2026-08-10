@@ -299,7 +299,8 @@
   --radius-sheet: 22px;
 
   /* グロー(旧 #457 ブランドの hover 発光)は新 DS で廃止(#463)。新 DS の hover は「ふわっと光る」
-     ではなく surface-hover への面変化 / filled は brightness(.93) / カード等は translateY(-2px) の
+     ではなく surface-hover への面変化 / filled は state layer(#960。下の --color-*-hover
+     の項を参照。当初は brightness(.93) だった) / カード等は translateY(-2px) の
      控えめな持ち上げで表す。互換のため --shadow-glow トークン名は残すが値は none にして、既存の
      box-shadow: var(--glow) 参照(hover)を一括で無効化する。 */
   --shadow-glow: none;
@@ -376,8 +377,67 @@
      新しい部品を足すときも同じ組み合わせを使うこと(shadow-focus 単独にしない)。 */
   --shadow-focus: 0 0 0 3px rgba(91, 139, 240, 0.16);
 
-  /* モーション: イージング */
+  /* モーション: イージング。**プロパティの種類で使い分ける**(#960)。
+     かつて DS が持つイージングは --ease-spring 1本だけで、足りない分は Tailwind 既定テーマの
+     ease-out / ease-in-out がそのまま使われていた(実測 6 箇所)。これは #117 で text-xl 以上を
+     `initial` で塞いだのと同じ「DS が管理していない値が静かに生き続ける」状態で、
+     **同じ DS の中で動きの質が揃わない**主因になる。
+
+     ⚠ **spring を色に掛けないこと。** --ease-spring は 1.56 の制御点を持つ、終点を行き過ぎて
+     戻る(オーバーシュートする)カーブ。位置や大きさが行き過ぎて戻るのは「弾んだ」と読めるが、
+     **色や不透明度が行き過ぎても物理的な意味を持たない** — 目標より濃い色が一瞬出て戻るだけで、
+     ちらつきとして知覚される。実際 button.tsx / link.tsx は
+     `transition-[transform,background,color,...] ease-spring` と1つの easing を全プロパティへ
+     掛けており、hover の色変化までオーバーシュートしていた。
+
+     使い分け:
+       --ease-spring   形・位置・大きさ(transform / 入場アニメ)。弾みが意味を持つもの
+       --ease-standard 色・不透明度・影(hover の面変化、フォーカス)。行き過ぎずに収束する
+
+     ⚠ 新しい遷移を足すときに `ease-out` / `ease-in-out`(Tailwind 既定)へ戻さないこと。
+     戻しても見た目は近いのでレビューで気づけないが、DS 側から値を動かせなくなる。
+
+     ⚠ **退場(exit)専用のイージングは、まだ足していない。** 退場は開始を速くして終端で緩めない
+     カーブ(cubic-bezier(0.4, 0, 1, 1) 等)を当てるのが定石だが、現状 DS の退場は Toast の
+     `data-ending-style:opacity-0` のように opacity を落とすだけで、カーブの差が知覚できない。
+     使い所が無いまま定義すると、値 none のまま参照だけが残った --shadow-glow と同じ
+     「読み手が意味を誤解する死んだトークン」になる。**実際に退場アニメを持つ部品が出てきた
+     回に足すこと**(font-display / font-mono を同値のまま使い分けなかったのと同じ判断)。 */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* filled な面の hover。**値は変えずにトークン化する**(#960)。
+     旧実装は filled な variant すべてが `hover:brightness-[.93]` を各コンポーネントへ直書き
+     していた。**見た目は妥当だったので変えない** — このトークンは
+     `color-mix(in srgb, black 7%, X)` で、これは brightness(0.93) と**数学的に同一**
+     (どちらも各チャンネルを 0.93 倍する。実測 #ff6a47 → #ed6342 で一致)。
+     変えたのは値ではなく、次の 3 点:
+
+       1. **DS が値を持てるようになる。** `.93` が 6 箇所へ散っていたため、hover の強さを
+          DS 側から動かせなかった。トークン 1 本を直せば全 filled variant に効く。
+       2. **filter を遷移させなくて済む。** filter は新しいスタッキングコンテキストを作るので、
+          ボタンの中に置いた要素（Spinner / アイコン）の重なりに影響し得る。背景色の遷移なら
+          その副作用が無い。
+       3. **apple variant と同じ形になる。** apple は黒地で brightness が効かない（乗算なので
+          何倍しても黒のまま）ため、以前から独自に --color-apple-hover への面変化を採っていた。
+          つまり「hover の実装」が filled=brightness / soft=surface-hover / apple=面変化 の
+          3 通りに割れていた。全部を面変化へ寄せて 1 つにする。
+
+     ⚠ **向きは「暗く」で正しい。明るくしないこと。**
+     Material 3 の state layer は面の上に文字色(on-*)を重ねるが、この DS でそれをやると
+     **白ラベルの面に白を混ぜることになり、ラベルのコントラストが下がる**(実測: accent 上の
+     白ラベルが 2.84:1 → 2.63:1、success 上が 2.25:1 → 2.11:1)。on-accent の項に書いたとおり
+     accent/on-accent は意図的に 1.4.3 の 4.5:1 を満たしておらず、**上げたいときに動かすのは
+     塗り側(暗くする)** という方針を採っている。hover で明るくするのはその逆を行く。
+
+     ⚠ 割合は素の数値で書く(var() で差さない)。@theme のトークンを color-mix の割合位置へ
+     var() で差すと、Tailwind v4 が --color-* をリテラル展開する経路と噛み合わず値が落ちる
+     ことがあるため、展開後も壊れない形に固定する。
+     ⚠ tinted な variant(danger)も同じ形でよい。面がティントでも一律に 7% 暗くなるだけ。 */
+  --color-fill-hover: color-mix(in srgb, black 7%, var(--color-fill));
+  --color-accent-hover: color-mix(in srgb, black 7%, var(--color-accent));
+  --color-success-hover: color-mix(in srgb, black 7%, var(--color-success));
+  --color-danger-hover: color-mix(in srgb, black 7%, var(--color-danger-surface));
 
   /* レコードプレーヤー風ビュー専用パレット(#376。ダークトーン化 #402)。ニューモーフィズム
      (Soft UI)向けに、単一の素材色から削り出したような外観にする一組。ミント/シアン/バイオレットの

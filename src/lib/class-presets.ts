@@ -25,10 +25,27 @@ export const FOCUS_RING =
   'focus-visible:shadow-focus focus-visible:outline-(length:--focus-ring-width) focus-visible:outline-offset-(--focus-ring-offset) focus-visible:outline-focus-ring';
 
 // 色（背景 / 文字 / 枠）だけを DS の速い duration で遷移させる。motion-reduce では遷移を切る。
-// hover で面色が変わる行・チップ・リンクなどで共通。transform や box-shadow まで遷移させたい
-// ボタン等はこの定数を使わず、遷移プロパティを個別に指定する。
+// hover で面色が変わる行・チップ・リンクなどで共通。
+// ⚠ イージングを省略しない（#960）。省略すると Tailwind 既定の ease が効き、DS 側から動きの質を
+// 動かせなくなる。色は行き過ぎて戻る意味がないので --ease-standard（オーバーシュートしない）。
 export const TRANSITION_COLORS =
-  'transition-colors motion-reduce:transition-none duration-(--dur-fast)';
+  'transition-colors motion-reduce:transition-none duration-(--dur-fast) ease-standard';
+
+// 押せる要素（ボタン / pill リンク）用。**transform だけに spring を掛け、色や影は standard**
+// にするための遷移指定（#960）。
+//
+// ── なぜ transition-[...] を並べず arbitrary property で書くか ──────────
+// Tailwind の transition-* は「遷移するプロパティの集合」しか表現できず、イージングは
+// transition-timing-function を1つ持つだけなので、**1つの要素の中でプロパティごとに違う
+// イージングを当てられない**。旧実装は transform と background/color/box-shadow を1つの
+// transition-[...] にまとめて ease-spring を掛けており、色までオーバーシュートしていた
+// （theme.css の --ease-spring の項を参照）。プロパティごとにイージングを指定できる書き方は
+// CSS の transition ショートハンドを直接書くしかないので、arbitrary property を使う。
+//
+// ⚠ filter は含めない。hover の輝度調整（brightness）は state layer 方式へ移したため、
+// filter を遷移させる必要がなくなった（theme.css の --color-*-hover の項を参照）。
+export const TRANSITION_INTERACTIVE =
+  '[transition:transform_var(--dur-fast)_var(--ease-spring),background-color_var(--dur-fast)_var(--ease-standard),border-color_var(--dur-fast)_var(--ease-standard),color_var(--dur-fast)_var(--ease-standard),box-shadow_var(--dur-fast)_var(--ease-standard)] motion-reduce:transition-none';
 
 // data-disabled 時の共通の見た目（カーソル / 強制カラー時の文字色 / 半透明）。Base UI 由来で
 // data-disabled を出す操作要素（segmented-control / toggle-group / color-input / slider など）で共通。

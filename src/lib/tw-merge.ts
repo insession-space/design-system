@@ -100,8 +100,9 @@ export const twMerge = extendTailwindMerge({
         'rp-concave',
         'rp-concave-lg',
       ],
-      // transition-timing-function。
-      ease: ['spring'],
+      // transition-timing-function。spring=形・位置（オーバーシュートする）、
+      // standard=色・不透明度・影（#960。theme.css の当該コメント参照）。
+      ease: ['spring', 'standard'],
       // letter-spacing。DS が切り出した中間値（badge / lozenge の uppercase caps）。
       tracking: ['tag', 'pill'],
     },
