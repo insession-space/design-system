@@ -136,15 +136,24 @@
      この値は**ライト側の accent (#ff5a36)** であってダーク既定の #ff6a47 ではないため、
      `var(--color-accent)` へ置き換えると**ダークでのティント面の色が変わる**(= 見た目が動く)。
      #109 は「名前だけを直し値は1つも変えない」変更なので、ここは据え置いた。
-     ティント面をアクセントに追従させるかどうかは、見た目の変更を伴う別の判断として扱うこと。 */
+     ティント面をアクセントに追従させるかどうかは、見た目の変更を伴う別の判断として扱うこと。
+
+     ⚠ **段は 5 つだけ。1〜2% 刻みで足さないこと(#961)。**
+     かつては 3/5/7/8/10/12/13/16/22 の 9 段あった。これは上の text-* が #117 で診断したのと
+     同じ病で、**7 と 8、12 と 13 のように 1% しか違わない段は誰にも選べない** — 選べない粒度は
+     「どちらを使うべきか」が決まらないぶん、かえって統一を壊す。実測すると 9 段のうち
+     **10 と 16 はトークン一覧の story にしか現れず、コンポーネントでの使用が 1 つも無かった**。
+     残りも 7 と 13 は Stepper だけ、12 は Badge だけが使っていた。
+     整理の内訳(削除した段の使用箇所は隣の段へ寄せた。差は 1% で知覚できない):
+       7  → 8  (Stepper のボタン地)
+       13 → 12 (Stepper のボタン hover)
+       10, 16  使用ゼロにつき削除
+     3 と 5 は 2% 差だが**両方残す** — UploadTile が hover(3) と active(5) の対比に使っており、
+     ここを畳むと 2 つの状態が同じ色になる。段の存在理由が「対比」にあるうちは残す。 */
   --color-tint-3: color-mix(in srgb, rgb(255 90 54) 3%, var(--color-bg));
   --color-tint-5: color-mix(in srgb, rgb(255 90 54) 5%, var(--color-bg));
-  --color-tint-7: color-mix(in srgb, rgb(255 90 54) 7%, var(--color-bg));
   --color-tint-8: color-mix(in srgb, rgb(255 90 54) 8%, var(--color-bg));
-  --color-tint-10: color-mix(in srgb, rgb(255 90 54) 10%, var(--color-bg));
   --color-tint-12: color-mix(in srgb, rgb(255 90 54) 12%, var(--color-bg));
-  --color-tint-13: color-mix(in srgb, rgb(255 90 54) 13%, var(--color-bg));
-  --color-tint-16: color-mix(in srgb, rgb(255 90 54) 16%, var(--color-bg));
   --color-tint-22: color-mix(in srgb, rgb(255 90 54) 22%, var(--color-bg));
 
   /* カラー: セマンティック(状態表現)。新4色パレットと対応させる(#457)。
@@ -301,10 +310,14 @@
   /* グロー(旧 #457 ブランドの hover 発光)は新 DS で廃止(#463)。新 DS の hover は「ふわっと光る」
      ではなく surface-hover への面変化 / filled は state layer(#960。下の --color-*-hover
      の項を参照。当初は brightness(.93) だった) / カード等は translateY(-2px) の
-     控えめな持ち上げで表す。互換のため --shadow-glow トークン名は残すが値は none にして、既存の
-     box-shadow: var(--glow) 参照(hover)を一括で無効化する。 */
-  --shadow-glow: none;
-  --shadow-glow-strong: none;
+     控えめな持ち上げで表す。
+     ⚠ **--shadow-glow / --shadow-glow-strong は削除した(#961)。復活させないこと。**
+     #463 は「互換のため名前だけ残して値を none にする」措置を採ったが、値が none のトークンは
+     **参照を書いても何も起きないのに、読み手には効果があるように見える**。実際 Stepper は
+     hover に shadow-glow を当てたまま出荷されており、box-shadow の遷移まで指定していたが、
+     光る効果は一度も描画されていなかった(面色の変化だけが効いていた)。
+     互換のために残した名前が、消えた効果を生きているように見せる方が有害なので消す。
+     消費側が参照していてもユーティリティが生成されなくなるだけで、描画は none のまま変わらない。 */
 
   /* エレベーション: 中立的なドロップシャドウ(グローとは別系統)。DS の3段(card / popover /
      modal)へ準拠(#463)。DS は blur を抑え負の spread(-2/-14/-28px)で締める控えめな影が signature。

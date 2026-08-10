@@ -188,7 +188,8 @@ const AVATAR_SIZE = 36;
 // ときだけ面と影を敷いて可読性を確保する — 常時面を敷くと、opacity-0 で見えない間も空の
 // チップが全 continuation 行に浮いて見えるため当てない。位置基準は root 側の `relative`。
 const CONTINUATION_ACTIONS_FLOAT =
-  'absolute top-0 right-0 z-10 rounded-full px-1 transition-colors motion-reduce:transition-none ' +
+  // ⚠ 角丸は DS の pill スケール。以前は Tailwind 既定の full だった(#961)。描画は同じ。
+  'absolute top-0 right-0 z-10 rounded-pill px-1 transition-colors motion-reduce:transition-none ' +
   'duration-(--dur-fast) group-hover:bg-surface-2 group-hover:shadow-popover ' +
   'group-focus-within:bg-surface-2 group-focus-within:shadow-popover';
 

@@ -88,8 +88,6 @@ export const twMerge = extendTailwindMerge({
         'soft',
         'popover',
         'overlay',
-        'glow',
-        'glow-strong',
         'elevation-0',
         'elevation-1',
         'elevation-2',

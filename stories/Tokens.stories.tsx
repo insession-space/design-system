@@ -11,9 +11,12 @@ export default meta;
 
 type Story = StoryObj;
 
+// note の値は theme.css の実値に合わせること。以前は chip(8) / card(14) / panel(20) と
+// 書かれていたが、#463 で DS の 3 段スケール(sm6 / md10 / lg16)へ寄せたときに実値だけが
+// 動いて note が取り残されていた(#961)。
 export const Radius: Story = {
   render: () => (
-    <Section title="半径" note="chip(8) / card(14) / panel(20) / pill(999)。">
+    <Section title="半径" note="chip=sm(6) / md(10) / card=lg(16) / panel=lg(16) / pill(999)。">
       <div className="flex flex-wrap gap-8">
         <BoxSwatch label="chip" varName="--radius-chip" boxClassName="rounded-chip" />
         <BoxSwatch label="card" varName="--radius-card" boxClassName="rounded-card" />
@@ -24,18 +27,40 @@ export const Radius: Story = {
   ),
 };
 
+// 旧「グロー(発光)」の節を差し替えたもの(#961)。グローは #463 で廃止され値が none になって
+// いたので、2 つのスウォッチは**何も描画しないただの箱**として並んでいた。トークンごと
+// 削除したため、この枠を本来カタログに無かった elevation スケールの説明に充てる。
 export const Elevation: Story = {
   render: () => (
     <Section
-      title="グロー(発光)"
-      note="ホバー/アクティブの一過性に使う。派手なグローは常用しない。"
+      title="エレベーション(段階スケール)"
+      note="「背景 + 境界 + 影」で1段を成す意味論に 0〜4 の名前を付けたもの(#42)。Surface の elevation prop がこのスケールを取る。0/1 に影は無く(下の箱に影が出ないのが正しい)、段は背景と境界の差で表す — その2つは Surface 側が持つ。3以上の実値は下の「影」の節と同じもの。"
     >
       <div className="flex flex-wrap gap-12 p-6">
-        <BoxSwatch label="glow" varName="--shadow-glow" boxClassName="rounded-card shadow-glow" />
         <BoxSwatch
-          label="glow-strong"
-          varName="--shadow-glow-strong"
-          boxClassName="rounded-card shadow-glow-strong"
+          label="elevation-0"
+          varName="--shadow-elevation-0"
+          boxClassName="rounded-card shadow-elevation-0"
+        />
+        <BoxSwatch
+          label="elevation-1"
+          varName="--shadow-elevation-1"
+          boxClassName="rounded-card shadow-elevation-1"
+        />
+        <BoxSwatch
+          label="elevation-2"
+          varName="--shadow-elevation-2"
+          boxClassName="rounded-card shadow-elevation-2"
+        />
+        <BoxSwatch
+          label="elevation-3"
+          varName="--shadow-elevation-3"
+          boxClassName="rounded-card shadow-elevation-3"
+        />
+        <BoxSwatch
+          label="elevation-4"
+          varName="--shadow-elevation-4"
+          boxClassName="rounded-card shadow-elevation-4"
         />
       </div>
     </Section>
@@ -46,7 +71,7 @@ export const Shadows: Story = {
   render: () => (
     <Section
       title="エレベーション(ドロップシャドウ)"
-      note="グローとは別系統の中立的な影(#445)。soft=小要素、overlay=スナックバー、popover=ポップオーバー/メニュー。"
+      note="中立的な影(#445)。soft=小要素、overlay=スナックバー、popover=ポップオーバー/メニュー。上の段階スケールとは同じ影を別の呼び方で指す(elevation-2 = soft / -3 = popover / -4 = overlay)。使い分けは、部品の class に直接書くときはこちら(用途で読める)、Surface の elevation prop のように段を数で受け取るときは上のスケール。"
     >
       <div className="flex flex-wrap gap-12 p-6">
         <BoxSwatch label="soft" varName="--shadow-soft" boxClassName="rounded-card shadow-soft" />
@@ -131,7 +156,7 @@ export const Motion: Story = {
     <>
       <Section
         title="イージング / duration"
-        note="ease-spring + --dur-* を基本に。下のカードにホバーすると transition が確認できる。"
+        note="イージングはプロパティの種類で選ぶ(#960)。spring=形・位置・大きさ(終点を行き過ぎて戻る)、standard=色・不透明度・影(行き過ぎない)。色に spring を当てるとちらつきとしてしか知覚されないので当てないこと。下のボタンにホバーすると各 duration の違いが確認できる。"
       >
         <div className="flex flex-wrap gap-6">
           {[
@@ -143,7 +168,7 @@ export const Motion: Story = {
             <div key={d.varName} className="flex flex-col items-center gap-2">
               <Button
                 variant="secondary"
-                className="hover:-translate-y-1 hover:shadow-glow ease-spring"
+                className="hover:-translate-y-1 ease-spring"
                 style={{ transitionDuration: d.dur, transitionProperty: 'transform, box-shadow' }}
               >
                 hover me
@@ -154,7 +179,12 @@ export const Motion: Story = {
           ))}
         </div>
       </Section>
-      <TokenTable rows={[{ varName: '--ease-spring', label: 'ease-spring' }]} />
+      <TokenTable
+        rows={[
+          { varName: '--ease-spring', label: 'ease-spring（形・位置・大きさ）' },
+          { varName: '--ease-standard', label: 'ease-standard（色・不透明度・影）' },
+        ]}
+      />
     </>
   ),
 };
