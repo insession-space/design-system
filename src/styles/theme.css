@@ -176,6 +176,10 @@
   --color-warning-border: rgba(245, 181, 74, 0.3);
   --color-danger: #ff6b6b;
   --color-danger-surface: color-mix(in srgb, rgb(255 107 107) 12%, var(--color-bg));
+  /* danger-surface-strong: #765 は success / warning / info にだけ -strong を足して danger を
+     飛ばしていた(危険色を濃く敷く部品が当時無かったため)。Lozenge に danger トーンを足す
+     にあたって対称にする(#962)。値の作り方は他の 3 色と同じ 20%。 */
+  --color-danger-surface-strong: color-mix(in srgb, rgb(255 107 107) 20%, var(--color-bg));
   --color-danger-border: rgba(255, 107, 107, 0.3);
   --color-info: #618ff1;
   --color-info-surface: color-mix(in srgb, rgb(91 139 240) 12%, var(--color-bg));

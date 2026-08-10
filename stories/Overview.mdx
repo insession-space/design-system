@@ -92,6 +92,83 @@ Stepper は押す操作だが `value` / `onChange` を持つ値エディタな�
 変わらない）。**Feedback** は処理中や処理結果を**一時的に**伝える（Toast は数秒で消える、
 Spinner は処理が終わると消える）。「消えることが前提か」で聞き分けられる。
 
+### ラベル系6部品の使い分け
+
+「小さいラベル」を出す部品が Data Display に 6 つある（Badge / Chip / Lozenge / StatusBadge /
+StatusDot / CountChip）。どれを使うかは、上から順に答えて最初に当たったものを選ぶ。
+
+1. **押せる・消せるか？** → **Chip**（唯一 `button` 要素）
+2. **中身が数値だけか？** → **CountChip**
+3. **ラベル文字を置く場所がないか？** → **StatusDot**
+4. **実時間で変化し続ける状態か？** → **StatusBadge**
+5. **オブジェクトの工程・区分か？** → **Lozenge**
+6. **それ以外のメタ情報** → **Badge**
+
+<table style={{ borderCollapse: 'collapse', width: '100%', margin: '1rem 0' }}>
+  <thead>
+    <tr>
+      {['部品', '表すもの', '例'].map((h) => (
+        <th key={h} style={{
+          textAlign: 'left',
+          padding: '.5rem .7rem',
+          borderBottom: `1px solid ${chrome.borderStrong}`,
+          color: chrome.textDim,
+          fontSize: '.8rem',
+        }}>{h}</th>
+      ))}
+    </tr>
+  </thead>
+  <tbody>
+    {[
+      ['Chip', '押せるタグ・フィルタ・入力トークン', 'すべて / デザイン / 開発'],
+      ['CountChip', '数値（件数・スコア）', '3 / 12 / 99+'],
+      ['StatusDot', '点だけで示す状態（アバター隅・行頭）', '—'],
+      ['StatusBadge', '実時間で変化し続ける状態', 'オンライン / 実行中 / 接続エラー'],
+      ['Lozenge', 'オブジェクトの工程・区分', 'BETA / PENDING / ARCHIVED'],
+      ['Badge', '付帯するメタ情報・一過性の強調', 'NEW / PRO / おすすめ'],
+    ].map(([name, role, ex]) => (
+      <tr key={name}>
+        <td style={{ padding: '.5rem .7rem', borderBottom: `1px solid ${chrome.border}`, fontWeight: 700 }}>
+          {name}
+        </td>
+        <td style={{ padding: '.5rem .7rem', borderBottom: `1px solid ${chrome.border}` }}>{role}</td>
+        <td style={{ padding: '.5rem .7rem', borderBottom: `1px solid ${chrome.border}`, color: chrome.textDim }}>
+          {ex}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+決め手は **StatusBadge だけが `pulse` を持つ**こと。明滅は「今この瞬間の状態」を表す装置なので、
+実時間で変わるものだけが StatusBadge という線引きは実装とも合う。Badge が唯一 `neutral` / `pro` と
+角丸矩形を持つのは、セマンティック色に乗らないメタ情報を扱う部品だから。
+
+この 3 分割（数値 / 状態 / 分類・対話）は Atlassian（Badge / Lozenge / Tag）と
+Primer（CounterLabel / Label / Token）が独立に到達した同じ軸。**ただし名前は業界と逆**で、
+Atlassian の `Badge` は数値を指すがこの DS の `Badge` は状態、数値は `CountChip` にあたる。
+
+#### やってはいけないこと
+
+- **Chip を非対話のラベルに使わない。** `button` 要素なので、押せないのに Tab でフォーカスが
+  止まり、`aria-pressed` が意味のない値を報告する。見た目が近くても Badge / Lozenge を使う。
+- **Badge で赤を出そうとしない。** Badge に赤は無く、`tone="accent"`（旧名 `danger`）が出すのは
+  ブランドのコーラル。真の赤が要る状態表現は StatusBadge か Lozenge の `danger`。
+- **同じ画面で Lozenge と StatusBadge を混在させない。** どちらも大文字ピルで、差はウェイト
+  （600 / 800）と 1px の枠だけ。並ぶと 2 種類あること自体が読み取れない。
+- **Lozenge の `tone="accent"` を Chip の近くに置かない。** 塗りと文字色が Chip の selected と
+  同一で、押せるものと押せないものが同じ色になる。
+- **1 つの対象に状態ラベルを 2 つ以上付けない。** 状態ラベルは目立つことで機能するので、
+  並べるほど 1 つあたりの効果が下がる。
+- **StatusDot 単独で状態を伝えるときは `label` を省略しない。** 省略すると `aria-hidden` になり
+  支援技術から消える。色だけが情報を担っている状態は、色覚特性によっては伝わらない。
+
+#### トーンの語彙
+
+状態を色で表す部品は `SemanticTone`（`success` / `warning` / `danger` / `info` / `neutral`）を
+共有する。Badge と Lozenge はこれにブランド強調の `accent` を足し、Badge はさらに `pro` を持つ。
+Badge の旧名（`live` / `warn` / `danger`）は別名として受けるが、新しいコードでは使わないこと。
+
 ### Overlays
 
 ページの上に重ねて出す層。Modal / Popover / BottomSheet など、元のレイアウトを覆う/浮かせるもの。

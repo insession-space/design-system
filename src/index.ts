@@ -20,6 +20,7 @@ export {
   Badge,
   type BadgeProps,
   type BadgeTone,
+  type BadgeToneLegacy,
   CountChip,
   type CountChipProps,
 } from './components/badge.tsx';
@@ -296,6 +297,8 @@ export { default as GoogleIcon } from './icons/google-icon.tsx';
 export { default as Icon, type IconName, type IconProps } from './icons/icon.tsx';
 export { default as PersonIcon } from './icons/person-icon.tsx';
 export { SideNav } from './side-nav-parts.ts';
+// 状態を色で表す部品（Status / Lozenge / CountChip）が共有するトーン語彙（#962）。
+export type { SemanticTone } from './tone.ts';
 export {
   FeedItem,
   FeedItemAttachment,

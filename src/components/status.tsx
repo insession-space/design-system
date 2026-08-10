@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { twMerge } from '../lib/tw-merge.ts';
+import type { SemanticTone } from '../tone.ts';
 
 // ステータス表現（純粋 leaf UI）。オンライン/実行中/エラー等の状態を、セマンティックカラー
 // トークンに沿って表す。feature ごとに個別だった app-running-dot / 参加者オンライン点 /
@@ -7,7 +8,9 @@ import { twMerge } from '../lib/tw-merge.ts';
 // - StatusDot: 状態を点だけで示す最小表現（アバター隅・行頭など）。
 // - StatusBadge: 点 + ラベルのピル。Badge(new/live の一過性強調) とは用途が別で、こちらは
 //   「継続的な状態」を表す。
-export type StatusTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+// トーン語彙は DS 共通の SemanticTone（#962。src/tone.ts）。この部品が最初から
+// 正名を使っていたので、別名は残っていない。型名は後方互換のため据え置く。
+export type StatusTone = SemanticTone;
 
 const DOT_TONE: Record<StatusTone, string> = {
   success: 'bg-success',

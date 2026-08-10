@@ -36,7 +36,7 @@ export const Default: Story = {
           cover={cover}
           overlay={
             <>
-              <Badge tone="live" dot>
+              <Badge tone="success" dot>
                 LIVE
               </Badge>
               <CircleBadge>
@@ -75,7 +75,7 @@ export const WithoutFooter: Story = {
         <MediaCard
           cover={cover}
           overlay={
-            <Badge tone="live" dot>
+            <Badge tone="success" dot>
               LIVE
             </Badge>
           }
@@ -100,7 +100,7 @@ export const Clickable: Story = {
           onClick={() => {}}
           cover={cover}
           overlay={
-            <Badge tone="live" dot>
+            <Badge tone="success" dot>
               LIVE
             </Badge>
           }
@@ -123,7 +123,7 @@ export const LongTitleAndMeta: Story = {
         <MediaCard
           cover={cover}
           overlay={
-            <Badge tone="live" dot>
+            <Badge tone="success" dot>
               LIVE
             </Badge>
           }
