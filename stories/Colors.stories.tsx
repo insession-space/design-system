@@ -48,11 +48,8 @@ export const Tints: Story = {
       <Grid>
         <ColorSwatch varName="--color-tint-3" label="tint-3" />
         <ColorSwatch varName="--color-tint-5" label="tint-5" />
-        <ColorSwatch varName="--color-tint-7" label="tint-7" />
         <ColorSwatch varName="--color-tint-8" label="tint-8" />
-        <ColorSwatch varName="--color-tint-10" label="tint-10" />
-        <ColorSwatch varName="--color-tint-13" label="tint-13" />
-        <ColorSwatch varName="--color-tint-16" label="tint-16" />
+        <ColorSwatch varName="--color-tint-12" label="tint-12" />
         <ColorSwatch varName="--color-tint-22" label="tint-22" />
       </Grid>
     </Section>

@@ -1,16 +1,22 @@
 import type { ReactNode } from 'react';
 import { twMerge } from '../lib/tw-merge.ts';
+import type { SemanticTone } from '../tone.ts';
 
 // DS の Lozenge（純粋 leaf UI）。claude design "INSESSION Design System" の Lozenge 仕様に準拠（#463）。
 // 状態やメタ情報の小ラベル（LIVE / PENDING / REC / BETA 等）。モノスペース大文字・塗り控えめ・非操作。
 // StatusBadge（点 + ラベルの枠付きピル。継続的な状態）とは用途が別で、こちらは mono の状態タグ。
 // tone でセマンティック色を切替える。dot で先頭に同色ドットを出す。i18n は持たない。
 // 塗りは視認性確保のため -surface-strong 系トークンを使う(#765)。
-export type LozengeTone = 'success' | 'warning' | 'accent' | 'info' | 'neutral';
+// トーンは DS 共通の SemanticTone（#962。src/tone.ts）+ ブランド強調の accent。
+// ⚠ danger は #962 で足した。それまで Lozenge には赤が無く、「失敗」「期限切れ」のような
+// 工程上の否定的な状態を出せなかった（accent のコーラルで代用するしかなく、Chip の
+// selected と紛らわしかった）。
+export type LozengeTone = SemanticTone | 'accent';
 
 const TONE: Record<LozengeTone, string> = {
   success: 'text-success bg-success-surface-strong',
   warning: 'text-warning bg-warning-surface-strong',
+  danger: 'text-danger bg-danger-surface-strong',
   accent: 'text-accent-soft bg-tint-22',
   info: 'text-info bg-info-surface-strong',
   // neutral は tint(accent 色相)ではなく中立の面を使う。tint を濃くすると accent tone と
@@ -20,6 +26,7 @@ const TONE: Record<LozengeTone, string> = {
 const DOT: Record<LozengeTone, string> = {
   success: 'bg-success',
   warning: 'bg-warning',
+  danger: 'bg-danger',
   accent: 'bg-accent',
   info: 'bg-info',
   neutral: 'bg-text-faint',

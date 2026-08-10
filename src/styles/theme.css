@@ -136,15 +136,24 @@
      この値は**ライト側の accent (#ff5a36)** であってダーク既定の #ff6a47 ではないため、
      `var(--color-accent)` へ置き換えると**ダークでのティント面の色が変わる**(= 見た目が動く)。
      #109 は「名前だけを直し値は1つも変えない」変更なので、ここは据え置いた。
-     ティント面をアクセントに追従させるかどうかは、見た目の変更を伴う別の判断として扱うこと。 */
+     ティント面をアクセントに追従させるかどうかは、見た目の変更を伴う別の判断として扱うこと。
+
+     ⚠ **段は 5 つだけ。1〜2% 刻みで足さないこと(#961)。**
+     かつては 3/5/7/8/10/12/13/16/22 の 9 段あった。これは上の text-* が #117 で診断したのと
+     同じ病で、**7 と 8、12 と 13 のように 1% しか違わない段は誰にも選べない** — 選べない粒度は
+     「どちらを使うべきか」が決まらないぶん、かえって統一を壊す。実測すると 9 段のうち
+     **10 と 16 はトークン一覧の story にしか現れず、コンポーネントでの使用が 1 つも無かった**。
+     残りも 7 と 13 は Stepper だけ、12 は Badge だけが使っていた。
+     整理の内訳(削除した段の使用箇所は隣の段へ寄せた。差は 1% で知覚できない):
+       7  → 8  (Stepper のボタン地)
+       13 → 12 (Stepper のボタン hover)
+       10, 16  使用ゼロにつき削除
+     3 と 5 は 2% 差だが**両方残す** — UploadTile が hover(3) と active(5) の対比に使っており、
+     ここを畳むと 2 つの状態が同じ色になる。段の存在理由が「対比」にあるうちは残す。 */
   --color-tint-3: color-mix(in srgb, rgb(255 90 54) 3%, var(--color-bg));
   --color-tint-5: color-mix(in srgb, rgb(255 90 54) 5%, var(--color-bg));
-  --color-tint-7: color-mix(in srgb, rgb(255 90 54) 7%, var(--color-bg));
   --color-tint-8: color-mix(in srgb, rgb(255 90 54) 8%, var(--color-bg));
-  --color-tint-10: color-mix(in srgb, rgb(255 90 54) 10%, var(--color-bg));
   --color-tint-12: color-mix(in srgb, rgb(255 90 54) 12%, var(--color-bg));
-  --color-tint-13: color-mix(in srgb, rgb(255 90 54) 13%, var(--color-bg));
-  --color-tint-16: color-mix(in srgb, rgb(255 90 54) 16%, var(--color-bg));
   --color-tint-22: color-mix(in srgb, rgb(255 90 54) 22%, var(--color-bg));
 
   /* カラー: セマンティック(状態表現)。新4色パレットと対応させる(#457)。
@@ -167,6 +176,10 @@
   --color-warning-border: rgba(245, 181, 74, 0.3);
   --color-danger: #ff6b6b;
   --color-danger-surface: color-mix(in srgb, rgb(255 107 107) 12%, var(--color-bg));
+  /* danger-surface-strong: #765 は success / warning / info にだけ -strong を足して danger を
+     飛ばしていた(危険色を濃く敷く部品が当時無かったため)。Lozenge に danger トーンを足す
+     にあたって対称にする(#962)。値の作り方は他の 3 色と同じ 20%。 */
+  --color-danger-surface-strong: color-mix(in srgb, rgb(255 107 107) 20%, var(--color-bg));
   --color-danger-border: rgba(255, 107, 107, 0.3);
   --color-info: #618ff1;
   --color-info-surface: color-mix(in srgb, rgb(91 139 240) 12%, var(--color-bg));
@@ -299,11 +312,16 @@
   --radius-sheet: 22px;
 
   /* グロー(旧 #457 ブランドの hover 発光)は新 DS で廃止(#463)。新 DS の hover は「ふわっと光る」
-     ではなく surface-hover への面変化 / filled は brightness(.93) / カード等は translateY(-2px) の
-     控えめな持ち上げで表す。互換のため --shadow-glow トークン名は残すが値は none にして、既存の
-     box-shadow: var(--glow) 参照(hover)を一括で無効化する。 */
-  --shadow-glow: none;
-  --shadow-glow-strong: none;
+     ではなく surface-hover への面変化 / filled は state layer(#960。下の --color-*-hover
+     の項を参照。当初は brightness(.93) だった) / カード等は translateY(-2px) の
+     控えめな持ち上げで表す。
+     ⚠ **--shadow-glow / --shadow-glow-strong は削除した(#961)。復活させないこと。**
+     #463 は「互換のため名前だけ残して値を none にする」措置を採ったが、値が none のトークンは
+     **参照を書いても何も起きないのに、読み手には効果があるように見える**。実際 Stepper は
+     hover に shadow-glow を当てたまま出荷されており、box-shadow の遷移まで指定していたが、
+     光る効果は一度も描画されていなかった(面色の変化だけが効いていた)。
+     互換のために残した名前が、消えた効果を生きているように見せる方が有害なので消す。
+     消費側が参照していてもユーティリティが生成されなくなるだけで、描画は none のまま変わらない。 */
 
   /* エレベーション: 中立的なドロップシャドウ(グローとは別系統)。DS の3段(card / popover /
      modal)へ準拠(#463)。DS は blur を抑え負の spread(-2/-14/-28px)で締める控えめな影が signature。
@@ -376,8 +394,67 @@
      新しい部品を足すときも同じ組み合わせを使うこと(shadow-focus 単独にしない)。 */
   --shadow-focus: 0 0 0 3px rgba(91, 139, 240, 0.16);
 
-  /* モーション: イージング */
+  /* モーション: イージング。**プロパティの種類で使い分ける**(#960)。
+     かつて DS が持つイージングは --ease-spring 1本だけで、足りない分は Tailwind 既定テーマの
+     ease-out / ease-in-out がそのまま使われていた(実測 6 箇所)。これは #117 で text-xl 以上を
+     `initial` で塞いだのと同じ「DS が管理していない値が静かに生き続ける」状態で、
+     **同じ DS の中で動きの質が揃わない**主因になる。
+
+     ⚠ **spring を色に掛けないこと。** --ease-spring は 1.56 の制御点を持つ、終点を行き過ぎて
+     戻る(オーバーシュートする)カーブ。位置や大きさが行き過ぎて戻るのは「弾んだ」と読めるが、
+     **色や不透明度が行き過ぎても物理的な意味を持たない** — 目標より濃い色が一瞬出て戻るだけで、
+     ちらつきとして知覚される。実際 button.tsx / link.tsx は
+     `transition-[transform,background,color,...] ease-spring` と1つの easing を全プロパティへ
+     掛けており、hover の色変化までオーバーシュートしていた。
+
+     使い分け:
+       --ease-spring   形・位置・大きさ(transform / 入場アニメ)。弾みが意味を持つもの
+       --ease-standard 色・不透明度・影(hover の面変化、フォーカス)。行き過ぎずに収束する
+
+     ⚠ 新しい遷移を足すときに `ease-out` / `ease-in-out`(Tailwind 既定)へ戻さないこと。
+     戻しても見た目は近いのでレビューで気づけないが、DS 側から値を動かせなくなる。
+
+     ⚠ **退場(exit)専用のイージングは、まだ足していない。** 退場は開始を速くして終端で緩めない
+     カーブ(cubic-bezier(0.4, 0, 1, 1) 等)を当てるのが定石だが、現状 DS の退場は Toast の
+     `data-ending-style:opacity-0` のように opacity を落とすだけで、カーブの差が知覚できない。
+     使い所が無いまま定義すると、値 none のまま参照だけが残った --shadow-glow と同じ
+     「読み手が意味を誤解する死んだトークン」になる。**実際に退場アニメを持つ部品が出てきた
+     回に足すこと**(font-display / font-mono を同値のまま使い分けなかったのと同じ判断)。 */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* filled な面の hover。**値は変えずにトークン化する**(#960)。
+     旧実装は filled な variant すべてが `hover:brightness-[.93]` を各コンポーネントへ直書き
+     していた。**見た目は妥当だったので変えない** — このトークンは
+     `color-mix(in srgb, black 7%, X)` で、これは brightness(0.93) と**数学的に同一**
+     (どちらも各チャンネルを 0.93 倍する。実測 #ff6a47 → #ed6342 で一致)。
+     変えたのは値ではなく、次の 3 点:
+
+       1. **DS が値を持てるようになる。** `.93` が 6 箇所へ散っていたため、hover の強さを
+          DS 側から動かせなかった。トークン 1 本を直せば全 filled variant に効く。
+       2. **filter を遷移させなくて済む。** filter は新しいスタッキングコンテキストを作るので、
+          ボタンの中に置いた要素（Spinner / アイコン）の重なりに影響し得る。背景色の遷移なら
+          その副作用が無い。
+       3. **apple variant と同じ形になる。** apple は黒地で brightness が効かない（乗算なので
+          何倍しても黒のまま）ため、以前から独自に --color-apple-hover への面変化を採っていた。
+          つまり「hover の実装」が filled=brightness / soft=surface-hover / apple=面変化 の
+          3 通りに割れていた。全部を面変化へ寄せて 1 つにする。
+
+     ⚠ **向きは「暗く」で正しい。明るくしないこと。**
+     Material 3 の state layer は面の上に文字色(on-*)を重ねるが、この DS でそれをやると
+     **白ラベルの面に白を混ぜることになり、ラベルのコントラストが下がる**(実測: accent 上の
+     白ラベルが 2.84:1 → 2.63:1、success 上が 2.25:1 → 2.11:1)。on-accent の項に書いたとおり
+     accent/on-accent は意図的に 1.4.3 の 4.5:1 を満たしておらず、**上げたいときに動かすのは
+     塗り側(暗くする)** という方針を採っている。hover で明るくするのはその逆を行く。
+
+     ⚠ 割合は素の数値で書く(var() で差さない)。@theme のトークンを color-mix の割合位置へ
+     var() で差すと、Tailwind v4 が --color-* をリテラル展開する経路と噛み合わず値が落ちる
+     ことがあるため、展開後も壊れない形に固定する。
+     ⚠ tinted な variant(danger)も同じ形でよい。面がティントでも一律に 7% 暗くなるだけ。 */
+  --color-fill-hover: color-mix(in srgb, black 7%, var(--color-fill));
+  --color-accent-hover: color-mix(in srgb, black 7%, var(--color-accent));
+  --color-success-hover: color-mix(in srgb, black 7%, var(--color-success));
+  --color-danger-hover: color-mix(in srgb, black 7%, var(--color-danger-surface));
 
   /* レコードプレーヤー風ビュー専用パレット(#376。ダークトーン化 #402)。ニューモーフィズム
      (Soft UI)向けに、単一の素材色から削り出したような外観にする一組。ミント/シアン/バイオレットの

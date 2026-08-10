@@ -388,15 +388,18 @@
    * visible、閉じる方向は duration の終わりに hidden へ落ちる）ので、閉じ切ってから支援技術と
    * タブ順の両方から中身が外れる。閉じている間だけ非表示にするために [data-open] を使わず、
    * 既定値を「閉じ」に置いている（属性が付くのは開いているときだけ）。 */
-  /* --ease-out は Tailwind 既定テーマのトークン（styles.src.css が読む tailwindcss/theme.css が
-     定義し、配布 CSS にもそのまま入る）。このパッケージ独自の --ease-spring と同じ扱いでよい。 */
+  /* ⚠ イージングは DS の --ease-standard を使う（#960）。ここは以前 --ease-out を参照していた。
+     それは Tailwind 既定テーマのトークン（styles.src.css が読む tailwindcss/theme.css が定義し、
+     配布 CSS にもそのまま入る）で、参照しても動きはするが **DS 側から値を動かせない** —
+     アコーディオンの開閉だけが DS のモーション設計の外に置かれ、他の遷移と質が揃わなくなる。
+     #117 で text-xl 以上を塞いだのと同じ「DS が管理していない既定値が静かに生き続ける」形。 */
   .accordion-panel {
     display: grid;
     grid-template-rows: 0fr;
     visibility: hidden;
     transition:
-      grid-template-rows var(--dur-fast) var(--ease-out),
-      visibility var(--dur-fast) var(--ease-out);
+      grid-template-rows var(--dur-fast) var(--ease-standard),
+      visibility var(--dur-fast) var(--ease-standard);
   }
 
   .accordion-panel[data-open] {
@@ -416,7 +419,7 @@
   .accordion-panel-content {
     padding: 4px 18px 18px var(--accordion-indent, 18px);
     opacity: 0;
-    transition: opacity var(--dur-fast) var(--ease-out);
+    transition: opacity var(--dur-fast) var(--ease-standard);
   }
 
   /* 狭幅では字下げをやめて均等にする（字下げのぶん本文が細くなり、読みにくくなるため）。 */

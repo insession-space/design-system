@@ -46,7 +46,14 @@ const VARIANT: Record<LinkVariant, string> = {
   // 他の variant は本文に埋め込まれないので下線を持たない(下のコメント参照)。
   inline: `text-link font-semibold underline decoration-1 underline-offset-4 decoration-link/60 cursor-pointer ${TRANSITION_COLORS} hover:text-link-hover hover:decoration-link-hover`,
   subtle: `text-link text-sm font-semibold no-underline cursor-pointer ${TRANSITION_COLORS} hover:text-link-hover`,
-  pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-pill uppercase no-underline cursor-pointer transition-[background,color,transform] motion-reduce:transition-none duration-(--dur-base) ease-spring hover:bg-surface-hover hover:text-accent-soft hover:-translate-y-px',
+  // ⚠ イージングは spring ではなく standard（#960）。ここは transform も遷移させるが、その中身は
+  // hover 時の `-translate-y-px` = **1px の持ち上げ**しかない。spring のオーバーシュートは
+  // 「行き過ぎて戻る」幅が動きの量に比例するので、1px ではそもそも知覚できない。一方で同じ
+  // easing が background と color にも掛かり、そちらはオーバーシュートが色のちらつきとして出る
+  // （theme.css の --ease-spring の項を参照）。得るものが無く失うものだけがあるため standard に
+  // 寄せる。button.tsx のように spring を残す価値があるのは、scale(0.97) のように動きの量が
+  // 知覚できる大きさのときだけ。
+  pill: 'inline-flex items-center gap-1.5 self-start px-4 py-2.5 rounded-pill border border-solid border-border bg-surface text-text text-sm font-bold tracking-pill uppercase no-underline cursor-pointer transition-[background,color,transform] motion-reduce:transition-none duration-(--dur-base) ease-standard hover:bg-surface-hover hover:text-accent-soft hover:-translate-y-px',
   wrapper: 'text-inherit no-underline cursor-pointer',
   bare: 'no-underline cursor-pointer',
 };

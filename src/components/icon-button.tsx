@@ -50,8 +50,10 @@ const BASE = `inline-flex shrink-0 items-center justify-center rounded-md cursor
 const VARIANT: Record<IconButtonVariant, string> = {
   surface:
     'bg-surface-2 border border-solid border-border text-text-dim hover:not-data-disabled:bg-surface-hover hover:not-data-disabled:text-text',
+  // ⚠ hover は面変化（#960）。他の 2 variant と同じ形に揃えてある。以前ここだけ
+  // `brightness-[.93]` で、accent の hover が Button の accent と違う出方をしていた。
   accent:
-    'bg-accent border border-solid border-transparent text-on-accent hover:not-data-disabled:brightness-[.93]',
+    'bg-accent border border-solid border-transparent text-on-accent hover:not-data-disabled:bg-accent-hover',
   ghost:
     'bg-transparent border border-solid border-transparent text-text-dim hover:not-data-disabled:bg-surface-hover',
 };

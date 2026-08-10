@@ -17,12 +17,12 @@ export const Tones: Story = {
   render: () => (
     <Section
       title="トーン (DS)"
-      note="live(green) / warn(amber) / danger(coral) / info(blue) / neutral / pro。colored tone は pill、neutral・pro は角丸矩形。"
+      note="success(green) / warning(amber) / accent(coral) / info(blue) / neutral / pro。colored tone は pill、neutral・pro は角丸矩形。⚠ Badge に赤は無い — 否定的な強調はブランドのコーラル(accent)で表す。真の赤が要る状態には StatusBadge か Lozenge の danger を使う。旧名 live / warn / danger も別名として受けるが、新しいコードでは使わないこと(#962)。"
     >
       <div className="flex flex-wrap items-center gap-4">
-        <Badge tone="live">配信中</Badge>
-        <Badge tone="warn">注意</Badge>
-        <Badge tone="danger">エラー</Badge>
+        <Badge tone="success">配信中</Badge>
+        <Badge tone="warning">注意</Badge>
+        <Badge tone="accent">おすすめ</Badge>
         <Badge tone="info">情報</Badge>
         <Badge tone="neutral">下書き</Badge>
         <Badge tone="pro">PRO</Badge>
@@ -38,10 +38,10 @@ export const WithDotAndIcon: Story = {
       note="dot で先頭に同色の 6px 点。icon は IconName か ReactNode（IconName なら size13 で描く）。"
     >
       <div className="flex flex-wrap items-center gap-4">
-        <Badge tone="live" dot>
+        <Badge tone="success" dot>
           LIVE
         </Badge>
-        <Badge tone="warn" icon="warning">
+        <Badge tone="warning" icon="warning">
           容量が少ない
         </Badge>
         <Badge tone="info" icon="check_circle">

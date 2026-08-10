@@ -44,7 +44,14 @@ export type StepperProps = {
 // が暗黙に埋めていたため長く露見しなかった（その基底を撤去した時点で露出した）。
 // data-disabled 側の cursor-not-allowed は `&[data-disabled]` で詳細度が一段高く、常に勝つ。
 const BTN =
-  'w-[30px] h-[30px] pointer-coarse:w-10 pointer-coarse:h-10 p-0 inline-flex items-center justify-center text-lg leading-none rounded-full bg-tint-7 border border-solid border-border text-text-dim cursor-pointer transition-[background,box-shadow] motion-reduce:transition-none hover:not-data-disabled:bg-tint-13 hover:not-data-disabled:shadow-glow data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText]';
+  // ⚠ hover からグローの影を外した(#961)。そのトークンは #463 で値が none にされており、
+  // **光る効果は一度も描画されていなかった**(実際に効いていたのは面色 tint の変化だけ)。
+  // トークンごと削除したので参照も外し、box-shadow の遷移指定も落とす(遷移するものが無い)。
+  // ⚠ 地と hover の tint を 7/13 から 8/12 へ寄せた(#961)。1% 差の段を畳んだもので、
+  //   知覚できる差は無い（theme.css の --color-tint-* の項を参照）。
+  // ⚠ 角丸は DS の pill スケール。以前は Tailwind 既定の full を使っていたが、どちらも
+  //   完全な円で描画は同じ(#961)。
+  'w-[30px] h-[30px] pointer-coarse:w-10 pointer-coarse:h-10 p-0 inline-flex items-center justify-center text-lg leading-none rounded-pill bg-tint-8 border border-solid border-border text-text-dim cursor-pointer transition-colors motion-reduce:transition-none duration-(--dur-fast) ease-standard hover:not-data-disabled:bg-tint-12 data-disabled:opacity-(--disabled-opacity) data-disabled:cursor-not-allowed data-disabled:forced-colors:text-[color:GrayText]';
 
 // 値の表示。移行前は span に min-w-[34px] / text-center / text-lg / font-bold / tabular-nums を
 // 当てていた。<input> になったが、枠・背景・アウトラインを消して同じ見た目に保つ。
@@ -53,7 +60,10 @@ const BTN =
 // ⚠ 素の outline-none は置かない。ブラウザ既定のアウトラインを常時消したうえで、代わりに置いた
 // shadow-focus は α が低くコントラストを満たさないため、キーボードフォーカスが完全に不可視だった。
 // 他の部品と同じトークン参照のアウトラインを出す。
-const VALUE = `text-center text-lg font-bold tabular-nums text-text bg-transparent border-none p-0 ${FOCUS_RING} rounded-sm`;
+// ⚠ 角丸は DS の chip スケール(sm=6px)。以前は Tailwind 既定の sm(4px)で、DS のスケールに
+// 無い値だった(#961)。この入力は枠も背景も持たないので角丸が見えるのはフォーカス
+// アウトラインの形だけで、4px → 6px の差は知覚できない。
+const VALUE = `text-center text-lg font-bold tabular-nums text-text bg-transparent border-none p-0 ${FOCUS_RING} rounded-chip`;
 
 export default function Stepper({
   value,
