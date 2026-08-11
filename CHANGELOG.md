@@ -1,5 +1,107 @@
 # @insession/design-system
 
+## 7.16.0
+
+### Minor Changes
+
+- cc7aed5: モーションのイージングと filled な hover をトークン化する（見た目はほぼ不変）
+
+  DS が管理していない値がモーションと hover に残っており、同じ DS の中で動きの質が揃っていなかった。トークンへ寄せて DS 側から動かせるようにする。
+
+  **追加したトークン**
+
+  - `--ease-standard` (`cubic-bezier(0.2, 0, 0, 1)`) — 色・不透明度・影用のイージング。オーバーシュートしない。
+  - `--color-fill-hover` / `--color-accent-hover` / `--color-success-hover` / `--color-danger-hover` — filled な面の hover 色。
+
+  **イージングをプロパティの種類で使い分ける**
+
+  これまで DS が持つイージングは `--ease-spring` 1 本だけで、足りない分は Tailwind 既定テーマの `ease-out` / `ease-in-out` がそのまま使われていた（実測 6 箇所）。`#117` で `text-xl` 以上を `initial` で塞いだのと同じ「DS が管理していない値が静かに生き続ける」状態にあたる。
+
+  加えて `Button` と `Link`(`pill`) は `transition-[transform,background,color,...]` に `ease-spring` を 1 つ掛けており、**hover の色変化までオーバーシュートしていた**。`--ease-spring` は制御点に 1.56 を持つ、終点を行き過ぎて戻るカーブで、位置や大きさが行き過ぎるのは「弾んだ」と読めるが、色が目標より濃くなって戻るのはちらつきとしてしか知覚されない。
+
+  - `--ease-spring` は形・位置・大きさ（transform / 入場アニメ）専用にする。
+  - 色・不透明度・影は `--ease-standard` を使う。
+  - `TRANSITION_COLORS` にイージング指定を足した（従来は省略され Tailwind 既定が効いていた）。
+  - `Button` は transform だけに spring、色と影は standard を当てる（プロパティごとに別イージングを当てるため `transition` ショートハンドを直接指定する）。
+  - `Link`(`pill`) は standard に統一した。ここの transform は hover 時の 1px の持ち上げだけで、その量では spring のオーバーシュートが知覚できない。
+  - `.accordion-panel` / `.accordion-panel-content` が参照していた Tailwind 既定の `--ease-out` を `--ease-standard` へ移した。
+
+  **filled な hover を面変化へ統一する**
+
+  `hover` の実装が filled=`brightness(.93)` / soft=`bg-surface-hover` / apple=`bg-apple-hover` の 3 通りに割れていたので、全て面変化へ寄せた。`Button` の 5 variant と `IconButton` の `accent` が対象。
+
+  **描画は変わらない。** 新トークンの実体は `color-mix(in srgb, black 7%, X)` で、これは `brightness(0.93)` と数学的に同一（どちらも各チャンネルを 0.93 倍する。`#ff6a47` → 両者とも `#ed6342`）。変わったのは次の 3 点:
+
+  1. `.93` が 6 箇所へ散っていたため hover の強さを DS 側から動かせなかったのが、トークン 1 本で効くようになる。
+  2. `filter` を遷移させなくて済む（`filter` は新しいスタッキングコンテキストを作るため、ボタン内の `Spinner` やアイコンの重なりに影響し得る）。
+  3. 黒地で `brightness` が効かず独自に面変化を採っていた `apple` variant と同じ形になる。
+
+  なお hover で面を**明るくする**方式（Material 3 の state layer のように文字色を重ねる）は採っていない。白ラベルの面に白を混ぜることになり、ラベルのコントラストが下がるため（実測: accent 上の白ラベルが 2.84:1 → 2.63:1、success 上が 2.25:1 → 2.11:1）。`--color-on-accent` の項に書いたとおり、この DS はコントラストを上げたいときに塗り側を暗くする方針を採っている。
+
+- cc7aed5: 死んだトークンを削除し、ティント段を 9 → 5 へ整理する
+
+  **削除したトークン**
+
+  - `--shadow-glow` / `--shadow-glow-strong` — #463 で値が `none` にされたまま名前だけ残っていた。値が `none` のトークンは、参照を書いても何も起きないのに読み手には効果があるように見える。実際 `Stepper` は hover にこれを当て `box-shadow` の遷移まで指定した状態で出荷されていたが、**光る効果は一度も描画されていなかった**（効いていたのは面色の変化だけ）。互換のために残した名前が、消えた効果を生きているように見せる方が有害なので消す。消費側が参照していてもユーティリティが生成されなくなるだけで、描画は `none` のまま変わらない。
+  - `--color-tint-7` / `--color-tint-10` / `--color-tint-13` / `--color-tint-16`
+
+  **ティント段の整理**
+
+  `--color-tint-*` は 3/5/7/8/10/12/13/16/22 の 9 段あった。`--text-*` が `#117` で診断したのと同じ問題で、**7 と 8、12 と 13 のように 1% しか違わない段は誰にも選べない**。実測すると 9 段のうち **10 と 16 はトークン一覧の story にしか現れず、コンポーネントでの使用が 1 つも無かった**。
+
+  削除した段の使用箇所は隣の段へ寄せた（差は 1% で知覚できない）:
+
+  - `tint-7` → `tint-8`（`Stepper` のボタン地）
+  - `tint-13` → `tint-12`（`Stepper` のボタン hover）
+  - `tint-10` / `tint-16` は使用ゼロにつき削除
+
+  `tint-3` と `tint-5` は 2% 差だが両方残した。`UploadTile` が hover と active の対比に使っており、畳むと 2 つの状態が同じ色になるため。
+
+  **Tailwind 既定の角丸を DS スケールへ寄せる**
+
+  DS のスケールに無い Tailwind 既定値が 4 箇所にあった。いずれも描画は変わらないか、知覚できない差にとどまる。
+
+  - `Stepper` のボタン・`MessageItem` の操作チップ: 既定の `full` → DS の `pill`（どちらも完全な円弧）
+  - `Stepper` の値入力: 既定の `sm`(4px) → DS の `chip`(6px)。枠も背景も持たない入力なので、角丸が見えるのはフォーカスアウトラインの形だけ
+  - `Tabs` の下線インジケータ: 既定の `xs` → DS の `pill`（高さ 2px のバーなのでどちらも完全に丸い端になる）
+
+  **カタログの修正**
+
+  - 「グロー(発光)」の節（何も描画しない箱が 2 つ並んでいた）を、カタログに載っていなかった `--shadow-elevation-0`〜`4` の段階スケールの説明へ差し替えた。あわせて「影」の節に、段階スケールと `soft` / `popover` / `overlay` が同じ影を別の呼び方で指すこと・どちらをいつ使うかを書いた。
+  - 半径の説明が `chip(8) / card(14) / panel(20)` のままだった（`#463` で実値が 6 / 16 / 16 へ動いたときに取り残されていた）。
+  - ティントの一覧に載っていなかった `--color-tint-12` を追加した。
+  - イージングの一覧に `--ease-standard` を追加し、プロパティの種類で選ぶことを書いた。
+
+- cc7aed5: ラベル系部品のトーン語彙を統一し、使い分けの基準をカタログに書く
+
+  状態を色で表す部品（`Status` / `Lozenge` / `Badge` / `CountChip`）が、それぞれ独立にトーンの文字列ユニオンを持っていた。**同じ緑を出すのに `tone="live"` と `tone="success"` の 2 通りの書き方**があり、琥珀も `warn` と `warning` に割れていて、部品を乗り換えるたびに呼び出し側の書き換えが要った。
+
+  **描画は変わらない。** 旧名は別名として受け続け、既定値も動かしていない。
+
+  ### 追加
+
+  - `SemanticTone` 型（`success` / `warning` / `danger` / `info` / `neutral`）を公開した。状態を色で表す部品が共有するトーン語彙の単一ソース。新しく同種の部品を足すときは独自のユニオンを書かずにこれを使う。
+  - `Lozenge` に `danger` トーン。それまで Lozenge には赤が無く、「失敗」「期限切れ」のような否定的な工程状態を出せなかった（`accent` のコーラルで代用するしかなく、`Chip` の selected と紛らわしかった）。
+  - `CountChip` に `tone` prop。既定は `success` で従来と同じ。以前は緑に固定されており、未読を `danger`、下書きを `neutral` で出すといった出し分けができなかった。
+  - `--color-danger-surface-strong`。`#765` は `success` / `warning` / `info` にだけ `-strong` を足して `danger` を飛ばしていたので対称にした。
+  - `BadgeToneLegacy` 型（旧 tone 名）。
+
+  ### `Badge` の tone 名を正名へ
+
+  `live` → `success`、`warn` → `warning`、`danger` → `accent`。旧名は別名として受け続けるので**呼び出し側の変更は不要**（描画も 1px 変わらない）。ただし新しいコードでは正名を使うこと。将来のメジャーで旧名を落とす。
+
+  `danger` → `accent` の改名は名前と実態のズレを解消するもの。`Badge` の `danger` が描画するのは**赤ではなくコーラル**で、同じ `tone="danger"` でも `StatusBadge` は赤を出していた。**同名で別色**は呼び出し側から予測できない。色そのものは DS 仕様なので動かさず、名前を実態に合わせた。
+
+  **`Badge` に赤は無い。** 真の赤が要る状態表現には `StatusBadge` か `Lozenge` の `danger` を使う。
+
+  ### カタログ
+
+  `Overview.mdx` に「ラベル系 6 部品の使い分け」の節を足した。上から順に答えて最初に当たったものを選ぶ判断フロー、各部品が表すものの一覧、やってはいけないこと 6 項目。
+
+  この 3 分割（数値 / 状態 / 分類・対話）は Atlassian（Badge / Lozenge / Tag）と Primer（CounterLabel / Label / Token）が独立に到達した同じ軸にあたる。ただし名前は業界と逆で、Atlassian の `Badge` は数値を指すがこの DS の `Badge` は状態、数値は `CountChip` にあたる — その点も明記した。
+
+  `Lozenge` / `CountChip` / `Badge` の story を正名と新トーンに合わせて更新した。
+
 ## 7.15.0
 
 ### Minor Changes
