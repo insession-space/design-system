@@ -35,6 +35,11 @@ export {
   type ButtonVariant,
   default as Button,
 } from './components/button.tsx';
+export {
+  type CalloutProps,
+  type CalloutTone,
+  default as Callout,
+} from './components/callout.tsx';
 export { type CheckboxProps, default as Checkbox } from './components/checkbox.tsx';
 export { type ChipAvatar, type ChipProps, default as Chip } from './components/chip.tsx';
 export {
