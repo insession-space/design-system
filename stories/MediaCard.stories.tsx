@@ -113,6 +113,39 @@ export const Clickable: Story = {
   ),
 };
 
+// #207 の回帰ガード。理由と実測値は media-card.tsx の実装コメントが持つ。
+export const InsideWrapperElement: Story = {
+  render: () => (
+    <Section
+      title="ラッパーを挟んだ配置(#207)"
+      note="grid の直接の子ではなく <div> を1枚挟んで置く。左右のカードが同じ見た目になり、面が1枚のまま・カバーがカード幅を超えないことを確認する。"
+    >
+      <div className="grid grid-cols-2 gap-4">
+        {/* 直接の子(grid item として blockify される。比較用) */}
+        <MediaCard
+          render={<a href="#" />}
+          interactive
+          cover={cover}
+          title="grid の直接の子"
+          meta="比較用"
+          footer={<AvatarStack people={people.slice(0, 2)} size={28} />}
+        />
+        {/* ラッパーを1枚挟む(grid item は div 側。<a> は通常フロー) */}
+        <div>
+          <MediaCard
+            render={<a href="#" />}
+            interactive
+            cover={cover}
+            title="ラッパーの中"
+            meta="#207 で壊れていた側"
+            footer={<AvatarStack people={people.slice(0, 2)} size={28} />}
+          />
+        </div>
+      </div>
+    </Section>
+  ),
+};
+
 export const LongTitleAndMeta: Story = {
   render: () => (
     <Section

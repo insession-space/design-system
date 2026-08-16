@@ -66,7 +66,18 @@ export function MediaCard({
       radius="card"
       padding="lg"
       interactive={interactive}
-      className={className}
+      // #207: カードは常に block レベルのボックスとして描く。既定タグの <div> では自明だが、
+      // `render` で <a> / <button> に差し替えると inline / inline-block になり、grid・flex の
+      // item にならない位置(ラッパー <div> の中など)では padding/border/radius/background の
+      // 付いたインラインボックスが行の切れ目で断片に割れる(実測3断片)。カバーの full-bleed
+      // (下の -mx-4)も親幅を基準にできずカード幅を超える。
+      // `w-full` は足さない — block ボックスは width:auto で containing block の幅いっぱいに
+      // なるので不要な上、twMerge は display と width を別グループとして扱うため、呼び出し側が
+      // `inline-block` を渡しても幅だけ 100% が残る中途半端な状態になる。
+      // ⚠ 同じ穴は Surface の RENDER_RESET_CLASS(display を持たない)にも空いているが、そこへ
+      // 足すと render を使う全 Surface / Card / Paper / Panel に効き、内容幅に縮んでいた
+      // <button> が軒並み幅いっぱいに広がる。ここでは MediaCard に閉じて持たせる。
+      className={`block ${className}`}
       {...rest}
     >
       {(cover || overlay) && (
