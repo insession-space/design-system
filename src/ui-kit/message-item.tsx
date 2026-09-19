@@ -124,6 +124,11 @@ export type MessageItemProps = {
   timestamp?: ReactNode;
   // アバター画像 URL。省略時はアバター無しのコンパクト表示になる。
   avatarSrc?: string | null;
+  // アバターの地の色(CSS の色の値。`var(--color-surface)` のようにトークンを渡す)。Avatar の
+  // bgColor へそのまま渡す。省略時は従来どおり Avatar の既定(bg-info)。
+  // 透過のある画像(ドット絵のキャラクター等)をアバターにすると、既定の地の色がそのまま透けて
+  // 見える。その地を消費側が選べるようにするための口。頭文字フォールバックの地にもなる。
+  avatarBgColor?: string;
   // 投稿本文。テキストに限らずリンク・添付なども差し込める。
   children?: ReactNode;
   // リアクションピルの並び。省略/空配列ならリアクション行を出さない。
@@ -237,6 +242,7 @@ export default function MessageItem({
   authorOnClick,
   timestamp,
   avatarSrc,
+  avatarBgColor,
   children,
   reactions,
   actions,
@@ -426,7 +432,9 @@ export default function MessageItem({
 
   // Avatar は status / ring を指定しないと legacy 経路(見た目を消費側 CSS に依存)を返すため、
   // UserLabel と同じく必ず `ds` を渡して DS 経路で描画させる。
-  const avatarNode = <Avatar ds name={authorName} src={avatarSrc} size={AVATAR_SIZE} />;
+  const avatarNode = (
+    <Avatar ds name={authorName} src={avatarSrc} size={AVATAR_SIZE} bgColor={avatarBgColor} />
+  );
 
   return (
     <HStack gap="sm" align="start" className={rootClass}>

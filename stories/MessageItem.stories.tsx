@@ -85,6 +85,34 @@ export const WithAvatar: Story = {
   ),
 };
 
+// 周囲が透明な画像(中央に小さな図形だけ。ドット絵のキャラクターのような透過アバターの代わり)。
+// 色は AVATAR_SRC と同じ値を使う。
+const TRANSPARENT_AVATAR_SRC =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect x='12' y='12' width='16' height='16' fill='%2312d8c9'/%3E%3C/svg%3E";
+
+export const TransparentAvatarBgColor: Story = {
+  render: () => (
+    <Section
+      title="透過のあるアバターの地の色(avatarBgColor)"
+      note="透過のある画像をアバターにすると、Avatar 既定の地(bg-info)が透けて見える。avatarBgColor にトークン(var(--color-surface) 等)を渡すと地を選べる。上: 省略時(既定の地) / 下: avatarBgColor='var(--color-surface-3)'。"
+    >
+      <div className="flex max-w-xl flex-col gap-3 rounded-card border border-solid border-border bg-surface p-3">
+        <MessageItem authorName="もち" timestamp="01:03" avatarSrc={TRANSPARENT_AVATAR_SRC}>
+          既定の地
+        </MessageItem>
+        <MessageItem
+          authorName="もち"
+          timestamp="01:04"
+          avatarSrc={TRANSPARENT_AVATAR_SRC}
+          avatarBgColor="var(--color-surface-3)"
+        >
+          地をサーフェス色にした
+        </MessageItem>
+      </div>
+    </Section>
+  ),
+};
+
 export const TwoColumnAlignment: Story = {
   render: () => (
     <Section
