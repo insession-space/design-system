@@ -9,7 +9,7 @@ claude.ai/design プロジェクト: **InSession UI** (`b683a5a6-eea2-4cf5-af15-
 - パッケージは単独リポジトリのルート。`stories/` も直下。
 - **同期対象 57 コンポーネント**、11 グループ（`actions` `data-display` `feedback` `foundations` `inputs` `layout` `navigation` `overlays` `page` `patterns` `surfaces`）。前回同期（22件・単一 `components` グループ）から大きく育ち、グループも再編された。
 - グローバル名は **`InsessionDesignSystem`**（`pkg` から自動導出）。`InSessionUi` は旧モノレポ時代（`@in-session/ui`）の名前で**もう存在しない**。
-- ビルド前提: Node 22.18 / pnpm 10 / esbuild は `.ds-sync` にローカル install。
+- ビルド前提: 開発は Node 26 / pnpm 10（利用側の要件は package.json の engines どおり >=22.18） / esbuild は `.ds-sync` にローカル install。
 
 ## この再同期（2026-07-28）で直したこと
 
